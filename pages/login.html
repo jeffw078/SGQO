@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SGQ Online</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/img/logo.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="login-page">
+        <!-- Left Panel - Rotating tips -->
+        <div class="login-left">
+
+            <!-- Logo -->
+            <div class="login-left-logo">
+                <a href="../index.html">
+                    <img src="../assets/img/logo.png" alt="SGQ Online">
+                </a>
+            </div>
+
+            <!-- Rotating Tip -->
+            <div class="login-tip-area">
+                <div class="login-tip-tag">
+                    <span></span> Dica de qualidade
+                </div>
+                <div class="login-tip-text" id="tipText">Uma não conformidade registrada hoje evita uma reclamação de cliente amanhã.</div>
+                <div class="login-tip-author" id="tipAuthor">
+                    <div class="tip-avatar" id="tipAvatar" style="background:#0f75bd">WE</div>
+                    <div>
+                        <div class="tip-author-name" id="tipName">W. Edwards Deming</div>
+                        <div class="tip-author-role" id="tipRole">Pai da Gestão da Qualidade</div>
+                    </div>
+                </div>
+                <div class="login-tip-dots" id="tipDots"></div>
+            </div>
+
+            <!-- Footer - Indicação -->
+            <div class="login-left-footer" style="flex-direction:column;gap:0;padding-top:24px;border-top:1px solid rgba(255,255,255,.08)">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                    <div>
+                        <div style="font-size:.8rem;font-weight:700;color:rgba(255,255,255,.9);text-transform:uppercase;letter-spacing:.8px">
+                            <i class="fas fa-hand-holding-heart" style="color:#10b981;margin-right:6px"></i> Indique uma empresa
+                        </div>
+                        <div style="font-size:.73rem;color:rgba(255,255,255,.35);margin-top:2px">Ajude um colega a organizar o SGQ</div>
+                    </div>
+                    <button class="indicar-toggle-btn" id="indicarToggle" onclick="toggleIndicar()">
+                        <i class="fas fa-chevron-down" id="indicarChevron"></i>
+                    </button>
+                </div>
+
+                <div id="indicarForm" style="display:none">
+                    <form onsubmit="enviarIndicacao(event)" autocomplete="off">
+                        <div style="font-size:.72rem;font-weight:600;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Seus dados</div>
+                        <div class="indic-field-row">
+                            <div class="indic-field">
+                                <label>Seu nome</label>
+                                <input type="text" name="ind_nome" placeholder="Nome completo" required>
+                            </div>
+                            <div class="indic-field">
+                                <label>Seu WhatsApp</label>
+                                <input type="tel" name="ind_tel" placeholder="(11) 99999-9999" required>
+                            </div>
+                        </div>
+
+                        <div style="font-size:.72rem;font-weight:600;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 10px">Empresa indicada</div>
+                        <div class="indic-field-row">
+                            <div class="indic-field">
+                                <label>Nome da empresa</label>
+                                <input type="text" name="emp_nome" placeholder="Razão social" required>
+                            </div>
+                            <div class="indic-field">
+                                <label>Contato na empresa</label>
+                                <input type="text" name="emp_contato" placeholder="Nome do responsável" required>
+                            </div>
+                        </div>
+                        <div class="indic-field">
+                            <label>E-mail corporativo da empresa <span style="color:#ef4444">*</span></label>
+                            <input type="email" name="emp_email" id="empEmail" placeholder="responsavel@empresa.com.br" required oninput="validarEmailCorp(this)">
+                            <div class="indic-err" id="empEmailErr">Use um e-mail corporativo (não gmail, hotmail, etc.)</div>
+                        </div>
+                        <div class="indic-field" style="margin-top:10px">
+                            <label>Telefone da empresa</label>
+                            <input type="tel" name="emp_tel" placeholder="(11) 3000-0000">
+                        </div>
+
+                        <button type="submit" class="indic-submit-btn">
+                            <i class="fas fa-paper-plane"></i> Enviar indicação
+                        </button>
+                        <div id="indicarSucesso" style="display:none;margin-top:12px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);border-radius:var(--radius-md);padding:12px 14px;display:none;align-items:center;gap:10px">
+                            <i class="fas fa-circle-check" style="color:#10b981;font-size:1.1rem"></i>
+                            <div>
+                                <div style="font-size:.82rem;font-weight:700;color:#fff">Indicação recebida!</div>
+                                <div style="font-size:.75rem;color:rgba(255,255,255,.45);margin-top:1px">Entraremos em contato em breve.</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Login Form -->
+        <div class="login-right">
+            <a href="../index.html" class="login-back-mobile" style="display:none;align-items:center;gap:6px;font-size:.82rem;color:var(--text-secondary);text-decoration:none;margin-bottom:28px;position:absolute;top:20px;left:20px">
+                <i class="fas fa-arrow-left"></i> Voltar ao site
+            </a>
+            <div class="login-form-wrapper">
+                <div class="brand">
+                    <img src="../assets/img/logo.png" alt="SGQ Online" style="width:100px;filter:brightness(0)">
+                    
+                </div>
+                <p class="subtitle">Acesse sua conta para continuar</p>
+
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" placeholder="seu@email.com.br" required autocomplete="username">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+
+                    <div class="form-row">
+                        <label>
+                            <input type="checkbox" style="accent-color:var(--primary)"> Lembrar de mim
+                        </label>
+                        <a href="#">Esqueci minha senha</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-login">
+                        <i class="fas fa-arrow-right-to-bracket"></i> Entrar
+                    </button>
+                </form>
+
+                <div class="login-footer">
+                    Não tem uma conta? <a href="cadastro.html">Criar conta grátis</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleLogin(e) {
+            e.preventDefault();
+            window.location.href = 'dashboard.html';
+        }
+
+        // ===== ROTATING TIPS =====
+        const tips = [
+            {
+                text: "Qualidade nunca é um acidente; é sempre o resultado de um esforço inteligente.",
+                name: "John Ruskin", role: "Filósofo e crítico", color: "#0f75bd", initials: "JR"
+            },
+            {
+                text: "Se você não consegue medir, não consegue gerenciar. Indicadores de qualidade são o coração do SGQ.",
+                name: "Peter Drucker", role: "Pai da Administração Moderna", color: "#10b981", initials: "PD"
+            },
+            {
+                text: "A primeira regra de qualquer tecnologia usada em negócios é que automação aplicada a uma operação eficiente vai ampliar a eficiência.",
+                name: "Bill Gates", role: "Empreendedor e filantropo", color: "#8b5cf6", initials: "BG"
+            },
+            {
+                text: "Não conformidades são presentes disfarçados — elas mostram exatamente onde seu processo precisa melhorar.",
+                name: "Princípio ISO 9001", role: "Melhoria contínua (cláusula 10.2)", color: "#f97316", initials: "IS"
+            },
+            {
+                text: "Uma auditoria interna bem conduzida vale mais do que qualquer consultoria externa: ela mostra a realidade do seu SGQ.",
+                name: "Joseph Juran", role: "Pioneiro da Gestão da Qualidade", color: "#ef4444", initials: "JJ"
+            },
+            {
+                text: "85% dos problemas de qualidade são problemas de sistema, não de pessoas. A liderança precisa entender isso.",
+                name: "W. Edwards Deming", role: "Pai da Gestão da Qualidade", color: "#0f75bd", initials: "WD"
+            },
+            {
+                text: "Documentos são evidências. Sem registros, seu SGQ não existe para um auditor — por melhor que seja seu processo.",
+                name: "ISO 9001:2015", role: "Requisito 7.5 — Informação documentada", color: "#f59e0b", initials: "IS"
+            }
+        ];
+
+        let currentTip = 0;
+        let tipTimer;
+
+        const dotsEl = document.getElementById('tipDots');
+        tips.forEach((_, i) => {
+            const d = document.createElement('div');
+            d.className = 'tip-dot' + (i === 0 ? ' active' : '');
+            d.onclick = () => goTip(i);
+            dotsEl.appendChild(d);
+        });
+
+        function renderTip(idx, animate) {
+            const t = tips[idx];
+            const textEl = document.getElementById('tipText');
+            const authorEl = document.getElementById('tipAuthor');
+            const avatarEl = document.getElementById('tipAvatar');
+            const nameEl = document.getElementById('tipName');
+            const roleEl = document.getElementById('tipRole');
+
+            if (animate) {
+                textEl.classList.add('fade-out');
+                authorEl.classList.add('fade-out');
+                setTimeout(() => {
+                    textEl.textContent = t.text;
+                    nameEl.textContent = t.name;
+                    roleEl.textContent = t.role;
+                    avatarEl.style.background = t.color;
+                    avatarEl.textContent = t.initials;
+                    textEl.classList.remove('fade-out');
+                    authorEl.classList.remove('fade-out');
+                }, 460);
+            } else {
+                textEl.textContent = t.text;
+                nameEl.textContent = t.name;
+                roleEl.textContent = t.role;
+                avatarEl.style.background = t.color;
+                avatarEl.textContent = t.initials;
+            }
+            document.querySelectorAll('.tip-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+        }
+
+        function goTip(idx) {
+            clearInterval(tipTimer);
+            currentTip = idx;
+            renderTip(currentTip, true);
+            startTimer();
+        }
+
+        function startTimer() {
+            tipTimer = setInterval(() => {
+                currentTip = (currentTip + 1) % tips.length;
+                renderTip(currentTip, true);
+            }, 6000);
+        }
+
+        renderTip(0, false);
+        startTimer();
+
+        // ===== INDICAÇÃO =====
+        const BLOCKED = ['gmail','googlemail','yahoo','ymail','hotmail','outlook','live','msn',
+            'icloud','me','mac','aol','uol','bol','terra','ig','globo','r7',
+            'protonmail','tutanota','zoho','gmx','mail','inbox','yandex','rambler'];
+
+        function isPersonalEmail(email) {
+            const domain = (email.split('@')[1] || '').split('.')[0].toLowerCase();
+            return BLOCKED.includes(domain);
+        }
+
+        function validarEmailCorp(input) {
+            const errEl = document.getElementById('empEmailErr');
+            const invalid = !input.value || isPersonalEmail(input.value);
+            errEl.style.display = invalid && input.value ? 'block' : 'none';
+            input.style.borderColor = invalid && input.value ? '#ef4444' : '';
+        }
+
+        function toggleIndicar() {
+            const form = document.getElementById('indicarForm');
+            const chevron = document.getElementById('indicarChevron');
+            const open = form.style.display === 'none';
+            form.style.display = open ? 'block' : 'none';
+            chevron.style.transform = open ? 'rotate(180deg)' : '';
+        }
+
+        function enviarIndicacao(e) {
+            e.preventDefault();
+            const f = e.target;
+            const empEmail = f.emp_email.value.trim();
+            if (isPersonalEmail(empEmail)) {
+                document.getElementById('empEmailErr').style.display = 'block';
+                document.getElementById('empEmail').style.borderColor = '#ef4444';
+                return;
+            }
+            // Show success message and reset form
+            f.reset();
+            const sucesso = document.getElementById('indicarSucesso');
+            sucesso.style.display = 'flex';
+            setTimeout(() => {
+                sucesso.style.display = 'none';
+                document.getElementById('indicarForm').style.display = 'none';
+                document.getElementById('indicarChevron').style.transform = '';
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

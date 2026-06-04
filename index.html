@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGQ Online - Gestão da Qualidade Inteligente | ISO 9001</title>
+    <meta name="description" content="Sistema inteligente de gestão da qualidade que guia sua empresa passo a passo para atender a ISO 9001. Elimine planilhas e organize seu SGQ.">
+    <link rel="icon" type="image/svg+xml" href="assets/img/logo.png">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <a href="#" class="navbar-brand">
+                <img src="assets/img/logo.png"  style="width:100px;">
+               
+            </a>
+            <ul class="nav-links">
+                <li><a href="#modulos">Módulos</a></li>
+                <li><a href="#beneficios">Benefícios</a></li>
+                <li><a href="#planos">Planos</a></li>
+                <li><a href="#contato">Contato</a></li>
+                <li><a href="pages/blog.html">Blog</a></li>
+            </ul>
+            <div class="nav-cta">
+                <a href="pages/login.html" class="btn btn-outline btn-sm">Entrar</a>
+                <a href="pages/cadastro.html" class="btn btn-primary btn-sm">Teste Grátis</a>
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-shield-halved"></i>
+                    Alinhado à ISO 9001:2015
+                </div>
+                <h1>Gestão da Qualidade <span>Inteligente</span> para <span class="industry-rotator" id="industryText">sua Indústria</span></h1>
+                <p>Sistema que guia sua empresa passo a passo para atender a ISO 9001. Elimine planilhas, organize processos e passe em auditorias sem dor.</p>
+                <div class="hero-buttons">
+                    <a href="pages/cadastro.html" class="btn btn-primary btn-lg">
+                        <i class="fas fa-rocket"></i> Começar Agora
+                    </a>
+                    <a href="#modulos" class="btn btn-outline btn-lg" style="color:#fff;border-color:rgba(255,255,255,.4)">
+                        <i class="fas fa-play-circle"></i> Ver Módulos
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="number">13</div>
+                        <div class="label">Módulos Integrados</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="number">100%</div>
+                        <div class="label">ISO 9001 Coberta</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="number">IA</div>
+                        <div class="label">Análise Inteligente</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Preview -->
+            <div class="hero-visual">
+                <div class="hero-dashboard-preview">
+                    <div class="dashboard-header-mini">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                    <div class="mini-chart-row">
+                        <div class="mini-card">
+                            <div class="mini-label">Conformidade ISO</div>
+                            <div class="mini-value">87%</div>
+                            <div class="mini-trend up"><i class="fas fa-arrow-up"></i> +12% este mês</div>
+                        </div>
+                        <div class="mini-card">
+                            <div class="mini-label">Não Conformidades</div>
+                            <div class="mini-value">5</div>
+                            <div class="mini-trend down"><i class="fas fa-arrow-down"></i> -3 pendentes</div>
+                        </div>
+                    </div>
+                    <div class="mini-chart-row">
+                        <div class="mini-card">
+                            <div class="mini-label">Auditorias</div>
+                            <div class="mini-value">3</div>
+                            <div class="mini-trend up"><i class="fas fa-check"></i> Programadas</div>
+                        </div>
+                        <div class="mini-card">
+                            <div class="mini-label">Documentos</div>
+                            <div class="mini-value">142</div>
+                            <div class="mini-trend up"><i class="fas fa-arrow-up"></i> Controlados</div>
+                        </div>
+                    </div>
+                    <div class="mini-card" style="margin-top:4px">
+                        <div class="mini-label">Indicadores do Mês</div>
+                        <div class="mini-bars">
+                            <div class="mini-bar" style="height:60%"></div>
+                            <div class="mini-bar" style="height:80%"></div>
+                            <div class="mini-bar" style="height:45%"></div>
+                            <div class="mini-bar" style="height:90%"></div>
+                            <div class="mini-bar" style="height:70%"></div>
+                            <div class="mini-bar" style="height:55%"></div>
+                            <div class="mini-bar" style="height:85%"></div>
+                            <div class="mini-bar" style="height:75%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating Cards -->
+                <div class="floating-card card-1">
+                    <div class="fc-icon" style="background:rgba(16,185,129,.12);color:#10b981">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="fc-title">Auditoria Aprovada</div>
+                    <div class="fc-value">ISO 9001 - requisito 8.5</div>
+                </div>
+                <div class="floating-card card-2">
+                    <div class="fc-icon" style="background:rgba(15,117,189,.12);color:#0f75bd">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="fc-title">IA Analisando</div>
+                    <div class="fc-value">Documento avaliado</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SOCIAL PROOF STRIP ===== -->
+    <div class="social-proof-strip">
+        <div class="container">
+            <div class="proof-numbers">
+                <div class="proof-item">
+                    <div class="proof-icon"><i class="fas fa-building"></i></div>
+                    <div class="proof-val">+1.200</div>
+                    <div class="proof-lbl">Empresas ativas</div>
+                </div>
+                <div class="proof-item">
+                    <div class="proof-icon" style="background:rgba(16,185,129,.08);color:var(--accent)"><i class="fas fa-rotate"></i></div>
+                    <div class="proof-val">97%</div>
+                    <div class="proof-lbl">Taxa de renovação</div>
+                </div>
+                <div class="proof-item">
+                    <div class="proof-icon" style="background:rgba(139,92,246,.08);color:var(--purple)"><i class="fas fa-cubes"></i></div>
+                    <div class="proof-val">13</div>
+                    <div class="proof-lbl">Módulos integrados</div>
+                </div>
+                <div class="proof-item">
+                    <div class="proof-icon" style="background:rgba(249,115,22,.08);color:var(--orange)"><i class="fas fa-shield-halved"></i></div>
+                    <div class="proof-val">100%</div>
+                    <div class="proof-lbl">ISO 9001 coberta</div>
+                </div>
+                <div class="proof-item">
+                    <div class="proof-icon" style="background:rgba(245,158,11,.08);color:var(--warning)"><i class="fas fa-clock"></i></div>
+                    <div class="proof-val">15 dias</div>
+                    <div class="proof-lbl">Teste grátis</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MÓDULOS ===== -->
+    <section class="section" id="modulos">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag"><i class="fas fa-cubes"></i> Módulos</div>
+                <h2>Tudo que sua empresa precisa em um só lugar</h2>
+                <p>13 módulos integrados que cobrem 100% dos requisitos da ISO 9001, desde documentos até gestão de riscos.</p>
+            </div>
+
+            <div class="modules-grid">
+                <!-- Controle de Documentos -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(15,117,189,.1);color:var(--primary)">
+                        <i class="fas fa-file-lines"></i>
+                    </div>
+                    <h4>Controle de Documentos</h4>
+                    <p>Versões, aprovação, histórico, validade e distribuição controlada. Chega de documentos perdidos.</p>
+                    <span class="module-tag">requisito 7.5</span>
+                </div>
+
+                <!-- BPM -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">
+                        <i class="fas fa-diagram-project"></i>
+                    </div>
+                    <h4>BPM / Processos</h4>
+                    <p>Mapeamento visual de processos, fluxos de trabalho automatizados e controle de etapas.</p>
+                    <span class="module-tag">requisitos 4.4, 8.1</span>
+                </div>
+
+                <!-- Inspeções -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <h4>Inspeções e Liberação</h4>
+                    <p>Inspeção de produto com checklists dinâmicos e liberação com critérios configuráveis.</p>
+                    <span class="module-tag">requisitos 8.5, 8.6</span>
+                </div>
+
+                <!-- Saídas Não Conformes -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(239,68,68,.1);color:var(--danger)">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </div>
+                    <h4>Saídas Não Conformes</h4>
+                    <p>Registro, segregação, disposição e rastreabilidade de produtos não conformes.</p>
+                    <span class="module-tag">requisito 8.7</span>
+                </div>
+
+                <!-- Não Conformidades -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h4>Não Conformidades</h4>
+                    <p>Registro completo de NCs, análise de causa raiz, ações corretivas e verificação de eficácia.</p>
+                    <span class="module-tag">requisito 10.2</span>
+                </div>
+
+                <!-- Planos de Ação -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(245,158,11,.1);color:var(--warning)">
+                        <i class="fas fa-list-check"></i>
+                    </div>
+                    <h4>Planos de Ação</h4>
+                    <p>5W2H integrado, acompanhamento de prazos, responsáveis e status em tempo real.</p>
+                    <span class="module-tag">requisito 10.2</span>
+                </div>
+
+                <!-- Calibração -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(15,117,189,.1);color:var(--primary)">
+                        <i class="fas fa-ruler-combined"></i>
+                    </div>
+                    <h4>Calibração de Equipamentos</h4>
+                    <p>Gestão de instrumentos, planos de calibração, certificados e alertas de vencimento.</p>
+                    <span class="module-tag">requisito 7.1.5</span>
+                </div>
+
+                <!-- Fornecedores -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h4>Avaliação de Fornecedores</h4>
+                    <p>Critérios de avaliação, reavaliação periódica, score de desempenho e histórico.</p>
+                    <span class="module-tag">requisito 8.4</span>
+                </div>
+
+                <!-- Gestão de Pessoas -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h4>Pessoas e Treinamentos</h4>
+                    <p>Matriz de competências, plano de treinamentos, registros e avaliação de eficácia.</p>
+                    <span class="module-tag">requisitos 7.2, 7.3</span>
+                </div>
+
+                <!-- Satisfação do Cliente -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">
+                        <i class="fas fa-face-smile"></i>
+                    </div>
+                    <h4>Satisfação e Reclamações</h4>
+                    <p>Pesquisa de satisfação, gestão de reclamações, análise de tendências e feedback.</p>
+                    <span class="module-tag">requisitos 8.2.1, 9.1.2</span>
+                </div>
+
+                <!-- Auditorias -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(239,68,68,.1);color:var(--danger)">
+                        <i class="fas fa-magnifying-glass-chart"></i>
+                    </div>
+                    <h4>Auditorias Internas</h4>
+                    <p>Plano de auditorias, checklists, registro de evidências, relatórios e acompanhamento.</p>
+                    <span class="module-tag">requisito 9.2</span>
+                </div>
+
+                <!-- Indicadores -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(245,158,11,.1);color:var(--warning)">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>Indicadores e KPIs</h4>
+                    <p>Dashboards automáticos, metas, gráficos de tendência e análise de desempenho em tempo real.</p>
+                    <span class="module-tag">requisitos 6.2, 9.1</span>
+                </div>
+
+                <!-- Gestão de Riscos -->
+                <div class="module-card">
+                    <div class="module-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <h4>Gestão de Riscos</h4>
+                    <p>Matriz de riscos e oportunidades, planos de mitigação, monitoramento e reavaliação.</p>
+                    <span class="module-tag">requisito 6.1</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== BENEFÍCIOS ===== -->
+    <section class="section" id="beneficios" style="background:#fff">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag"><i class="fas fa-star"></i> Benefícios</div>
+                <h2>Por que escolher o SGQ Online?</h2>
+                <p>Mais do que um sistema — um guia inteligente para a conformidade da sua empresa.</p>
+            </div>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon" style="background:rgba(15,117,189,.1);color:var(--primary)">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h4>IA Integrada</h4>
+                    <p>Análise inteligente de documentos, sugestões de melhoria e score de maturidade ISO automático.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h4>Simples e Rápido</h4>
+                    <p>Interface limpa e intuitiva. Qualquer colaborador consegue usar sem treinamento extenso.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h4>Guia Passo a Passo</h4>
+                    <p>O sistema mostra exatamente o que fazer, quando fazer e se está correto para a ISO 9001.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h4>Alertas Automáticos</h4>
+                    <p>Notificações de documentos vencidos, calibrações pendentes, prazos de ação e auditorias.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon" style="background:rgba(239,68,68,.1);color:var(--danger)">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h4>Dashboards em Tempo Real</h4>
+                    <p>Visão completa da qualidade da sua empresa. KPIs, gráficos e relatórios automáticos.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon" style="background:rgba(245,158,11,.1);color:var(--warning)">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <h4>100% na Nuvem</h4>
+                    <p>Acesse de qualquer lugar, a qualquer momento. Dados seguros com backup automático.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== COMO FUNCIONA ===== -->
+    <section class="how-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag"><i class="fas fa-route"></i> Como Funciona</div>
+                <h2>Do cadastro à certificação em 4 passos</h2>
+                <p>Sem curva de aprendizado longa. Você configura, o sistema guia.</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card" data-delay="0">
+                    <div class="step-num">1</div>
+                    <h4>Configure sua empresa</h4>
+                    <p>Importe seus documentos existentes, defina processos e adicione sua equipe em minutos.</p>
+                </div>
+                <div class="step-card" data-delay="150">
+                    <div class="step-num">2</div>
+                    <h4>A IA analisa seus gaps</h4>
+                    <p>Nossa IA mapeia automaticamente quais requisitos da ISO 9001 já estão cobertos e o que falta.</p>
+                </div>
+                <div class="step-card" data-delay="300">
+                    <div class="step-num">3</div>
+                    <h4>Execute o plano guiado</h4>
+                    <p>O sistema cria um roteiro personalizado com tarefas, prazos e responsáveis para fechar cada gap.</p>
+                </div>
+                <div class="step-card" data-delay="450">
+                    <div class="step-num">4</div>
+                    <h4>Passe na auditoria</h4>
+                    <p>Com evidências organizadas, dashboards de conformidade e relatórios prontos, a auditoria fica simples.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== DEPOIMENTOS ===== -->
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag"><i class="fas fa-quote-left"></i> Depoimentos</div>
+                <h2>Empresas que confiam no SGQ Online</h2>
+                <p>De pequenas metalúrgicas a redes de saúde — veja quem já transformou sua gestão da qualidade.</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <div class="testimonial-text">Reduzimos nossas não conformidades em 68% em 4 meses. O módulo de análise de causa raiz guiado pela IA fez toda a diferença. Nossa auditoria de renovação foi aprovada sem nenhuma oportunidade de melhoria maior.</div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar" style="background:var(--primary)">RL</div>
+                        <div>
+                            <div class="testimonial-name">Ricardo Lima</div>
+                            <div class="testimonial-role">Gerente de Qualidade · Metalúrgica do Sul</div>
+                            <span class="testimonial-tag">Indústria Metal-mecânica</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <div class="testimonial-text">Conseguimos nossa primeira certificação ISO 9001 em apenas 8 meses. O guia passo a passo do sistema mostrou exatamente o que precisávamos fazer. Antes gastávamos horas procurando documentos — agora tudo está organizado.</div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar" style="background:var(--accent)">PC</div>
+                        <div>
+                            <div class="testimonial-name">Patrícia Cunha</div>
+                            <div class="testimonial-role">Diretora de Operações · Clínica Saúde+</div>
+                            <span class="testimonial-tag">Saúde e Hospitalar</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <div class="testimonial-text">Usávamos 14 planilhas diferentes para o SGQ. Com o SGQ Online, centralizamos tudo e nossa equipe de qualidade ficou 3 vezes mais produtiva. Os dashboards automáticos mudaram a forma como apresentamos resultados para a diretoria.</div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar" style="background:var(--orange)">FM</div>
+                        <div>
+                            <div class="testimonial-name">Felipe Moraes</div>
+                            <div class="testimonial-role">Coordenador da Qualidade · Alimentos BV</div>
+                            <span class="testimonial-tag">Indústria Alimentícia</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SECONDARY CTA ===== -->
+    <section class="cta-secondary">
+        <div class="container">
+            <div class="cta-secondary-inner">
+                <div>
+                    <h2>Sua empresa está a 15 dias de ter um SGQ organizado</h2>
+                    <p>Sem planilhas, sem confusão. Configure em minutos e veja o resultado no seu dashboard.</p>
+                </div>
+                <div class="cta-secondary-actions">
+                    <a href="pages/cadastro.html" class="btn btn-white btn-lg">
+                        <i class="fas fa-rocket"></i> Começar grátis agora
+                    </a>
+                    <div class="cta-trust">
+                        <i class="fas fa-shield-halved"></i> Sem cartão de crédito &nbsp;·&nbsp;
+                        <i class="fas fa-clock"></i> Cancele quando quiser
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PLANOS ===== -->
+    <section class="section pricing-section" id="planos">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag"><i class="fas fa-tags"></i> Planos</div>
+                <h2>Escolha o plano ideal para sua empresa</h2>
+                <p>Comece grátis por 15 dias. Sem cartão de crédito. Cancele quando quiser.</p>
+            </div>
+
+            <div class="pricing-grid">
+                <!-- Essencial -->
+                <div class="pricing-card">
+                    <div class="plan-name">Essencial</div>
+                    <div class="plan-price">R$ 299<span>/mês</span></div>
+                    <div class="plan-desc">Ideal para pequenas empresas que querem sair do Excel</div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Até 5 usuários</li>
+                        <li><i class="fas fa-check"></i> Controle de Documentos</li>
+                        <li><i class="fas fa-check"></i> Não Conformidades</li>
+                        <li><i class="fas fa-check"></i> Planos de Ação (5W2H)</li>
+                        <li><i class="fas fa-check"></i> Dashboard básico</li>
+                        <li><i class="fas fa-check"></i> 5 análises IA / mês</li>
+                        <li class="disabled"><i class="fas fa-xmark"></i> Auditorias internas</li>
+                        <li class="disabled"><i class="fas fa-xmark"></i> BPM / Processos</li>
+                        <li class="disabled"><i class="fas fa-xmark"></i> Gestão de Riscos</li>
+                    </ul>
+                    <a href="pages/cadastro.html" class="btn btn-outline" style="width:100%;justify-content:center">Começar Grátis</a>
+                </div>
+
+                <!-- Profissional -->
+                <div class="pricing-card featured">
+                    <div class="popular-badge">Mais Popular</div>
+                    <div class="plan-name">Profissional</div>
+                    <div class="plan-price">R$ 699<span>/mês</span></div>
+                    <div class="plan-desc">Para empresas que precisam de conformidade completa</div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Até 15 usuários</li>
+                        <li><i class="fas fa-check"></i> Todos os 13 módulos</li>
+                        <li><i class="fas fa-check"></i> BPM / Workflow completo</li>
+                        <li><i class="fas fa-check"></i> Auditorias internas</li>
+                        <li><i class="fas fa-check"></i> Gestão de Riscos</li>
+                        <li><i class="fas fa-check"></i> 100 análises IA / mês</li>
+                        <li><i class="fas fa-check"></i> Indicadores avançados</li>
+                        <li><i class="fas fa-check"></i> Suporte prioritário</li>
+                        <li><i class="fas fa-check"></i> Score de maturidade ISO</li>
+                    </ul>
+                    <a href="pages/cadastro.html" class="btn btn-primary" style="width:100%;justify-content:center">Começar Grátis</a>
+                </div>
+
+                <!-- Industrial -->
+                <div class="pricing-card">
+                    <div class="plan-name">Industrial</div>
+                    <div class="plan-price">R$ 1.499<span>/mês</span></div>
+                    <div class="plan-desc">Para indústrias com operação de chão de fábrica</div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Até 50 usuários</li>
+                        <li><i class="fas fa-check"></i> Todos os 13 módulos</li>
+                        <li><i class="fas fa-check"></i> Modo tablet / chão de fábrica</li>
+                        <li><i class="fas fa-check"></i> 200+ análises IA / mês</li>
+                        <li><i class="fas fa-check"></i> Multiunidade</li>
+                        <li><i class="fas fa-check"></i> Integrações (API / ERP)</li>
+                        <li><i class="fas fa-check"></i> IA avançada + preditiva</li>
+                        <li><i class="fas fa-check"></i> Suporte dedicado</li>
+                        <li><i class="fas fa-check"></i> Onboarding assistido</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline" style="width:100%;justify-content:center" onclick="openConsultorModal(event)">Falar com Consultor</a>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="comparison-wrap" id="comparacao">
+                <div class="comparison-toggle" onclick="toggleComparison(this)">
+                    <i class="fas fa-table-list"></i> Ver comparativo completo dos planos
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="comparison-table-wrap" style="display:none">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Recurso / Módulo</th>
+                                <th><span class="plan-badge">Essencial<br><small>R$299/mês</small></span></th>
+                                <th><span class="plan-badge featured">Profissional<br><small>R$699/mês</small></span></th>
+                                <th><span class="plan-badge">Industrial<br><small>R$1.499/mês</small></span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="group-row"><td colspan="4"><i class="fas fa-users"></i> Usuários e Acesso</td></tr>
+                            <tr><td>Usuários incluídos</td><td>5</td><td>15</td><td>50</td></tr>
+                            <tr><td>Usuários adicionais</td><td class="no"><i class="fas fa-xmark"></i></td><td>+R$39/usuário</td><td>+R$25/usuário</td></tr>
+                            <tr><td>Perfis de acesso (RBAC)</td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Multiunidade / filiais</td><td class="no"><i class="fas fa-xmark"></i></td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Modo tablet / chão de fábrica</td><td class="no"><i class="fas fa-xmark"></i></td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+
+                            <tr class="group-row"><td colspan="4"><i class="fas fa-file-lines"></i> Controle de Documentos (7.5)</td></tr>
+                            <tr><td>Controle de versões</td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Aprovação e distribuição</td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Alertas de validade</td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Assinatura digital</td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+
+                            <tr class="group-row"><td colspan="4"><i class="fas fa-diagram-project"></i> BPM / Processos (4.4, 8.1)</td></tr>
+                            <tr><td>Mapeamento visual de processos</td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Workflow automatizado</td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+
+                            <tr class="group-row"><td colspan="4"><i class="fas fa-clipboard-check"></i> Inspeções e Não Conformidades (8.5–10.2)</td></tr>
+                            <tr><td>Inspeções com checklists</td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Saídas não conformes (8.7)</td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Não Conformidades + causa raiz</td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Planos de ação 5W2H</td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+
+                            <tr class="group-row"><td colspan="4"><i class="fas fa-ruler-combined"></i> Calibração e Fornecedores</td></tr>
+                            <tr><td>Calibração de equipamentos (7.1.5)</td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Avaliação de fornecedores (8.4)</td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+
+                            <tr class="group-row"><td colspan="4"><i class="fas fa-chart-line"></i> Gestão Estratégica e Indicadores</td></tr>
+                            <tr><td>Dashboard básico</td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Indicadores e KPIs avançados (6.2, 9.1)</td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Gestão de Riscos (6.1)</td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Auditorias internas (9.2)</td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Satisfação e reclamações (8.2.1, 9.1.2)</td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Pessoas e treinamentos (7.2, 7.3)</td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+
+                            <tr class="group-row"><td colspan="4"><i class="fas fa-brain"></i> Inteligência Artificial</td></tr>
+                            <tr><td>Análises IA / mês</td><td>5</td><td>100</td><td>200+</td></tr>
+                            <tr><td>Score de maturidade ISO</td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>IA preditiva avançada</td><td class="no"><i class="fas fa-xmark"></i></td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+
+                            <tr class="group-row"><td colspan="4"><i class="fas fa-plug"></i> Integrações e Suporte</td></tr>
+                            <tr><td>Integrações API / ERP</td><td class="no"><i class="fas fa-xmark"></i></td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Suporte</td><td>E-mail</td><td>Prioritário</td><td>Dedicado</td></tr>
+                            <tr><td>Onboarding assistido</td><td class="no"><i class="fas fa-xmark"></i></td><td class="no"><i class="fas fa-xmark"></i></td><td><i class="fas fa-check yes"></i></td></tr>
+                            <tr><td>Teste grátis</td><td>15 dias</td><td>15 dias</td><td>15 dias</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="cta-section" id="contato">
+        <div class="container">
+            <h2>Pronto para organizar seu SGQ?</h2>
+            <p>Comece agora com 15 dias grátis e descubra como a gestão da qualidade pode ser simples.</p>
+            <div class="cta-buttons">
+                <a href="pages/cadastro.html" class="btn btn-white btn-lg">
+                    <i class="fas fa-rocket"></i> Começar Teste Grátis
+                </a>
+                <a href="#" class="btn btn-lg" style="color:#fff;border-color:rgba(255,255,255,.4)" onclick="openConsultorModal(event)">
+                    <i class="fab fa-whatsapp"></i> Falar com Consultor
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">
+                          <img src="assets/img/logo.png"  style="width:100px;">
+                       
+                    </div>
+                    <p style="font-size:.9rem;max-width:300px">Sistema inteligente de gestão da qualidade para indústrias. Guia sua empresa passo a passo na conformidade ISO 9001.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Produto</h4>
+                    <ul>
+                        <li><a href="#modulos">Módulos</a></li>
+                        <li><a href="#beneficios">Benefícios</a></li>
+                        <li><a href="#planos">Planos</a></li>
+                        <li><a href="#">Roadmap</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Recursos</h4>
+                    <ul>
+                        <li><a href="#">Central de Ajuda</a></li>
+                        <li><a href="#">Documentação</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">API</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contato</h4>
+                    <ul>
+                        <li><a href="#"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                        <li><a href="#">contato@sgqonline.com.br</a></li>
+                        <li><a href="#">Santa Catarina, Brasil</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 SGQ Online. Todos os direitos reservados.</span>
+                <span>Feito com <i class="fas fa-heart" style="color:var(--danger)"></i> por DataBooster</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== CONSULTOR MODAL ===== -->
+    <div class="modal-overlay" id="consultorModal" onclick="closeConsultorModal(event)">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeConsultorModal()" aria-label="Fechar"><i class="fas fa-xmark"></i></button>
+            <div class="modal-header">
+                <div class="modal-icon"><i class="fab fa-whatsapp"></i></div>
+                <h3>Falar com Consultor</h3>
+                <p>Preencha os dados e enviaremos sua mensagem pelo WhatsApp.</p>
+            </div>
+            <form class="modal-form" id="consultorForm" onsubmit="sendConsultorWhatsApp(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome completo <span>*</span></label>
+                        <input type="text" name="nome" placeholder="Seu nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail corporativo <span>*</span></label>
+                        <input type="email" name="email" placeholder="voce@suaempresa.com.br" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Empresa <span>*</span></label>
+                        <input type="text" name="empresa" placeholder="Nome da empresa" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone / WhatsApp <span>*</span></label>
+                        <input type="tel" name="telefone" placeholder="(11) 99999-9999" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ramo de atividade <span>*</span></label>
+                        <select name="ramo" required>
+                            <option value="">Selecione...</option>
+                            <option>Indústria Metalúrgica / Metal-mecânica</option>
+                            <option>Indústria Alimentícia / Bebidas</option>
+                            <option>Construção Civil / Engenharia</option>
+                            <option>Saúde / Hospitalar / Clínicas</option>
+                            <option>Laboratórios de Análise / P&D</option>
+                            <option>Tecnologia da Informação / Software</option>
+                            <option>Logística / Transporte</option>
+                            <option>Automotivo / Autopeças</option>
+                            <option>Farmacêutico / Cosméticos</option>
+                            <option>Agronegócio / Agroquímica</option>
+                            <option>Têxtil / Confecção</option>
+                            <option>Prestação de Serviços</option>
+                            <option>Comércio / Varejo</option>
+                            <option>Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de funcionários <span>*</span></label>
+                        <select name="funcionarios" required>
+                            <option value="">Selecione...</option>
+                            <option>1 a 10</option>
+                            <option>11 a 50</option>
+                            <option>51 a 200</option>
+                            <option>201 a 500</option>
+                            <option>Mais de 500</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Como podemos ajudar?</label>
+                    <textarea name="mensagem" rows="3" placeholder="Descreva sua necessidade..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-accent" style="width:100%;justify-content:center;font-size:1rem;padding:14px">
+                    <i class="fab fa-whatsapp"></i> Enviar pelo WhatsApp
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                const href = a.getAttribute('href');
+                if (href === '#') return;
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Mobile toggle
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (navToggle) {
+            navToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('open');
+            });
+        }
+
+        // ===== STEP CARDS ANIMATION =====
+        const stepObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const delay = entry.target.dataset.delay || 0;
+                    setTimeout(() => entry.target.classList.add('visible'), Number(delay));
+                    stepObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.2 });
+        document.querySelectorAll('.step-card').forEach(card => stepObserver.observe(card));
+
+        // ===== INDUSTRY ROTATOR =====
+        const industries = [
+            'sua Indústria',
+            'a Metalurgia',
+            'a Construção Civil',
+            'a Alimentação',
+            'a Saúde e Hospitais',
+            'Laboratórios',
+            'a Tecnologia',
+            'a Logística',
+            'o Agronegócio',
+            'o Setor Automotivo',
+            'o Farmacêutico',
+            'o Têxtil',
+            'Prestadores de Serviço',
+            'o Comércio',
+        ];
+        let industryIdx = 0;
+        const industryEl = document.getElementById('industryText');
+        setInterval(() => {
+            industryEl.classList.add('fade-out');
+            setTimeout(() => {
+                industryIdx = (industryIdx + 1) % industries.length;
+                industryEl.textContent = industries[industryIdx];
+                industryEl.classList.remove('fade-out');
+            }, 400);
+        }, 2800);
+
+        // ===== COMPARISON TOGGLE =====
+        function toggleComparison(btn) {
+            const wrap = btn.nextElementSibling;
+            const icon = btn.querySelector('.toggle-icon');
+            const open = wrap.style.display === 'none';
+            wrap.style.display = open ? 'block' : 'none';
+            icon.style.transform = open ? 'rotate(180deg)' : '';
+        }
+
+        // ===== CONSULTOR MODAL =====
+        function openConsultorModal(e) {
+            if (e) e.preventDefault();
+            document.getElementById('consultorModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeConsultorModal(e) {
+            if (e && e.target !== document.getElementById('consultorModal')) return;
+            document.getElementById('consultorModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeConsultorModal();
+        });
+
+        function sendConsultorWhatsApp(e) {
+            e.preventDefault();
+            const f = e.target;
+            const nome = f.nome.value.trim();
+            const empresa = f.empresa.value.trim();
+            const ramo = f.ramo.value;
+            const funcionarios = f.funcionarios.value;
+            const telefone = f.telefone.value.trim();
+            const email = f.email.value.trim();
+            const msg = f.mensagem.value.trim();
+            const text = [
+                `Olá! Gostaria de falar com um consultor SGQ Online.`,
+                ``,
+                `*Nome:* ${nome}`,
+                `*Empresa:* ${empresa}`,
+                `*Ramo:* ${ramo}`,
+                `*Funcionários:* ${funcionarios}`,
+                `*Telefone:* ${telefone}`,
+                `*E-mail:* ${email}`,
+                msg ? `*Mensagem:* ${msg}` : ''
+            ].filter(Boolean).join('%0A');
+            window.open(`https://wa.me/5500000000000?text=${text}`, '_blank');
+            document.getElementById('consultorModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    </script>
+</body>
+</html>

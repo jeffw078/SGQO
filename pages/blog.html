@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog – SGQ Online | Gestão da Qualidade e ISO 9001</title>
+    <meta name="description" content="Artigos, guias e dicas sobre ISO 9001, gestão da qualidade, auditorias e melhoria contínua para sua empresa.">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body style="background:var(--light)">
+
+<!-- ===== NAVBAR ===== -->
+<nav class="blog-navbar">
+    <div class="container">
+        <a href="../index.html" class="navbar-brand" style="color:var(--dark)">
+            <img src="../assets/img/logo.png" style="height:36px">
+        </a>
+        <ul class="blog-nav-links">
+            <li><a href="blog.html" style="color:var(--primary);font-weight:700">Blog</a></li>
+            <li><a href="../index.html#modulos">Módulos</a></li>
+            <li><a href="../index.html#planos">Planos</a></li>
+        </ul>
+        <div style="display:flex;gap:10px">
+            <a href="login.html" class="btn btn-outline btn-sm">Entrar</a>
+            <a href="cadastro.html" class="btn btn-primary btn-sm">Teste Grátis</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="blog-hero">
+    <div class="container">
+        <div class="hero-badge" style="margin:0 auto 16px;width:fit-content">
+            <i class="fas fa-pen-nib"></i> Blog SGQ Online
+        </div>
+        <h1>Gestão da Qualidade na Prática</h1>
+        <p>Artigos, guias e estratégias para implementar e manter a ISO 9001 em qualquer segmento.</p>
+        <div class="blog-search">
+            <input type="text" placeholder="Buscar artigos sobre qualidade..." id="searchInput" oninput="filterPosts()">
+            <button><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CONTENT ===== -->
+<div class="container">
+    <div class="blog-layout">
+
+        <!-- ===== MAIN ===== -->
+        <main class="blog-main">
+
+            <!-- Categories -->
+            <div class="blog-categories" id="catFilters">
+                <button class="blog-cat-btn active" data-cat="todos" onclick="setCategory(this,'todos')">Todos</button>
+                <button class="blog-cat-btn" data-cat="ISO 9001" onclick="setCategory(this,'ISO 9001')">ISO 9001</button>
+                <button class="blog-cat-btn" data-cat="Auditoria" onclick="setCategory(this,'Auditoria')">Auditoria</button>
+                <button class="blog-cat-btn" data-cat="Não Conformidade" onclick="setCategory(this,'Não Conformidade')">Não Conformidades</button>
+                <button class="blog-cat-btn" data-cat="Indicadores" onclick="setCategory(this,'Indicadores')">Indicadores & KPIs</button>
+                <button class="blog-cat-btn" data-cat="Documentos" onclick="setCategory(this,'Documentos')">Documentos</button>
+                <button class="blog-cat-btn" data-cat="IA" onclick="setCategory(this,'IA')">IA na Qualidade</button>
+            </div>
+
+            <!-- Featured Post -->
+            <div class="blog-featured" id="featuredPost">
+                <div class="blog-featured-img"><i class="fas fa-award"></i></div>
+                <div class="blog-featured-body">
+                    <span class="blog-featured-tag">ISO 9001</span>
+                    <div class="blog-meta">
+                        <span class="author">
+                            <div class="author-avatar">MR</div> Marcos Ribeiro
+                        </span>
+                        <span><i class="fas fa-calendar"></i> 2 jun 2026</span>
+                        <span><i class="fas fa-clock"></i> 8 min</span>
+                    </div>
+                    <h2>ISO 9001:2015 — Guia Completo para Iniciantes: do Zero à Certificação</h2>
+                    <p>Entenda cada cláusula da norma, como estruturar seu SGQ e o que os auditores realmente verificam durante a certificação.</p>
+                    <a href="blog-post.html" class="btn btn-primary btn-sm">
+                        Ler artigo completo <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Blog Grid -->
+            <div class="blog-grid" id="blogGrid">
+
+                <!-- Post 1 -->
+                <article class="blog-card" data-cat="Não Conformidade">
+                    <div class="blog-card-img" style="background:linear-gradient(135deg,#ef4444,#b91c1c)">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <div class="blog-card-body">
+                        <span class="blog-card-tag" style="background:rgba(239,68,68,.1);color:#ef4444">Não Conformidade</span>
+                        <h4>Como reduzir em 70% as Não Conformidades com Análise de Causa Raiz</h4>
+                        <p>Aprenda o método dos 5 Porquês e o Diagrama de Ishikawa na prática, com exemplos reais de indústrias.</p>
+                        <div class="blog-card-footer">
+                            <div class="blog-meta" style="margin:0">
+                                <span><i class="fas fa-calendar"></i> 28 mai 2026</span>
+                                <span><i class="fas fa-clock"></i> 6 min</span>
+                            </div>
+                            <a href="blog-post.html" class="read-more">Ler <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 2 -->
+                <article class="blog-card" data-cat="Auditoria">
+                    <div class="blog-card-img" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
+                        <i class="fas fa-magnifying-glass-chart"></i>
+                    </div>
+                    <div class="blog-card-body">
+                        <span class="blog-card-tag" style="background:rgba(139,92,246,.1);color:#8b5cf6">Auditoria</span>
+                        <h4>Checklist de Auditoria Interna ISO 9001: 47 Pontos Essenciais</h4>
+                        <p>Baixe e use nosso checklist completo para auditar todos os requisitos da ISO 9001:2015 em sua empresa.</p>
+                        <div class="blog-card-footer">
+                            <div class="blog-meta" style="margin:0">
+                                <span><i class="fas fa-calendar"></i> 20 mai 2026</span>
+                                <span><i class="fas fa-clock"></i> 5 min</span>
+                            </div>
+                            <a href="blog-post.html" class="read-more">Ler <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- AD INLINE (spans full grid) -->
+                <div class="blog-card ad-banner inline" style="grid-column:1/-1;background:#111827">
+                    <div class="ad-label">Publicidade</div>
+                    <h4>Deixe de usar planilhas para gerir a qualidade</h4>
+                    <p>Automatize auditorias, não conformidades e indicadores com o SGQ Online.</p>
+                    <a href="cadastro.html" class="btn btn-white btn-sm">Teste 15 dias grátis</a>
+                </div>
+
+                <!-- Post 3 -->
+                <article class="blog-card" data-cat="Indicadores">
+                    <div class="blog-card-img" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="blog-card-body">
+                        <span class="blog-card-tag" style="background:rgba(245,158,11,.1);color:#f59e0b">Indicadores</span>
+                        <h4>10 KPIs de Qualidade que todo Gestor precisa acompanhar</h4>
+                        <p>Taxa de retrabalho, PPM de defeitos, eficácia de ações corretivas e mais. Veja como calculá-los.</p>
+                        <div class="blog-card-footer">
+                            <div class="blog-meta" style="margin:0">
+                                <span><i class="fas fa-calendar"></i> 12 mai 2026</span>
+                                <span><i class="fas fa-clock"></i> 7 min</span>
+                            </div>
+                            <a href="blog-post.html" class="read-more">Ler <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 4 -->
+                <article class="blog-card" data-cat="Documentos">
+                    <div class="blog-card-img" style="background:linear-gradient(135deg,#0f75bd,#0a5a94)">
+                        <i class="fas fa-file-lines"></i>
+                    </div>
+                    <div class="blog-card-body">
+                        <span class="blog-card-tag">Documentos</span>
+                        <h4>Controle de Documentos na ISO 9001: o que realmente é obrigatório</h4>
+                        <p>Muitas empresas criam documentos desnecessários. Entenda o mínimo obrigatório e como organizar tudo.</p>
+                        <div class="blog-card-footer">
+                            <div class="blog-meta" style="margin:0">
+                                <span><i class="fas fa-calendar"></i> 5 mai 2026</span>
+                                <span><i class="fas fa-clock"></i> 6 min</span>
+                            </div>
+                            <a href="blog-post.html" class="read-more">Ler <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 5 -->
+                <article class="blog-card" data-cat="IA">
+                    <div class="blog-card-img" style="background:linear-gradient(135deg,#10b981,#059669)">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="blog-card-body">
+                        <span class="blog-card-tag" style="background:rgba(16,185,129,.1);color:#10b981">IA na Qualidade</span>
+                        <h4>Como a Inteligência Artificial está revolucionando a Gestão da Qualidade</h4>
+                        <p>Análise preditiva de falhas, revisão automática de documentos e score de maturidade ISO com IA.</p>
+                        <div class="blog-card-footer">
+                            <div class="blog-meta" style="margin:0">
+                                <span><i class="fas fa-calendar"></i> 28 abr 2026</span>
+                                <span><i class="fas fa-clock"></i> 9 min</span>
+                            </div>
+                            <a href="blog-post.html" class="read-more">Ler <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 6 -->
+                <article class="blog-card" data-cat="ISO 9001">
+                    <div class="blog-card-img" style="background:linear-gradient(135deg,#f97316,#c2410c)">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <div class="blog-card-body">
+                        <span class="blog-card-tag" style="background:rgba(249,115,22,.1);color:#f97316">ISO 9001</span>
+                        <h4>ISO 9001 na Construção Civil: desafios e como superar cada requisito</h4>
+                        <p>O setor construtivo tem particularidades únicas. Veja como adaptar o SGQ para obras, projetos e contratos.</p>
+                        <div class="blog-card-footer">
+                            <div class="blog-meta" style="margin:0">
+                                <span><i class="fas fa-calendar"></i> 18 abr 2026</span>
+                                <span><i class="fas fa-clock"></i> 7 min</span>
+                            </div>
+                            <a href="blog-post.html" class="read-more">Ler <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 7 -->
+                <article class="blog-card" data-cat="Auditoria">
+                    <div class="blog-card-img" style="background:linear-gradient(135deg,#6d28d9,#4c1d95)">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="blog-card-body">
+                        <span class="blog-card-tag" style="background:rgba(139,92,246,.1);color:#8b5cf6">Auditoria</span>
+                        <h4>Erros que reprovam empresas na auditoria de certificação ISO 9001</h4>
+                        <p>Os 8 motivos mais comuns de reprovação e como evitá-los antes da visita do auditor externo.</p>
+                        <div class="blog-card-footer">
+                            <div class="blog-meta" style="margin:0">
+                                <span><i class="fas fa-calendar"></i> 10 abr 2026</span>
+                                <span><i class="fas fa-clock"></i> 5 min</span>
+                            </div>
+                            <a href="blog-post.html" class="read-more">Ler <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 8 -->
+                <article class="blog-card" data-cat="Indicadores">
+                    <div class="blog-card-img" style="background:linear-gradient(135deg,#0c2340,#1a3a5c)">
+                        <i class="fas fa-gauge-high"></i>
+                    </div>
+                    <div class="blog-card-body">
+                        <span class="blog-card-tag" style="background:rgba(245,158,11,.1);color:#f59e0b">Indicadores</span>
+                        <h4>Balanced Scorecard na ISO 9001: como alinhar estratégia à qualidade</h4>
+                        <p>Integre os objetivos da qualidade (cláusula 6.2) com o BSC para ter uma gestão estratégica sólida.</p>
+                        <div class="blog-card-footer">
+                            <div class="blog-meta" style="margin:0">
+                                <span><i class="fas fa-calendar"></i> 1 abr 2026</span>
+                                <span><i class="fas fa-clock"></i> 8 min</span>
+                            </div>
+                            <a href="blog-post.html" class="read-more">Ler <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </article>
+
+            </div><!-- /blog-grid -->
+
+            <!-- Pagination -->
+            <div class="blog-pagination">
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+
+        </main>
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="blog-sidebar">
+
+            <!-- Ad Banner Top -->
+            <div class="ad-banner" style="background:#111827">
+                <div class="ad-label">Publicidade</div>
+                <h4>SGQ Online</h4>
+                <p>Gerencie sua ISO 9001 com inteligência artificial.</p>
+                <a href="cadastro.html" class="btn btn-white btn-sm">Teste Grátis</a>
+            </div>
+
+            <!-- Recent Posts -->
+            <div class="sidebar-widget">
+                <h5>Recentes</h5>
+                <div class="sidebar-post">
+                    <div class="sidebar-post-img"><i class="fas fa-award"></i></div>
+                    <div>
+                        <div class="sidebar-post-title">ISO 9001:2015 — Guia Completo para Iniciantes</div>
+                        <div class="sidebar-post-date">2 jun 2026</div>
+                    </div>
+                </div>
+                <div class="sidebar-post">
+                    <div class="sidebar-post-img"><i class="fas fa-bug"></i></div>
+                    <div>
+                        <div class="sidebar-post-title">Como reduzir 70% das NCs com Causa Raiz</div>
+                        <div class="sidebar-post-date">28 mai 2026</div>
+                    </div>
+                </div>
+                <div class="sidebar-post">
+                    <div class="sidebar-post-img"><i class="fas fa-magnifying-glass-chart"></i></div>
+                    <div>
+                        <div class="sidebar-post-title">Checklist de Auditoria: 47 Pontos Essenciais</div>
+                        <div class="sidebar-post-date">20 mai 2026</div>
+                    </div>
+                </div>
+                <div class="sidebar-post">
+                    <div class="sidebar-post-img"><i class="fas fa-chart-line"></i></div>
+                    <div>
+                        <div class="sidebar-post-title">10 KPIs de Qualidade todo Gestor precisa acompanhar</div>
+                        <div class="sidebar-post-date">12 mai 2026</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Banner Middle -->
+            <div class="ad-banner" style="background:#059669">
+                <div class="ad-label">Publicidade</div>
+                <h4>Conformidade em 15 dias</h4>
+                <p>Organize todos os requisitos da ISO 9001 com apoio de IA.</p>
+                <a href="cadastro.html" class="btn btn-white btn-sm">Saiba mais</a>
+            </div>
+
+            <!-- Tags -->
+            <div class="sidebar-widget">
+                <h5>Tags</h5>
+                <div class="sidebar-tags">
+                    <span class="sidebar-tag">ISO 9001</span>
+                    <span class="sidebar-tag">Auditoria</span>
+                    <span class="sidebar-tag">PDCA</span>
+                    <span class="sidebar-tag">Não Conformidade</span>
+                    <span class="sidebar-tag">5W2H</span>
+                    <span class="sidebar-tag">KPIs</span>
+                    <span class="sidebar-tag">Documentos</span>
+                    <span class="sidebar-tag">Risco</span>
+                    <span class="sidebar-tag">Calibração</span>
+                    <span class="sidebar-tag">Fornecedores</span>
+                    <span class="sidebar-tag">Inteligência Artificial</span>
+                    <span class="sidebar-tag">FMEA</span>
+                    <span class="sidebar-tag">5S</span>
+                    <span class="sidebar-tag">Ishikawa</span>
+                </div>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="sidebar-widget" style="background:linear-gradient(135deg,var(--dark),var(--dark-700));color:#fff">
+                <h5 style="color:rgba(255,255,255,.5)">Newsletter</h5>
+                <p style="font-size:.85rem;color:rgba(255,255,255,.65);margin-bottom:14px">Receba artigos sobre qualidade toda semana.</p>
+                <input type="email" placeholder="seu@email.com.br" style="width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:none;margin-bottom:10px;font-family:inherit;font-size:.88rem">
+                <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center">
+                    <i class="fas fa-paper-plane"></i> Inscrever-se
+                </button>
+            </div>
+
+        </aside>
+
+    </div><!-- /blog-layout -->
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer" style="margin-top:0">
+    <div class="container">
+        <div class="footer-bottom">
+            <span>&copy; 2026 SGQ Online. Todos os direitos reservados.</span>
+            <span><a href="blog-admin.html" style="color:rgba(255,255,255,.3);font-size:.8rem">Admin Blog</a></span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    let currentCat = 'todos';
+
+    function setCategory(btn, cat) {
+        currentCat = cat;
+        document.querySelectorAll('.blog-cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterPosts();
+    }
+
+    function filterPosts() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('#blogGrid .blog-card[data-cat]').forEach(card => {
+            const cat = card.dataset.cat;
+            const title = card.querySelector('h4').textContent.toLowerCase();
+            const matchCat = currentCat === 'todos' || cat === currentCat;
+            const matchQ = !q || title.includes(q);
+            card.style.display = (matchCat && matchQ) ? '' : 'none';
+        });
+    }
+</script>
+</body>
+</html>

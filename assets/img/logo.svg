@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Blue square background -->
+  <rect width="200" height="200" rx="24" fill="#0f75bd"/>
+  
+  <!-- Three white checkmarks -->
+  <!-- Check 1 (top) -->
+  <polyline points="58,52 78,72 118,32" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Check 2 (middle) -->
+  <polyline points="58,90 78,110 118,70" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Check 3 (bottom) -->
+  <polyline points="58,128 78,148 118,108" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- SGQ text -->
+  <text x="100" y="186" font-family="Inter, Arial, Helvetica, sans-serif" font-size="40" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="4">SGQ</text>
+</svg>

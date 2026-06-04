@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta Grátis – SGQ Online</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="cadastro-page">
+    <div class="cadastro-card">
+
+        <div class="cadastro-logo">
+            <img src="../assets/img/logo.png" alt="SGQ Online">
+        </div>
+
+        <div class="cadastro-header">
+            <h2>Comece grátis por 15 dias</h2>
+            <p>Sem cartão de crédito. Cancele quando quiser.</p>
+        </div>
+
+        <!-- Steps indicator -->
+        <div class="cadastro-steps">
+            <div class="step-item active" id="step-ind-1">
+                <div class="step-dot">1</div>
+                <div class="step-label">Acesso</div>
+            </div>
+            <div class="step-item" id="step-ind-2">
+                <div class="step-dot">2</div>
+                <div class="step-label">Empresa</div>
+            </div>
+            <div class="step-item" id="step-ind-3">
+                <div class="step-dot">3</div>
+                <div class="step-label">Qualidade</div>
+            </div>
+        </div>
+
+        <form class="cadastro-form" id="cadastroForm" novalidate>
+
+            <!-- STEP 1: Dados de acesso -->
+            <div class="cadastro-form-step active" id="step1">
+                <div class="form-group">
+                    <label>Nome completo <span>*</span></label>
+                    <input type="text" id="nome" placeholder="Seu nome completo" required>
+                    <div class="field-error" id="err-nome">Por favor, informe seu nome.</div>
+                </div>
+                <div class="form-group">
+                    <label>E-mail corporativo <span>*</span></label>
+                    <input type="email" id="email" placeholder="voce@suaempresa.com.br" required>
+                    <div class="field-error" id="err-email">Use um e-mail corporativo (não gmail, hotmail, etc.).</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Senha <span>*</span></label>
+                        <input type="password" id="senha" placeholder="Mínimo 8 caracteres" required minlength="8">
+                        <div class="field-error" id="err-senha">Mínimo 8 caracteres.</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar senha <span>*</span></label>
+                        <input type="password" id="senha2" placeholder="Repita a senha" required>
+                        <div class="field-error" id="err-senha2">As senhas não conferem.</div>
+                    </div>
+                </div>
+                <div class="cadastro-nav">
+                    <button type="button" class="btn btn-primary" onclick="goStep(2)">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Dados da empresa -->
+            <div class="cadastro-form-step" id="step2">
+                <div class="form-group">
+                    <label>Nome da empresa <span>*</span></label>
+                    <input type="text" id="empresa" placeholder="Razão social ou nome fantasia" required>
+                    <div class="field-error" id="err-empresa">Informe o nome da empresa.</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ramo de atividade <span>*</span></label>
+                        <select id="ramo" required>
+                            <option value="">Selecione...</option>
+                            <option>Indústria Metal­úrgica / Metal­mecânica</option>
+                            <option>Indústria Alimentícia / Bebidas</option>
+                            <option>Construção Civil / Engenharia</option>
+                            <option>Saúde / Hospitalar / Clínicas</option>
+                            <option>Laboratórios de Análise / P&amp;D</option>
+                            <option>Tecnologia da Informação / Software</option>
+                            <option>Logística / Transporte</option>
+                            <option>Automotivo / Autopeças</option>
+                            <option>Farmacêutico / Cosméticos</option>
+                            <option>Agronegócio / Agroquímica</option>
+                            <option>Têxtil / Confecção</option>
+                            <option>Prestação de Serviços</option>
+                            <option>Comércio / Varejo</option>
+                            <option>Outro</option>
+                        </select>
+                        <div class="field-error" id="err-ramo">Selecione o ramo.</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de funcionários <span>*</span></label>
+                        <select id="funcionarios" required>
+                            <option value="">Selecione...</option>
+                            <option>1 a 10</option>
+                            <option>11 a 50</option>
+                            <option>51 a 200</option>
+                            <option>201 a 500</option>
+                            <option>Mais de 500</option>
+                        </select>
+                        <div class="field-error" id="err-funcionarios">Selecione o porte.</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cidade <span>*</span></label>
+                        <input type="text" id="cidade" placeholder="Ex.: Joinville" required>
+                        <div class="field-error" id="err-cidade">Informe a cidade.</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado <span>*</span></label>
+                        <select id="estado" required>
+                            <option value="">Selecione...</option>
+                            <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+                            <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+                            <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+                            <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+                            <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+                            <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+                            <option>SP</option><option>SE</option><option>TO</option>
+                        </select>
+                        <div class="field-error" id="err-estado">Selecione o estado.</div>
+                    </div>
+                </div>
+                <div class="cadastro-nav">
+                    <button type="button" class="btn btn-outline" onclick="goStep(1)">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="goStep(3)">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Perfil de qualidade -->
+            <div class="cadastro-form-step" id="step3">
+                <div class="form-group">
+                    <label>Sua empresa já possui certificação ISO 9001? <span>*</span></label>
+                    <select id="certificacao" required>
+                        <option value="">Selecione...</option>
+                        <option value="nao">Não possui certificação</option>
+                        <option value="em_processo">Está em processo de certificação</option>
+                        <option value="sim_menos1">Sim, certificada há menos de 1 ano</option>
+                        <option value="sim_1_3">Sim, certificada há 1 a 3 anos</option>
+                        <option value="sim_mais3">Sim, certificada há mais de 3 anos</option>
+                    </select>
+                    <div class="field-error" id="err-certificacao">Informe o status de certificação.</div>
+                </div>
+                <div class="form-group">
+                    <label>Qual o seu principal desafio com a qualidade hoje?</label>
+                    <select id="desafio">
+                        <option value="">Selecione (opcional)...</option>
+                        <option>Organizar documentos e registros</option>
+                        <option>Reduzir não conformidades</option>
+                        <option>Preparar para auditoria</option>
+                        <option>Engajar a equipe com a qualidade</option>
+                        <option>Medir indicadores e KPIs</option>
+                        <option>Implementar o SGQ do zero</option>
+                        <option>Manter a certificação existente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Como conheceu o SGQ Online?</label>
+                    <select id="origem">
+                        <option value="">Selecione (opcional)...</option>
+                        <option>Google / Busca orgânica</option>
+                        <option>Redes sociais</option>
+                        <option>Indicação de colega</option>
+                        <option>LinkedIn</option>
+                        <option>Evento / Feira</option>
+                        <option>Consultor de qualidade</option>
+                        <option>Outro</option>
+                    </select>
+                </div>
+
+                <div style="background:rgba(15,117,189,.06);border:1.5px solid rgba(15,117,189,.15);border-radius:var(--radius-md);padding:16px 18px;margin-bottom:20px;font-size:.84rem;color:var(--text-secondary);">
+                    <i class="fas fa-shield-halved" style="color:var(--primary);margin-right:6px;"></i>
+                    Ao criar sua conta você concorda com os <a href="#" style="color:var(--primary)">Termos de Uso</a> e a <a href="#" style="color:var(--primary)">Política de Privacidade</a>.
+                </div>
+
+                <div class="cadastro-nav">
+                    <button type="button" class="btn btn-outline" onclick="goStep(2)">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> Criar conta grátis
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="cadastro-trial-badge">
+            <strong>15 dias grátis</strong> · Sem cartão de crédito · Cancele quando quiser
+        </div>
+        <div style="text-align:center;margin-top:18px;font-size:.85rem;color:var(--text-light)">
+            Já tem conta? <a href="login.html" style="color:var(--primary);font-weight:600">Entrar</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BLOCKED_DOMAINS = [
+        'gmail','googlemail','yahoo','ymail','hotmail','outlook','live','msn',
+        'icloud','me','mac','aol','uol','bol','terra','ig','globo','r7',
+        'protonmail','tutanota','zoho','gmx','mail','inbox','yandex','rambler'
+    ];
+
+    function isPersonalEmail(email) {
+        const domain = email.split('@')[1];
+        if (!domain) return true;
+        const base = domain.split('.')[0].toLowerCase();
+        return BLOCKED_DOMAINS.includes(base);
+    }
+
+    function showErr(id, show) {
+        const el = document.getElementById('err-' + id);
+        if (el) el.classList.toggle('show', show);
+        const input = document.getElementById(id);
+        if (input) input.classList.toggle('error', show);
+    }
+
+    function validateStep(n) {
+        let ok = true;
+        if (n === 1) {
+            const nome = document.getElementById('nome').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value;
+            const senha2 = document.getElementById('senha2').value;
+            if (!nome) { showErr('nome', true); ok = false; } else showErr('nome', false);
+            if (!email || isPersonalEmail(email)) { showErr('email', true); ok = false; } else showErr('email', false);
+            if (senha.length < 8) { showErr('senha', true); ok = false; } else showErr('senha', false);
+            if (!senha2 || senha !== senha2) { showErr('senha2', true); ok = false; } else showErr('senha2', false);
+        }
+        if (n === 2) {
+            const empresa = document.getElementById('empresa').value.trim();
+            const ramo = document.getElementById('ramo').value;
+            const funcionarios = document.getElementById('funcionarios').value;
+            const cidade = document.getElementById('cidade').value.trim();
+            const estado = document.getElementById('estado').value;
+            if (!empresa) { showErr('empresa', true); ok = false; } else showErr('empresa', false);
+            if (!ramo) { showErr('ramo', true); ok = false; } else showErr('ramo', false);
+            if (!funcionarios) { showErr('funcionarios', true); ok = false; } else showErr('funcionarios', false);
+            if (!cidade) { showErr('cidade', true); ok = false; } else showErr('cidade', false);
+            if (!estado) { showErr('estado', true); ok = false; } else showErr('estado', false);
+        }
+        if (n === 3) {
+            const cert = document.getElementById('certificacao').value;
+            if (!cert) { showErr('certificacao', true); ok = false; } else showErr('certificacao', false);
+        }
+        return ok;
+    }
+
+    function goStep(n) {
+        const current = parseInt(document.querySelector('.cadastro-form-step.active').id.replace('step', ''));
+        if (n > current && !validateStep(current)) return;
+        document.querySelectorAll('.cadastro-form-step').forEach(s => s.classList.remove('active'));
+        document.getElementById('step' + n).classList.add('active');
+        document.querySelectorAll('.step-item').forEach((el, i) => {
+            el.classList.remove('active', 'done');
+            if (i + 1 < n) el.classList.add('done');
+            if (i + 1 === n) el.classList.add('active');
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('cadastroForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!validateStep(3)) return;
+        // Show success state
+        const card = document.querySelector('.cadastro-card');
+        card.innerHTML = `
+            <div style="text-align:center;padding:40px 20px">
+                <div style="width:80px;height:80px;border-radius:50%;background:rgba(16,185,129,.1);color:var(--accent);font-size:2.5rem;display:inline-flex;align-items:center;justify-content:center;margin-bottom:20px">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2 style="color:var(--dark);margin-bottom:10px">Conta criada com sucesso!</h2>
+                <p style="max-width:380px;margin:0 auto 28px">Seu período de teste de 15 dias começou agora. Verifique seu e-mail para confirmar o acesso.</p>
+                <a href="login.html" class="btn btn-primary btn-lg" style="justify-content:center">
+                    <i class="fas fa-arrow-right"></i> Acessar o Sistema
+                </a>
+            </div>`;
+    });
+</script>
+</body>
+</html>
