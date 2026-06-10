@@ -1,9 +1,3 @@
-# Dashboard e módulos internos (não publicar ainda)
-pages/dashboard.html
-pages/bpm.html
-pages/documentos.html
-pages/blog-admin.html
-
 # Backend Python
 backend/
 

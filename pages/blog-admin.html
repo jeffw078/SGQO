@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Admin - SGQ Online</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { margin: 0; background: var(--light); }
+        .view { display: none; }
+        .view.active { display: block; }
+    </style>
+</head>
+<body>
+<div class="blog-admin-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="admin-sidebar">
+        <div class="admin-logo">
+            <img src="../assets/img/logo.png" alt="SGQ Online">
+        </div>
+        <a class="admin-nav-item active" onclick="showView('dashboard',this)">
+            <i class="fas fa-chart-pie"></i> Dashboard
+        </a>
+        <a class="admin-nav-item" onclick="showView('posts',this)">
+            <i class="fas fa-newspaper"></i> Posts
+        </a>
+        <a class="admin-nav-item" onclick="showView('novo',this)">
+            <i class="fas fa-plus-circle"></i> Novo Post
+        </a>
+        <a class="admin-nav-item" onclick="showView('categorias',this)">
+            <i class="fas fa-tags"></i> Categorias
+        </a>
+        <a class="admin-nav-item" onclick="showView('midias',this)">
+            <i class="fas fa-images"></i> Mídias
+        </a>
+        <a class="admin-nav-item" onclick="showView('comments',this)">
+            <i class="fas fa-comments"></i> Comentários
+        </a>
+        <a class="admin-nav-item" onclick="showView('ads',this)">
+            <i class="fas fa-rectangle-ad"></i> Anúncios
+        </a>
+        <a class="admin-nav-item" style="margin-top:auto" href="blog.html" target="_blank">
+            <i class="fas fa-arrow-up-right-from-square"></i> Ver Blog
+        </a>
+        <a class="admin-nav-item" href="login.html">
+            <i class="fas fa-right-from-bracket"></i> Sair
+        </a>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main class="admin-main">
+
+        <!-- ===== DASHBOARD VIEW ===== -->
+        <div class="view active" id="view-dashboard">
+            <div class="admin-topbar">
+                <h2>Dashboard do Blog</h2>
+                <button class="btn btn-primary btn-sm" onclick="showView('novo', document.querySelector('[onclick*=novo]'))">
+                    <i class="fas fa-plus"></i> Novo Post
+                </button>
+            </div>
+
+            <div class="admin-stats">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    <div class="admin-stat-value">24</div>
+                    <div class="admin-stat-label">Posts publicados</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="admin-stat-value">18.4k</div>
+                    <div class="admin-stat-label">Visualizações no mês</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)">
+                        <i class="fas fa-file-pen"></i>
+                    </div>
+                    <div class="admin-stat-value">3</div>
+                    <div class="admin-stat-label">Rascunhos</div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="admin-stat-value">12</div>
+                    <div class="admin-stat-label">Comentários pendentes</div>
+                </div>
+            </div>
+
+            <!-- Recent Posts Table -->
+            <div class="admin-table-card">
+                <div class="admin-table-header">
+                    <h4>Posts Recentes</h4>
+                    <button class="btn btn-outline btn-sm" onclick="showView('posts', document.querySelector('[onclick*=posts]'))">Ver todos</button>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Categoria</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                            <th>Visualiz.</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="max-width:280px;font-weight:600;color:var(--dark)">ISO 9001:2015 - Guia Completo para Iniciantes</td>
+                            <td>ISO 9001</td>
+                            <td><span class="status-badge published">Publicado</span></td>
+                            <td>02/06/2026</td>
+                            <td>3.241</td>
+                            <td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td>
+                        </tr>
+                        <tr>
+                            <td style="max-width:280px;font-weight:600;color:var(--dark)">Como reduzir 70% das NCs com Causa Raiz</td>
+                            <td>Não Conformidade</td>
+                            <td><span class="status-badge published">Publicado</span></td>
+                            <td>28/05/2026</td>
+                            <td>2.180</td>
+                            <td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td>
+                        </tr>
+                        <tr>
+                            <td style="max-width:280px;font-weight:600;color:var(--dark)">Checklist de Auditoria: 47 Pontos Essenciais</td>
+                            <td>Auditoria</td>
+                            <td><span class="status-badge published">Publicado</span></td>
+                            <td>20/05/2026</td>
+                            <td>1.930</td>
+                            <td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td>
+                        </tr>
+                        <tr>
+                            <td style="max-width:280px;font-weight:600;color:var(--dark)">BSC e ISO 9001: alinhando estratégia à qualidade</td>
+                            <td>Indicadores</td>
+                            <td><span class="status-badge draft">Rascunho</span></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td>
+                        </tr>
+                        <tr>
+                            <td style="max-width:280px;font-weight:600;color:var(--dark)">IA na Gestão da Qualidade: o futuro chegou</td>
+                            <td>IA na Qualidade</td>
+                            <td><span class="status-badge scheduled">Agendado</span></td>
+                            <td>10/06/2026</td>
+                            <td>-</td>
+                            <td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Quick performance chart placeholder -->
+            <div class="admin-table-card">
+                <div class="admin-table-header">
+                    <h4>Posts mais visitados</h4>
+                </div>
+                <div style="padding:24px">
+                    <div id="topPostsChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== POSTS VIEW ===== -->
+        <div class="view" id="view-posts">
+            <div class="admin-topbar">
+                <h2>Todos os Posts</h2>
+                <div style="display:flex;gap:10px;align-items:center">
+                    <input type="text" placeholder="Buscar post..." style="padding:9px 14px;border:1.5px solid var(--light-200);border-radius:var(--radius-md);font-size:.88rem;font-family:inherit">
+                    <select style="padding:9px 14px;border:1.5px solid var(--light-200);border-radius:var(--radius-md);font-size:.88rem;font-family:inherit">
+                        <option>Todos os status</option>
+                        <option>Publicado</option>
+                        <option>Rascunho</option>
+                        <option>Agendado</option>
+                    </select>
+                    <button class="btn btn-primary btn-sm" onclick="showView('novo', document.querySelector('[onclick*=novo]'))">
+                        <i class="fas fa-plus"></i> Novo
+                    </button>
+                </div>
+            </div>
+            <div class="admin-table-card">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox"></th>
+                            <th>Título</th>
+                            <th>Categoria</th>
+                            <th>Autor</th>
+                            <th>Status</th>
+                            <th>Publicado</th>
+                            <th>Visualiz.</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><input type="checkbox"></td><td style="font-weight:600;color:var(--dark)">ISO 9001:2015 - Guia Completo</td><td>ISO 9001</td><td>Marcos Ribeiro</td><td><span class="status-badge published">Publicado</span></td><td>02/06/2026</td><td>3.241</td><td><div class="action-btns"><button class="action-btn edit" onclick="showView('novo',document.querySelector('[onclick*=novo]'))"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                        <tr><td><input type="checkbox"></td><td style="font-weight:600;color:var(--dark)">Como reduzir 70% das NCs</td><td>Não Conformidade</td><td>Ana Lima</td><td><span class="status-badge published">Publicado</span></td><td>28/05/2026</td><td>2.180</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                        <tr><td><input type="checkbox"></td><td style="font-weight:600;color:var(--dark)">Checklist de Auditoria Interna</td><td>Auditoria</td><td>Carlos Mendes</td><td><span class="status-badge published">Publicado</span></td><td>20/05/2026</td><td>1.930</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                        <tr><td><input type="checkbox"></td><td style="font-weight:600;color:var(--dark)">10 KPIs de Qualidade essenciais</td><td>Indicadores</td><td>Marcos Ribeiro</td><td><span class="status-badge published">Publicado</span></td><td>12/05/2026</td><td>1.720</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                        <tr><td><input type="checkbox"></td><td style="font-weight:600;color:var(--dark)">BSC e ISO 9001</td><td>Indicadores</td><td>Ana Lima</td><td><span class="status-badge draft">Rascunho</span></td><td>-</td><td>-</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                        <tr><td><input type="checkbox"></td><td style="font-weight:600;color:var(--dark)">IA na Gestão da Qualidade</td><td>IA na Qualidade</td><td>Carlos Mendes</td><td><span class="status-badge scheduled">Agendado</span></td><td>10/06/2026</td><td>-</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== NOVO POST VIEW ===== -->
+        <div class="view" id="view-novo">
+            <div class="admin-topbar">
+                <h2>Novo Post</h2>
+                <div style="display:flex;gap:10px">
+                    <button class="btn btn-outline btn-sm" onclick="saveDraft()"><i class="fas fa-floppy-disk"></i> Salvar rascunho</button>
+                    <button class="btn btn-primary btn-sm" onclick="publishPost()"><i class="fas fa-paper-plane"></i> Publicar</button>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 300px;gap:24px">
+                <div>
+                    <!-- Title -->
+                    <div class="editor-card" style="margin-bottom:20px">
+                        <input type="text" id="postTitle" placeholder="Título do post..." style="width:100%;font-size:1.4rem;font-weight:700;border:none;outline:none;font-family:inherit;color:var(--dark);padding:0 0 12px;border-bottom:2px solid var(--light-200)">
+                        <div style="margin-top:10px;display:flex;align-items:center;gap:10px">
+                            <span style="font-size:.8rem;color:var(--text-light)">Slug:</span>
+                            <input type="text" id="postSlug" placeholder="url-do-post" style="flex:1;font-size:.82rem;padding:6px 10px;border:1.5px solid var(--light-200);border-radius:var(--radius-sm);font-family:inherit" oninput="slugMode=true">
+                        </div>
+                    </div>
+
+                    <!-- Editor -->
+                    <div class="editor-card">
+                        <div class="editor-toolbar">
+                            <button class="editor-btn" title="Negrito" onclick="fmt('bold')"><i class="fas fa-bold"></i></button>
+                            <button class="editor-btn" title="It?lico" onclick="fmt('italic')"><i class="fas fa-italic"></i></button>
+                            <button class="editor-btn" title="Sublinhado" onclick="fmt('underline')"><i class="fas fa-underline"></i></button>
+                            <button class="editor-btn" onclick="fmt('strikeThrough')"><i class="fas fa-strikethrough"></i></button>
+                            <div style="width:1px;height:20px;background:var(--light-200);margin:0 4px"></div>
+                            <button class="editor-btn" onclick="fmt('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+                            <button class="editor-btn" onclick="fmt('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+                            <div style="width:1px;height:20px;background:var(--light-200);margin:0 4px"></div>
+                            <button class="editor-btn" onclick="insertHeading(2)">H2</button>
+                            <button class="editor-btn" onclick="insertHeading(3)">H3</button>
+                            <button class="editor-btn" onclick="insertBlockquote()"><i class="fas fa-quote-left"></i></button>
+                            <div style="width:1px;height:20px;background:var(--light-200);margin:0 4px"></div>
+                            <button class="editor-btn" onclick="fmt('createLink',prompt('URL:'))"><i class="fas fa-link"></i></button>
+                            <button class="editor-btn" onclick="insertAd()"><i class="fas fa-rectangle-ad"></i> An?ncio</button>
+                        </div>
+                        <div class="editor-area" id="postEditor" contenteditable="true" data-placeholder="Escreva o conte?do do seu post aqui..."></div>
+                    </div>
+
+                    <!-- Excerpt -->
+                    <div class="editor-card" style="margin-top:20px">
+                        <h5 style="font-size:.9rem;color:var(--dark);margin-bottom:10px">Resumo / Excerpt</h5>
+                        <textarea style="width:100%;padding:12px;border:1.5px solid var(--light-200);border-radius:var(--radius-md);font-family:inherit;font-size:.9rem;resize:vertical;min-height:80px" placeholder="Breve descrição para SEO e listagem do blog..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Sidebar Settings -->
+                <div>
+                    <!-- Publish Box -->
+                    <div class="editor-card" style="margin-bottom:20px">
+                        <h5 style="font-size:.9rem;color:var(--dark);margin-bottom:16px;border-bottom:1px solid var(--light-200);padding-bottom:8px">Publicação</h5>
+                        <div class="form-group" style="margin-bottom:14px">
+                            <label style="font-size:.82rem;font-weight:600;color:var(--dark)">Status</label>
+                            <select style="width:100%;padding:9px 12px;border:1.5px solid var(--light-200);border-radius:var(--radius-md);font-family:inherit;font-size:.88rem;margin-top:4px">
+                                <option>Rascunho</option>
+                                <option>Publicado</option>
+                                <option>Agendado</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:14px">
+                            <label style="font-size:.82rem;font-weight:600;color:var(--dark)">Data de publicação</label>
+                            <input type="datetime-local" style="width:100%;padding:9px 12px;border:1.5px solid var(--light-200);border-radius:var(--radius-md);font-family:inherit;font-size:.88rem;margin-top:4px">
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size:.82rem;font-weight:600;color:var(--dark)">Autor</label>
+                            <select style="width:100%;padding:9px 12px;border:1.5px solid var(--light-200);border-radius:var(--radius-md);font-family:inherit;font-size:.88rem;margin-top:4px">
+                                <option>Marcos Ribeiro</option>
+                                <option>Ana Lima</option>
+                                <option>Carlos Mendes</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:8px;margin-top:16px">
+                            <button class="btn btn-outline btn-sm" style="flex:1;justify-content:center" onclick="saveDraft()">Rascunho</button>
+                            <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="publishPost()">Publicar</button>
+                        </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="editor-card" style="margin-bottom:20px">
+                        <h5 style="font-size:.9rem;color:var(--dark);margin-bottom:16px;border-bottom:1px solid var(--light-200);padding-bottom:8px">Categoria</h5>
+                        <div style="display:flex;flex-direction:column;gap:8px">
+                            <label style="display:flex;align-items:center;gap:8px;font-size:.87rem;cursor:pointer"><input type="radio" name="cat" value="ISO 9001"> ISO 9001</label>
+                            <label style="display:flex;align-items:center;gap:8px;font-size:.87rem;cursor:pointer"><input type="radio" name="cat" value="Auditoria"> Auditoria</label>
+                            <label style="display:flex;align-items:center;gap:8px;font-size:.87rem;cursor:pointer"><input type="radio" name="cat" value="Não Conformidade"> Não Conformidade</label>
+                            <label style="display:flex;align-items:center;gap:8px;font-size:.87rem;cursor:pointer"><input type="radio" name="cat" value="Indicadores"> Indicadores & KPIs</label>
+                            <label style="display:flex;align-items:center;gap:8px;font-size:.87rem;cursor:pointer"><input type="radio" name="cat" value="Documentos"> Documentos</label>
+                            <label style="display:flex;align-items:center;gap:8px;font-size:.87rem;cursor:pointer"><input type="radio" name="cat" value="IA"> IA na Qualidade</label>
+                        </div>
+                        <input type="text" placeholder="+ Nova categoria" style="width:100%;margin-top:12px;padding:8px 12px;border:1.5px solid var(--light-200);border-radius:var(--radius-md);font-size:.85rem;font-family:inherit">
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="editor-card" style="margin-bottom:20px">
+                        <h5 style="font-size:.9rem;color:var(--dark);margin-bottom:12px;border-bottom:1px solid var(--light-200);padding-bottom:8px">Tags</h5>
+                        <input type="text" id="tagsInput" placeholder="Adicionar tag e pressionar Enter" style="width:100%;padding:9px 12px;border:1.5px solid var(--light-200);border-radius:var(--radius-md);font-family:inherit;font-size:.87rem" onkeydown="addTag(event)">
+                        <div id="tagsList" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px"></div>
+                    </div>
+
+                    <!-- Featured Image -->
+                    <div class="editor-card">
+                        <h5 style="font-size:.9rem;color:var(--dark);margin-bottom:12px;border-bottom:1px solid var(--light-200);padding-bottom:8px">Imagem destacada</h5>
+                        <div id="imgDrop" style="border:2px dashed var(--light-200);border-radius:var(--radius-md);padding:28px;text-align:center;cursor:pointer;transition:var(--transition)" onclick="document.getElementById('imgUpload').click()" ondragover="this.style.borderColor='var(--primary)'" ondragleave="this.style.borderColor='var(--light-200)'">
+                            <i class="fas fa-cloud-arrow-up" style="font-size:2rem;color:var(--text-light);margin-bottom:8px;display:block"></i>
+                            <div style="font-size:.83rem;color:var(--text-light)">Clique ou arraste a imagem<br><span style="font-size:.75rem">PNG, JPG até 5MB</span></div>
+                        </div>
+                        <input type="file" id="imgUpload" accept="image/*" style="display:none" onchange="previewImg(this)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== CATEGORIAS VIEW ===== -->
+        <div class="view" id="view-categorias">
+            <div class="admin-topbar"><h2>Categorias</h2></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+                <div class="editor-card">
+                    <h5 style="font-size:1rem;color:var(--dark);margin-bottom:20px">Nova Categoria</h5>
+                    <div class="form-group" style="margin-bottom:16px">
+                        <label style="font-size:.85rem;font-weight:600;color:var(--dark)">Nome</label>
+                        <input type="text" placeholder="Nome da categoria" style="width:100%;margin-top:6px;padding:10px 12px;border:1.5px solid var(--light-200);border-radius:var(--radius-md);font-family:inherit">
+                    </div>
+                    <div class="form-group" style="margin-bottom:16px">
+                        <label style="font-size:.85rem;font-weight:600;color:var(--dark)">Slug</label>
+                        <input type="text" placeholder="slug-da-categoria" style="width:100%;margin-top:6px;padding:10px 12px;border:1.5px solid var(--light-200);border-radius:var(--radius-md);font-family:inherit">
+                    </div>
+                    <button class="btn btn-primary btn-sm">Adicionar categoria</button>
+                </div>
+                <div class="admin-table-card">
+                    <div class="admin-table-header"><h4>Categorias existentes</h4></div>
+                    <table class="admin-table">
+                        <thead><tr><th>Nome</th><th>Slug</th><th>Posts</th><th>Ações</th></tr></thead>
+                        <tbody>
+                            <tr><td>ISO 9001</td><td>iso-9001</td><td>8</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                            <tr><td>Auditoria</td><td>auditoria</td><td>5</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                            <tr><td>Não Conformidade</td><td>nao-conformidade</td><td>4</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                            <tr><td>Indicadores</td><td>indicadores</td><td>3</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                            <tr><td>IA na Qualidade</td><td>ia-qualidade</td><td>2</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== M?DIAS VIEW ===== -->
+        <div class="view" id="view-midias">
+            <div class="admin-topbar">
+                <h2>Biblioteca de Mídias</h2>
+                <button class="btn btn-primary btn-sm"><i class="fas fa-upload"></i> Enviar arquivo</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px">
+                <div style="background:linear-gradient(135deg,var(--dark),var(--primary));border-radius:var(--radius-md);height:120px;display:flex;align-items:center;justify-content:center;font-size:2rem;color:rgba(255,255,255,.3);cursor:pointer"></div>
+                <div style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-radius:var(--radius-md);height:120px;display:flex;align-items:center;justify-content:center;font-size:2rem;color:rgba(255,255,255,.3);cursor:pointer"></div>
+                <div style="background:linear-gradient(135deg,#10b981,#059669);border-radius:var(--radius-md);height:120px;display:flex;align-items:center;justify-content:center;font-size:2rem;color:rgba(255,255,255,.3);cursor:pointer"></div>
+                <div style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:var(--radius-md);height:120px;display:flex;align-items:center;justify-content:center;font-size:2rem;color:rgba(255,255,255,.3);cursor:pointer"></div>
+                <div style="border:2px dashed var(--light-200);border-radius:var(--radius-md);height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--text-light);font-size:.8rem;gap:8px"><i class="fas fa-plus" style="font-size:1.5rem"></i>Enviar</div>
+            </div>
+        </div>
+
+        <!-- ===== COMMENTS VIEW ===== -->
+        <div class="view" id="view-comments">
+            <div class="admin-topbar"><h2>Comentários</h2></div>
+            <div class="admin-table-card">
+                <table class="admin-table">
+                    <thead><tr><th>Autor</th><th>Comentário</th><th>Post</th><th>Data</th><th>Ações</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>João Silva</strong><br><span style="font-size:.75rem;color:var(--text-light)">joao@empresa.com.br</span></td><td style="max-width:300px">Excelente artigo! Me ajudou muito a entender a cláusula 6...</td><td>ISO 9001 - Guia Completo</td><td>03/06/2026</td><td><div class="action-btns"><button class="action-btn edit" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-check"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                        <tr><td><strong>Maria Costa</strong><br><span style="font-size:.75rem;color:var(--text-light)">maria@industria.com</span></td><td style="max-width:300px">Tenho uma dúvida: o representante da direção ainda é exigido?</td><td>ISO 9001 - Guia Completo</td><td>02/06/2026</td><td><div class="action-btns"><button class="action-btn edit" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-check"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== ADS VIEW ===== -->
+        <div class="view" id="view-ads">
+            <div class="admin-topbar">
+                <h2>Gerenciar Anúncios</h2>
+                <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Novo An?ncio</button>
+            </div>
+            <div class="admin-table-card">
+                <table class="admin-table">
+                    <thead><tr><th>Nome</th><th>Posição</th><th>Tipo</th><th>Status</th><th>Cliques</th><th>Ações</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>SGQ Banner Topo</strong></td><td>Sidebar Topo</td><td>Interno</td><td><span class="status-badge published">Ativo</span></td><td>842</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                        <tr><td><strong>SGQ Inline Post</strong></td><td>Meio do post</td><td>Interno</td><td><span class="status-badge published">Ativo</span></td><td>1.203</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                        <tr><td><strong>Parceiro XYZ</strong></td><td>Sidebar Meio</td><td>Externo</td><td><span class="status-badge draft">Inativo</span></td><td>-</td><td><div class="action-btns"><button class="action-btn edit"><i class="fas fa-pen"></i></button><button class="action-btn del"><i class="fas fa-trash"></i></button></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Chart bars for top posts -->
+<script>
+    function showView(name, clickedEl) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + name).classList.add('active');
+        document.querySelectorAll('.admin-nav-item').forEach(a => a.classList.remove('active'));
+        if (clickedEl) clickedEl.classList.add('active');
+    }
+
+    // Simple top posts bar chart
+    const posts = [
+        { title: 'ISO 9001 Guia Completo', views: 3241 },
+        { title: 'Reduzir NCs 70%', views: 2180 },
+        { title: 'Checklist Auditoria', views: 1930 },
+        { title: '10 KPIs Qualidade', views: 1720 },
+        { title: 'IA na Qualidade', views: 980 },
+    ];
+    const max = Math.max(...posts.map(p => p.views));
+    const container = document.getElementById('topPostsChart');
+    posts.forEach(p => {
+        const pct = Math.round((p.views / max) * 100);
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:14px;margin-bottom:14px';
+        row.innerHTML = `
+            <span style="min-width:160px;font-size:.83rem;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title}</span>
+            <div style="flex:1;background:var(--light);border-radius:999px;height:10px;overflow:hidden">
+                <div style="width:${pct}%;background:var(--primary);height:100%;border-radius:999px;transition:width .6s ease"></div>
+            </div>
+            <span style="min-width:40px;font-size:.82rem;font-weight:700;color:var(--dark);text-align:right">${p.views.toLocaleString('pt-BR')}</span>`;
+        container.appendChild(row);
+    });
+
+    // Editor helpers
+    function fmt(cmd, val) {
+        document.getElementById('postEditor').focus();
+        document.execCommand(cmd, false, val || null);
+    }
+    function insertHeading(n) {
+        document.getElementById('postEditor').focus();
+        document.execCommand('formatBlock', false, `h${n}`);
+    }
+    function insertBlockquote() {
+        document.getElementById('postEditor').focus();
+        document.execCommand('formatBlock', false, 'blockquote');
+    }
+    function insertAd() {
+        document.getElementById('postEditor').focus();
+        document.execCommand('insertHTML', false, `<div style="background:linear-gradient(135deg,#0c2340,#0f75bd);padding:24px;border-radius:12px;text-align:center;color:#fff;margin:28px 0">[AN?sNCIO SGQ ONLINE]</div>`);
+    }
+
+    // Slug auto-gen
+    let slugMode = false;
+    document.getElementById('postTitle').addEventListener('input', function() {
+        if (slugMode) return;
+        document.getElementById('postSlug').value = this.value
+            .toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .trim().replace(/\s+/g, '-');
+    });
+
+    // Tags
+    const tags = [];
+    function addTag(e) {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        const v = e.target.value.trim();
+        if (!v || tags.includes(v)) { e.target.value = ''; return; }
+        tags.push(v);
+        e.target.value = '';
+        const el = document.createElement('span');
+        el.className = 'post-tag';
+        el.style.cursor = 'pointer';
+        el.innerHTML = `${v} <i class="fas fa-xmark" style="font-size:.7rem"></i>`;
+        el.onclick = () => { tags.splice(tags.indexOf(v), 1); el.remove(); };
+        document.getElementById('tagsList').appendChild(el);
+    }
+
+    // Image preview
+    function previewImg(input) {
+        if (!input.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('imgDrop').innerHTML = `<img src="${e.target.result}" style="max-height:140px;border-radius:var(--radius-md);object-fit:cover">`;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+
+    function saveDraft() {
+        alert('Rascunho salvo com sucesso!');
+    }
+    function publishPost() {
+        const title = document.getElementById('postTitle').value.trim();
+        if (!title) { alert('Informe o t?tulo do post.'); return; }
+        alert('Post publicado com sucesso!');
+        showView('posts', document.querySelector('[onclick*=posts]'));
+    }
+</script>
+</body>
+</html>
+

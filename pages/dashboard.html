@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="../assets/img/logo.png"  style="width:100px;">
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- Principal -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Principal</div>
+                    <a href="dashboard.html" class="nav-item active">
+                        <i class="fas fa-chart-pie"></i> Dashboard
+                    </a>
+                    <a href="javascript:void(0)" class="nav-item">
+                        <i class="fas fa-brain"></i> Assistente IA
+                        <span class="badge" style="background:rgba(16,185,129,.3);color:#34d399">Em breve</span>
+                    </a>
+                </div>
+
+                <!-- Documentação -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Documentação</div>
+                    <a href="documentos.html" class="nav-item">
+                        <i class="fas fa-file-lines"></i> Controle de Documentos
+                    </a>
+                    <a href="bpm.html" class="nav-item">
+                        <i class="fas fa-diagram-project"></i> BPM & Modelagem de Processos
+                    </a>
+                </div>
+
+                <!-- Produção -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Produção</div>
+                    <a href="producao.html" class="nav-item">
+                        <i class="fas fa-industry"></i> Processo Produtivo
+                        <span class="badge" style="background:rgba(15,117,189,.3);color:#60a5fa">Novo</span>
+                    </a>
+                </div>
+
+                <!-- Qualidade -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Qualidade</div>
+                    <a href="inspecoes.html" class="nav-item">
+                        <i class="fas fa-clipboard-check"></i> Inspeções e Liberação
+                    </a>
+                    <a href="nao-conformidades.html" class="nav-item">
+                        <i class="fas fa-bug"></i> Não Conformidades e NCs
+                    </a>
+                    <a href="calibracao.html" class="nav-item">
+                        <i class="fas fa-ruler-combined"></i> Calibração de Instrumentos
+                    </a>
+                </div>
+
+                <!-- Gestão -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Gestão</div>
+                    <a href="fornecedores.html" class="nav-item">
+                        <i class="fas fa-handshake"></i> Avaliação de Fornecedores
+                    </a>
+                    <a href="pessoas.html" class="nav-item">
+                        <i class="fas fa-user-graduate"></i> Pessoas e Treinamentos
+                    </a>
+                    <a href="satisfacao.html" class="nav-item">
+                        <i class="fas fa-face-smile"></i> Satisfação do Cliente
+                    </a>
+                </div>
+
+                <!-- Análise -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Análise e Melhoria</div>
+                    <a href="auditorias.html" class="nav-item">
+                        <i class="fas fa-magnifying-glass-chart"></i> Auditorias Internas
+                    </a>
+                    <a href="indicadores.html" class="nav-item">
+                        <i class="fas fa-chart-line"></i> Indicadores / KPIs
+                    </a>
+                    <a href="riscos.html" class="nav-item">
+                        <i class="fas fa-shield-halved"></i> Gestão de Riscos
+                    </a>
+                </div>
+
+                
+
+                <!-- Cadastros -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Cadastros</div>
+                    <a href="cadastros.html" class="nav-item">
+                        <i class="fas fa-box-archive"></i> Pedidos, Produtos e Setores
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <div class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <div class="topbar-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Buscar módulos, documentos, NCs...">
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="topbar-icon" title="Assistente IA"><i class="fas fa-brain"></i></button>
+                    <button class="topbar-icon" title="Notificações"><i class="fas fa-bell"></i><span class="notif-dot"></span></button>
+                    <div class="user-menu" id="userMenu">
+                        <button class="user-btn" onclick="toggleUserMenu(event)">
+                            <div class="avatar">JW</div>
+                            <span class="user-btn-name">Jefferson Willian</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-dropdown">
+                            <div class="user-dropdown-header">
+                                <div class="avatar">JW</div>
+                                <div><div class="user-name">Jefferson Willian</div><div class="user-role">Gestor da Qualidade</div></div>
+                            </div>
+                            <div class="user-dropdown-divider"></div>
+                            <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                            <div class="user-dropdown-divider"></div>
+                            <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Header -->
+                <div class="page-header">
+                    <div>
+                        <h2>Dashboard</h2>
+                        <p>Visão geral do Sistema de Gestão da Qualidade</p>
+                    </div>
+                    <div style="display:flex;gap:10px">
+                        <select style="padding:8px 14px;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-md);font-family:inherit;font-size:.85rem;background:rgba(255,255,255,.06);color:#fff;cursor:pointer">
+                            <option>Últimos 30 dias</option>
+                            <option>Últimos 7 dias</option>
+                            <option>Este mês</option>
+                            <option>Este ano</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-download"></i> Relatório
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)">
+                                <i class="fas fa-file-lines"></i>
+                            </div>
+                            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> 8%</div>
+                        </div>
+                        <div class="stat-value">142</div>
+                        <div class="stat-label">Documentos Controlados</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(239,68,68,.1);color:var(--danger)">
+                                <i class="fas fa-bug"></i>
+                            </div>
+                            <div class="stat-trend down"><i class="fas fa-arrow-down"></i> 23%</div>
+                        </div>
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">NCs Abertas</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> 15%</div>
+                        </div>
+                        <div class="stat-value">87%</div>
+                        <div class="stat-label">Conformidade ISO</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)">
+                                <i class="fas fa-list-check"></i>
+                            </div>
+                            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> 5%</div>
+                        </div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Ações em Andamento</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="nao-conformidades.html" class="quick-action" style="text-decoration:none;color:inherit">
+                        <div class="qa-icon" style="background:rgba(239,68,68,.1);color:var(--danger)">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="qa-text">
+                            <h4>Registrar NC</h4>
+                            <p>Abrir não conformidade</p>
+                        </div>
+                    </a>
+                    <a href="documentos.html" class="quick-action" style="text-decoration:none;color:inherit">
+                        <div class="qa-icon" style="background:rgba(15,117,189,.1);color:var(--primary)">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <div class="qa-text">
+                            <h4>Novo Documento</h4>
+                            <p>Upload e controle</p>
+                        </div>
+                    </a>
+                    <a href="inspecoes.html" class="quick-action" style="text-decoration:none;color:inherit">
+                        <div class="qa-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <div class="qa-text">
+                            <h4>Nova Inspeção</h4>
+                            <p>Iniciar inspeção</p>
+                        </div>
+                    </a>
+                    <a href="riscos.html" class="quick-action" style="text-decoration:none;color:inherit">
+                        <div class="qa-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">
+                            <i class="fas fa-shield-virus"></i>
+                        </div>
+                        <div class="qa-text">
+                            <h4>Novo Risco</h4>
+                            <p>Registrar risco</p>
+                        </div>
+                    </a>
+                    <a href="auditorias.html" class="quick-action" style="text-decoration:none;color:inherit">
+                        <div class="qa-icon" style="background:rgba(239,68,68,.1);color:var(--danger)">
+                            <i class="fas fa-magnifying-glass-chart"></i>
+                        </div>
+                        <div class="qa-text">
+                            <h4>Planejar Auditoria</h4>
+                            <p>Nova auditoria interna</p>
+                        </div>
+                    </a>
+                    <a href="indicadores.html" class="quick-action" style="text-decoration:none;color:inherit">
+                        <div class="qa-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="qa-text">
+                            <h4>Lançar KPI</h4>
+                            <p>Registrar resultado</p>
+                        </div>
+                    </a>
+                    <a href="satisfacao.html" class="quick-action" style="text-decoration:none;color:inherit">
+                        <div class="qa-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div class="qa-text">
+                            <h4>Reclamação</h4>
+                            <p>Registrar reclamação</p>
+                        </div>
+                    </a>
+                    <a href="bpm.html" class="quick-action" style="text-decoration:none;color:inherit">
+                        <div class="qa-icon" style="background:rgba(15,117,189,.1);color:var(--primary)">
+                            <i class="fas fa-diagram-project"></i>
+                        </div>
+                        <div class="qa-text">
+                            <h4>Modelar Processo</h4>
+                            <p>Abrir BPM canvas</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Iniciar Processo -->
+                <div class="card" id="iniciarProcessoCard" style="margin-bottom:28px">
+                    <div class="card-header">
+                        <h4><i class="fas fa-play-circle" style="color:var(--accent);margin-right:8px"></i> Iniciar Processo</h4>
+                        <span class="status-badge active" id="processCountBadge"><span class="status-dot"></span> <span id="processCount">0</span> disponáveis</span>
+                    </div>
+                    <div class="card-body" style="padding:16px 24px">
+                        <div style="position:relative;margin-bottom:16px">
+                            <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);font-size:.85rem"></i>
+                            <input type="text" id="processSearch" placeholder="Buscar processo ou formulário..." oninput="filterProcessos()" style="width:100%;padding:10px 14px 10px 36px;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-md);font-family:inherit;font-size:.85rem;background:rgba(255,255,255,.06);color:#fff;outline:none;transition:border .2s" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+                        </div>
+                        <div id="processosList" style="display:flex;flex-direction:column;gap:8px"></div>
+                        <div id="processosEmpty" style="display:none;text-align:center;padding:24px 0">
+                            <i class="fas fa-inbox" style="font-size:2rem;color:rgba(255,255,255,.15);margin-bottom:8px;display:block"></i>
+                            <p style="font-size:.85rem;color:rgba(255,255,255,.35)">Nenhum processo encontrado</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Chart Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-chart-bar" style="color:var(--primary);margin-right:8px"></i> Indicadores Mensais</h4>
+                            <div style="display:flex;gap:16px;font-size:.8rem">
+                                <span style="display:flex;align-items:center;gap:4px;color:rgba(255,255,255,.5)">
+                                    <span style="width:10px;height:10px;background:var(--primary);border-radius:2px;display:inline-block"></span> NCs
+                                </span>
+                                <span style="display:flex;align-items:center;gap:4px;color:rgba(255,255,255,.5)">
+                                    <span style="width:10px;height:10px;background:var(--accent);border-radius:2px;display:inline-block"></span> Ações
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-placeholder">
+                                <div class="chart-bars">
+                                    <div class="chart-bar" style="height:40%"></div>
+                                    <div class="chart-bar accent" style="height:55%"></div>
+                                    <div class="chart-bar" style="height:65%"></div>
+                                    <div class="chart-bar accent" style="height:50%"></div>
+                                    <div class="chart-bar" style="height:30%"></div>
+                                    <div class="chart-bar accent" style="height:70%"></div>
+                                    <div class="chart-bar" style="height:45%"></div>
+                                    <div class="chart-bar accent" style="height:85%"></div>
+                                    <div class="chart-bar" style="height:25%"></div>
+                                    <div class="chart-bar accent" style="height:60%"></div>
+                                    <div class="chart-bar" style="height:55%"></div>
+                                    <div class="chart-bar accent" style="height:90%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ISO Compliance Ring + Activity -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-shield-halved" style="color:var(--accent);margin-right:8px"></i> Maturidade ISO 9001</h4>
+                        </div>
+                        <div class="card-body" style="text-align:center">
+                            <div class="compliance-ring">
+                                <svg viewBox="0 0 160 160">
+                                    <circle class="bg-ring" cx="80" cy="80" r="70"></circle>
+                                    <circle class="fg-ring" cx="80" cy="80" r="70" style="stroke-dashoffset:57"></circle>
+                                </svg>
+                                <div class="ring-text">
+                                    <div class="ring-value">87%</div>
+                                    <div class="ring-label">Conformidade</div>
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left;margin-top:8px">
+                                <div style="padding:10px;background:rgba(255,255,255,.06);border-radius:var(--radius-sm)">
+                                    <div style="font-size:.72rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px">Cláusulas Atendidas</div>
+                                    <div style="font-size:1.1rem;font-weight:700;color:var(--accent)">28/32</div>
+                                </div>
+                                <div style="padding:10px;background:rgba(255,255,255,.06);border-radius:var(--radius-sm)">
+                                    <div style="font-size:.72rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px">Pendências</div>
+                                    <div style="font-size:1.1rem;font-weight:700;color:var(--warning)">4</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second Grid Row -->
+                <div class="dashboard-grid">
+                    <!-- Modules Status Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-cubes" style="color:var(--primary);margin-right:8px"></i> Status dos Módulos</h4>
+                            <a href="javascript:void(0)" style="font-size:.85rem;color:var(--primary);font-weight:500">Ver todos '</a>
+                        </div>
+                        <div style="overflow-x:auto">
+                            <table class="modules-overview">
+                                <thead>
+                                    <tr>
+                                        <th>Módulo</th>
+                                        <th>Status</th>
+                                        <th>Progresso</th>
+                                        <th>Pendências</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr onclick="location.href='documentos.html'" style="cursor:pointer">
+                                        <td style="font-weight:600"><i class="fas fa-file-lines" style="color:var(--primary);margin-right:8px"></i> Documentos</td>
+                                        <td><span class="status-badge active"><span class="status-dot"></span> Ativo</span></td>
+                                        <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:92%;background:var(--accent)"></div></div><span style="font-size:.8rem;font-weight:600">92%</span></div></td>
+                                        <td><span style="font-weight:600;color:var(--warning)">3</span> docs p/ revisar</td>
+                                    </tr>
+                                    <tr onclick="location.href='bpm.html'" style="cursor:pointer">
+                                        <td style="font-weight:600"><i class="fas fa-diagram-project" style="color:var(--accent);margin-right:8px"></i> BPM / Processos</td>
+                                        <td><span class="status-badge active"><span class="status-dot"></span> Ativo</span></td>
+                                        <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:80%;background:var(--accent)"></div></div><span style="font-size:.8rem;font-weight:600">80%</span></div></td>
+                                        <td><span style="font-weight:600;color:var(--primary)">-</span></td>
+                                    </tr>
+                                    <tr onclick="location.href='inspecoes.html'" style="cursor:pointer">
+                                        <td style="font-weight:600"><i class="fas fa-clipboard-check" style="color:var(--accent);margin-right:8px"></i> Inspeções</td>
+                                        <td><span class="status-badge active"><span class="status-dot"></span> Ativo</span></td>
+                                        <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:75%;background:var(--primary)"></div></div><span style="font-size:.8rem;font-weight:600">75%</span></div></td>
+                                        <td><span style="font-weight:600;color:var(--orange)">2</span> inspeções abertas</td>
+                                    </tr>
+                                    <tr onclick="location.href='nao-conformidades.html'" style="cursor:pointer">
+                                        <td style="font-weight:600"><i class="fas fa-bug" style="color:var(--danger);margin-right:8px"></i> Não Conformidades</td>
+                                        <td><span class="status-badge warning"><span class="status-dot"></span> Atenção</span></td>
+                                        <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:68%;background:var(--warning)"></div></div><span style="font-size:.8rem;font-weight:600">68%</span></div></td>
+                                        <td><span style="font-weight:600;color:var(--danger)">5</span> NCs abertas</td>
+                                    </tr>
+                                    <tr onclick="location.href='calibracao.html'" style="cursor:pointer">
+                                        <td style="font-weight:600"><i class="fas fa-ruler-combined" style="color:var(--primary);margin-right:8px"></i> Calibração</td>
+                                        <td><span class="status-badge danger"><span class="status-dot"></span> Vencendo</span></td>
+                                        <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:55%;background:var(--danger)"></div></div><span style="font-size:.8rem;font-weight:600">55%</span></div></td>
+                                        <td><span style="font-weight:600;color:var(--danger)">2</span> instrumentos</td>
+                                    </tr>
+                                    <tr onclick="location.href='fornecedores.html'" style="cursor:pointer">
+                                        <td style="font-weight:600"><i class="fas fa-handshake" style="color:var(--purple);margin-right:8px"></i> Fornecedores</td>
+                                        <td><span class="status-badge active"><span class="status-dot"></span> Ativo</span></td>
+                                        <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:90%;background:var(--accent)"></div></div><span style="font-size:.8rem;font-weight:600">90%</span></div></td>
+                                        <td><span style="font-weight:600;color:var(--accent)">4</span> avaliados</td>
+                                    </tr>
+                                    <tr onclick="location.href='pessoas.html'" style="cursor:pointer">
+                                        <td style="font-weight:600"><i class="fas fa-user-graduate" style="color:var(--warning);margin-right:8px"></i> Pessoas</td>
+                                        <td><span class="status-badge warning"><span class="status-dot"></span> Atenção</span></td>
+                                        <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:70%;background:var(--warning)"></div></div><span style="font-size:.8rem;font-weight:600">70%</span></div></td>
+                                        <td><span style="font-weight:600;color:var(--danger)">1</span> treinamento vencido</td>
+                                    </tr>
+                                    <tr onclick="location.href='satisfacao.html'" style="cursor:pointer">
+                                        <td style="font-weight:600"><i class="fas fa-face-smile" style="color:var(--orange);margin-right:8px"></i> Satisfação</td>
+                                        <td><span class="status-badge active"><span class="status-dot"></span> Ativo</span></td>
+                                        <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:85%;background:var(--accent)"></div></div><span style="font-size:.8rem;font-weight:600">NPS 72</span></div></td>
+                                        <td><span style="font-weight:600;color:var(--danger)">2</span> reclamações abertas</td>
+                                    </tr>
+                                    <tr onclick="location.href='auditorias.html'" style="cursor:pointer">
+                                        <td style="font-weight:600"><i class="fas fa-magnifying-glass-chart" style="color:var(--danger);margin-right:8px"></i> Auditorias</td>
+                                        <td><span class="status-badge info"><span class="status-dot"></span> Programada</span></td>
+                                        <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:40%;background:var(--primary)"></div></div><span style="font-size:.8rem;font-weight:600">40%</span></div></td>
+                                        <td><span style="font-weight:600;color:var(--primary)">1</span> auditoria agendada</td>
+                                    </tr>
+                                    <tr onclick="location.href='indicadores.html'" style="cursor:pointer">
+                                        <td style="font-weight:600"><i class="fas fa-chart-line" style="color:var(--accent);margin-right:8px"></i> Indicadores KPI</td>
+                                        <td><span class="status-badge active"><span class="status-dot"></span> Ativo</span></td>
+                                        <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:60%;background:var(--warning)"></div></div><span style="font-size:.8rem;font-weight:600">3/5 metas</span></div></td>
+                                        <td><span style="font-weight:600;color:var(--danger)">2</span> KPIs não atingidos</td>
+                                    </tr>
+                                    <tr onclick="location.href='riscos.html'" style="cursor:pointer">
+                                        <td style="font-weight:600"><i class="fas fa-shield-halved" style="color:var(--purple);margin-right:8px"></i> Gestão de Riscos</td>
+                                        <td><span class="status-badge active"><span class="status-dot"></span> Ativo</span></td>
+                                        <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:120px"><div class="progress-fill" style="width:82%;background:var(--accent)"></div></div><span style="font-size:.8rem;font-weight:600">82%</span></div></td>
+                                        <td><span style="font-weight:600;color:var(--danger)">2</span> riscos críticos</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Activity Feed -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-clock-rotate-left" style="color:var(--orange);margin-right:8px"></i> Atividade Recente</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-dot" style="background:var(--danger)"></div>
+                                    <div>
+                                        <div class="activity-text"><strong>NC #047</strong> registrada na linha de produção por Maria Silva</div>
+                                        <div class="activity-time">Há 25 minutos</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-dot" style="background:var(--accent)"></div>
+                                    <div>
+                                        <div class="activity-text"><strong>Documento PQ-012</strong> aprovado pelo gestor Jefferson Willian</div>
+                                        <div class="activity-time">Há 1 hora</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-dot" style="background:var(--primary)"></div>
+                                    <div>
+                                        <div class="activity-text"><strong>IA analisou</strong> IT-034 - Score: 94% conformidade</div>
+                                        <div class="activity-time">Há 2 horas</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-dot" style="background:var(--warning)"></div>
+                                    <div>
+                                        <div class="activity-text"><strong>Calibração</strong> do paqu?metro #05 vence em 3 dias</div>
+                                        <div class="activity-time">Há 3 horas</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-dot" style="background:var(--accent)"></div>
+                                    <div>
+                                        <div class="activity-text"><strong>Plano de Ação #21</strong> conclu?do - ação corretiva eficaz</div>
+                                        <div class="activity-time">Há 5 horas</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-dot" style="background:var(--purple)"></div>
+                                    <div>
+                                        <div class="activity-text"><strong>Fornecedor ABC Aços</strong> avaliado com nota 8.5</div>
+                                        <div class="activity-time">Há 6 horas</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-dot" style="background:var(--primary)"></div>
+                                    <div>
+                                        <div class="activity-text"><strong>Auditoria Interna</strong> da cláusula 8.5 agendada para 22/04</div>
+                                        <div class="activity-time">Ontem</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-dot" style="background:var(--orange)"></div>
+                                    <div>
+                                        <div class="activity-text"><strong>Pesquisa de Satisfação</strong> enviada para 45 clientes</div>
+                                        <div class="activity-time">Ontem</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produtos Não Conforme + OEE Row -->
+                <div class="dashboard-grid">
+                    <!-- Produtos Não Conforme -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-triangle-exclamation" style="color:var(--danger);margin-right:8px"></i> Saídas Não Conformes</h4>
+                            <span class="status-badge danger"><span class="status-dot"></span> 7 este mês</span>
+                        </div>
+                        <div class="card-body" style="padding:16px 24px">
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
+                                <div style="text-align:center;padding:14px;background:rgba(239,68,68,.08);border-radius:var(--radius-sm)">
+                                    <div style="font-size:1.8rem;font-weight:800;color:var(--danger)">7</div>
+                                    <div style="font-size:.72rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">Registradas</div>
+                                </div>
+                                <div style="text-align:center;padding:14px;background:rgba(245,158,11,.08);border-radius:var(--radius-sm)">
+                                    <div style="font-size:1.8rem;font-weight:800;color:var(--warning)">3</div>
+                                    <div style="font-size:.72rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">Em Análise</div>
+                                </div>
+                                <div style="text-align:center;padding:14px;background:rgba(16,185,129,.08);border-radius:var(--radius-sm)">
+                                    <div style="font-size:1.8rem;font-weight:800;color:var(--accent)">4</div>
+                                    <div style="font-size:.72rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">Disposição</div>
+                                </div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:10px">
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:var(--radius-sm);border-left:3px solid var(--danger)">
+                                    <div style="display:flex;align-items:center;gap:10px">
+                                        <span style="font-size:.85rem;font-weight:600;color:#fff">PNC #031</span>
+                                        <span style="font-size:.75rem;color:rgba(255,255,255,.4)">Lote 2024-158 - Dimensional fora</span>
+                                    </div>
+                                    <span class="status-badge danger" style="font-size:.7rem"><span class="status-dot"></span> Segregado</span>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:var(--radius-sm);border-left:3px solid var(--warning)">
+                                    <div style="display:flex;align-items:center;gap:10px">
+                                        <span style="font-size:.85rem;font-weight:600;color:#fff">PNC #030</span>
+                                        <span style="font-size:.75rem;color:rgba(255,255,255,.4)">Lote 2024-155 - Acabamento superficial</span>
+                                    </div>
+                                    <span class="status-badge warning" style="font-size:.7rem"><span class="status-dot"></span> Retrabalho</span>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:var(--radius-sm);border-left:3px solid var(--accent)">
+                                    <div style="display:flex;align-items:center;gap:10px">
+                                        <span style="font-size:.85rem;font-weight:600;color:#fff">PNC #029</span>
+                                        <span style="font-size:.75rem;color:rgba(255,255,255,.4)">Lote 2024-152 - Matéria-prima</span>
+                                    </div>
+                                    <span class="status-badge active" style="font-size:.7rem"><span class="status-dot"></span> Devolvido</span>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:var(--radius-sm);border-left:3px solid var(--primary)">
+                                    <div style="display:flex;align-items:center;gap:10px">
+                                        <span style="font-size:.85rem;font-weight:600;color:#fff">PNC #028</span>
+                                        <span style="font-size:.75rem;color:rgba(255,255,255,.4)">Lote 2024-149 - Teste funcional</span>
+                                    </div>
+                                    <span class="status-badge info" style="font-size:.7rem"><span class="status-dot"></span> Aceito c/ concessão</span>
+                                </div>
+                            </div>
+                            <div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center">
+                                <span style="font-size:.82rem;color:rgba(255,255,255,.4)">Taxa de rejeio: <strong style="color:var(--danger)">1.2%</strong></span>
+                                <span style="font-size:.78rem;color:var(--primary);font-weight:500;cursor:pointer">Ver histórico '</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OEE - Overall Equipment Effectiveness -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-gauge-high" style="color:var(--primary);margin-right:8px"></i> OEE - Efici?ncia Global</h4>
+                            <span class="status-badge active"><span class="status-dot"></span> Tempo real</span>
+                        </div>
+                        <div class="card-body" style="text-align:center;padding:20px 24px">
+                            <!-- OEE Ring -->
+                            <div class="compliance-ring" style="margin-bottom:16px">
+                                <svg viewBox="0 0 160 160">
+                                    <circle class="bg-ring" cx="80" cy="80" r="70"></circle>
+                                    <circle class="fg-ring" cx="80" cy="80" r="70" style="stroke-dashoffset:92;stroke:var(--accent)"></circle>
+                                </svg>
+                                <div class="ring-text">
+                                    <div class="ring-value" style="font-size:1.8rem">79%</div>
+                                    <div class="ring-label">OEE</div>
+                                </div>
+                            </div>
+                            <!-- 3 pillars -->
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;margin-bottom:16px">
+                                <div style="padding:12px 8px;background:rgba(15,117,189,.08);border-radius:var(--radius-sm)">
+                                    <div style="font-size:.68rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Disponibilidade</div>
+                                    <div style="font-size:1.3rem;font-weight:800;color:var(--primary)">92%</div>
+                                    <div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="width:92%;background:var(--primary)"></div></div>
+                                </div>
+                                <div style="padding:12px 8px;background:rgba(16,185,129,.08);border-radius:var(--radius-sm)">
+                                    <div style="font-size:.68rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Performance</div>
+                                    <div style="font-size:1.3rem;font-weight:800;color:var(--accent)">89%</div>
+                                    <div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="width:89%;background:var(--accent)"></div></div>
+                                </div>
+                                <div style="padding:12px 8px;background:rgba(245,158,11,.08);border-radius:var(--radius-sm)">
+                                    <div style="font-size:.68rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Qualidade</div>
+                                    <div style="font-size:1.3rem;font-weight:800;color:var(--warning)">97%</div>
+                                    <div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="width:97%;background:var(--warning)"></div></div>
+                                </div>
+                            </div>
+                            <!-- Equipment list -->
+                            <div style="display:flex;flex-direction:column;gap:8px;text-align:left">
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:var(--radius-sm)">
+                                    <span style="font-size:.82rem;color:#fff;font-weight:600"><i class="fas fa-industry" style="color:var(--accent);margin-right:6px;font-size:.75rem"></i> Linha A - CNC</span>
+                                    <span style="font-size:.82rem;font-weight:700;color:var(--accent)">85%</span>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:var(--radius-sm)">
+                                    <span style="font-size:.82rem;color:#fff;font-weight:600"><i class="fas fa-industry" style="color:var(--primary);margin-right:6px;font-size:.75rem"></i> Linha B - Injeo</span>
+                                    <span style="font-size:.82rem;font-weight:700;color:var(--primary)">76%</span>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:var(--radius-sm)">
+                                    <span style="font-size:.82rem;color:#fff;font-weight:600"><i class="fas fa-industry" style="color:var(--warning);margin-right:6px;font-size:.75rem"></i> Linha C - Montagem</span>
+                                    <span style="font-size:.82rem;font-weight:700;color:var(--warning)">72%</span>
+                                </div>
+                            </div>
+                            <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center">
+                                <span style="font-size:.82rem;color:rgba(255,255,255,.4)">Meta OEE: <strong style="color:var(--accent)">? 85%</strong></span>
+                                <span style="font-size:.78rem;color:var(--primary);font-weight:500;cursor:pointer">Detalhes '</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Third Row: Additional Widgets -->
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:28px">
+                    <!-- Alertas -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-bell" style="color:var(--warning);margin-right:8px"></i> Alertas</h4>
+                            <span class="status-badge warning"><span class="status-dot"></span> 6 pendentes</span>
+                        </div>
+                        <div class="card-body" style="padding:16px 24px">
+                            <div style="display:flex;flex-direction:column;gap:10px">
+                                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(239,68,68,.08);border-radius:var(--radius-sm);border-left:3px solid var(--danger)">
+                                    <i class="fas fa-exclamation-circle" style="color:var(--danger);font-size:.9rem"></i>
+                                    <div>
+                                        <div style="font-size:.85rem;font-weight:600;color:#fff">2 calibrações vencendo</div>
+                                        <div style="font-size:.75rem;color:rgba(255,255,255,.3)">Paqu?metro #05 e Micrômetro #12</div>
+                                    </div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(245,158,11,.08);border-radius:var(--radius-sm);border-left:3px solid var(--warning)">
+                                    <i class="fas fa-clock" style="color:var(--warning);font-size:.9rem"></i>
+                                    <div>
+                                        <div style="font-size:.85rem;font-weight:600;color:#fff">3 documentos para revisão</div>
+                                        <div style="font-size:.75rem;color:rgba(255,255,255,.3)">PQ-003, IT-015, FQ-021</div>
+                                    </div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(15,117,189,.08);border-radius:var(--radius-sm);border-left:3px solid var(--primary)">
+                                    <i class="fas fa-calendar" style="color:var(--primary);font-size:.9rem"></i>
+                                    <div>
+                                        <div style="font-size:.85rem;font-weight:600;color:#fff">Auditoria em 7 dias</div>
+                                        <div style="font-size:.75rem;color:rgba(255,255,255,.3)">Cláusulas 8.5 e 8.6</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Satisfação do Cliente -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-face-smile" style="color:var(--accent);margin-right:8px"></i> Satisfação do Cliente</h4>
+                        </div>
+                        <div class="card-body" style="text-align:center">
+                            <div style="font-size:3rem;font-weight:800;color:#fff">8.4</div>
+                            <div style="font-size:.85rem;color:rgba(255,255,255,.5);margin-bottom:16px">Nota mídia (?ltima pesquisa)</div>
+                            <div style="display:flex;justify-content:center;gap:4px;margin-bottom:20px">
+                                <i class="fas fa-star" style="color:var(--warning);font-size:1.2rem"></i>
+                                <i class="fas fa-star" style="color:var(--warning);font-size:1.2rem"></i>
+                                <i class="fas fa-star" style="color:var(--warning);font-size:1.2rem"></i>
+                                <i class="fas fa-star" style="color:var(--warning);font-size:1.2rem"></i>
+                                <i class="fas fa-star-half-stroke" style="color:var(--warning);font-size:1.2rem"></i>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left">
+                                <div style="padding:10px;background:rgba(255,255,255,.06);border-radius:var(--radius-sm)">
+                                    <div style="font-size:.72rem;color:rgba(255,255,255,.3);text-transform:uppercase">Respondentes</div>
+                                    <div style="font-size:1rem;font-weight:700;color:#fff">38/45</div>
+                                </div>
+                                <div style="padding:10px;background:rgba(255,255,255,.06);border-radius:var(--radius-sm)">
+                                    <div style="font-size:.72rem;color:rgba(255,255,255,.3);text-transform:uppercase">Reclamações</div>
+                                    <div style="font-size:1rem;font-weight:700;color:var(--danger)">2</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Treinamentos -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-user-graduate" style="color:var(--purple);margin-right:8px"></i> Treinamentos</h4>
+                        </div>
+                        <div class="card-body" style="padding:16px 24px">
+                            <div style="display:flex;flex-direction:column;gap:14px">
+                                <div>
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                                        <span style="font-size:.85rem;font-weight:600;color:#fff">ISO 9001 - Requisitos</span>
+                                        <span style="font-size:.8rem;font-weight:600;color:var(--accent)">85%</span>
+                                    </div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width:85%;background:var(--accent)"></div></div>
+                                </div>
+                                <div>
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                                        <span style="font-size:.85rem;font-weight:600;color:#fff">Controle de Documentos</span>
+                                        <span style="font-size:.8rem;font-weight:600;color:var(--primary)">72%</span>
+                                    </div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width:72%;background:var(--primary)"></div></div>
+                                </div>
+                                <div>
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                                        <span style="font-size:.85rem;font-weight:600;color:#fff">Auditoria Interna</span>
+                                        <span style="font-size:.8rem;font-weight:600;color:var(--warning)">45%</span>
+                                    </div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--warning)"></div></div>
+                                </div>
+                                <div>
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                                        <span style="font-size:.85rem;font-weight:600;color:#fff">Gestão de Riscos</span>
+                                        <span style="font-size:.8rem;font-weight:600;color:var(--accent)">90%</span>
+                                    </div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width:90%;background:var(--accent)"></div></div>
+                                </div>
+                                <div style="padding-top:8px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center">
+                                    <span style="font-size:.82rem;color:rgba(255,255,255,.5)"><strong style="color:#fff">24</strong> colaboradores treinados</span>
+                                    <span style="font-size:.78rem;color:var(--primary);font-weight:500;cursor:pointer">Ver todos '</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleUserMenu(e) {
+            e.stopPropagation();
+            document.getElementById('userMenu')?.classList.toggle('open');
+        }
+        document.addEventListener('click', () => document.getElementById('userMenu')?.classList.remove('open'));
+
+        // Active nav item highlight
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // ===== Iniciar Processo =====
+        // Load active flows from localStorage (shared with BPM page)
+        function loadActiveFlows() {
+            try {
+                const raw = localStorage.getItem('sgq_flows');
+                if (!raw) return [];
+                const all = JSON.parse(raw);
+                if (!Array.isArray(all)) return [];
+                return all.filter(f => f.status === 'active');
+            } catch(e) { return []; }
+        }
+
+        const activeFlows = loadActiveFlows();
+        const processos = activeFlows.map(f => ({
+            id: f.id,
+            name: f.name,
+            category: 'BPM',
+            steps: f.steps ? f.steps.length : 0,
+            icon: 'fa-diagram-project',
+            color: 'var(--primary)'
+        }));
+
+        function renderProcessos(list) {
+            const container = document.getElementById('processosList');
+            const empty = document.getElementById('processosEmpty');
+            document.getElementById('processCount').textContent = list.length;
+
+            if (list.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            container.innerHTML = list.map(p => `
+                <div onclick="iniciarProcesso(${p.id})" style="display:flex;align-items:center;gap:14px;padding:12px 14px;background:rgba(255,255,255,.04);border-radius:var(--radius-sm);cursor:pointer;transition:background .2s;border-left:3px solid ${p.color}" onmouseenter="this.style.background='rgba(255,255,255,.08)'" onmouseleave="this.style.background='rgba(255,255,255,.04)'">
+                    <div style="width:38px;height:38px;border-radius:var(--radius-sm);background:${p.color}15;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <i class="fas ${p.icon}" style="color:${p.color};font-size:.9rem"></i>
+                    </div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:.88rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+                        <div style="font-size:.75rem;color:rgba(255,255,255,.35)">${p.category} - ${p.steps} etapas</div>
+                    </div>
+                    <i class="fas fa-play" style="color:${p.color};font-size:.75rem;opacity:.6"></i>
+                </div>
+            `).join('');
+        }
+
+        function filterProcessos() {
+            const q = document.getElementById('processSearch').value.toLowerCase().trim();
+            const filtered = q
+                ? processos.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q))
+                : processos;
+            renderProcessos(filtered);
+        }
+
+        function iniciarProcesso(id) {
+            const p = processos.find(x => x.id === id);
+            if (!p) return;
+            // Redireciona para a página BPM passando o fluxo como par�metro
+            window.location.href = 'bpm.html?startFlow=' + id;
+        }
+
+        // Render on load
+        renderProcessos(processos);
+    </script>
+</body>
+</html>
+
