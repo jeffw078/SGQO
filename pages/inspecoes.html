@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspeções e Liberação - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../assets/img/logo.png" style="width:100px;">
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-clipboard-check" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Inspeções e Liberação</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Inspeções</div>
+                <a href="#" class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard');return false"><i class="fas fa-chart-pie"></i> Visão Geral</a>
+                <a href="#" class="nav-item" id="nav-nova" onclick="switchView('nova');return false"><i class="fas fa-plus-circle"></i> Iniciar Inspeção</a>
+                <a href="#" class="nav-item" id="nav-andamento" onclick="switchView('andamento');return false">
+                    <i class="fas fa-spinner"></i> Em Andamento
+                    <span class="badge" id="badge-andamento" style="background:rgba(245,158,11,.3);color:#fbbf24">0</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-finalizadas" onclick="switchView('finalizadas');return false"><i class="fas fa-check-circle"></i> Finalizadas</a>
+                <a href="#" class="nav-item" id="nav-bloqueados" onclick="switchView('bloqueados');return false">
+                    <i class="fas fa-ban"></i> Produtos Bloqueados
+                    <span class="badge" id="badge-bloqueados" style="background:rgba(239,68,68,.3);color:#f87171">0</span>
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Configurações</div>
+                <a href="#" class="nav-item" id="nav-config" onclick="switchView('config');return false"><i class="fas fa-gear"></i> Configurações</a>
+            </div>
+        </nav>
+        </aside>
+
+    <!-- ===== MAIN ===== -->
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Buscar por pedido, produto ou cliente..." oninput="globalSearchFn()">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JD</div>
+                        <span class="user-btn-name">Jo\u00e3o Demo</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JD</div>
+                            <div><div class="user-name">Jo\u00e3o Demo</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- ===== VIEW: DASHBOARD ===== -->
+            <div id="view-dashboard" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-clipboard-check" style="color:var(--accent);margin-right:10px"></i>Inspeções e Liberação</h2>
+                        <p>Controle de qualidade de produtos - requisitos 8.5 e 8.6</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn primary" onclick="switchView('nova')"><i class="fas fa-plus"></i> Iniciar Inspeção</button>
+                    </div>
+                </div>
+
+                <div class="mod-stats">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-spinner"></i></div>
+                            <div class="stat-trend" id="trend-andamento"></div>
+                        </div>
+                        <div class="stat-value" id="stat-andamento">0</div>
+                        <div class="stat-label">Em Andamento</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-check-circle"></i></div>
+                        </div>
+                        <div class="stat-value" id="stat-hoje">0</div>
+                        <div class="stat-label">Finalizadas Hoje</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fas fa-ban"></i></div>
+                        </div>
+                        <div class="stat-value" id="stat-bloqueados">0</div>
+                        <div class="stat-label">Produtos Bloqueados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)"><i class="fas fa-chart-bar"></i></div>
+                        </div>
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">Total este Mês</div>
+                    </div>
+                </div>
+
+                <!-- Recent inspections -->
+                <div class="card" style="margin-bottom:24px">
+                    <div class="card-header">
+                        <h4><i class="fas fa-clock-rotate-left" style="color:var(--orange);margin-right:8px"></i> Inspeções Recentes</h4>
+                        <button class="mod-btn ghost" onclick="switchView('andamento')" style="font-size:.8rem;padding:5px 12px">Ver todas</button>
+                    </div>
+                    <div class="card-body" style="padding:0">
+                        <div id="recentList"></div>
+                        <div class="mod-empty" id="recentEmpty" style="display:none">
+                            <i class="fas fa-clipboard-check"></i>
+                            <h3>Nenhuma inspeção ainda</h3>
+                            <p>Inicie a primeira inspeção clicando no botão acima</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== VIEW: NOVA INSPEÇÃO ===== -->
+            <div id="view-nova" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div>
+                        <h2>Iniciar Nova Inspeção</h2>
+                        <p>Preencha as informações para iniciar o processo de inspeção</p>
+                    </div>
+                    <button class="mod-btn ghost" onclick="switchView('dashboard')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-clipboard-list" style="color:var(--accent);margin-right:8px"></i> Dados da Inspeção</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Tipo de Inspeção <span>*</span></label>
+                                <select class="mod-select-inp" id="insp-tipo" onchange="updateTipoInfo()">
+                                    <option value="">Selecione o tipo...</option>
+                                    <option value="recebimento">Inspeção de Recebimento de Matéria-Prima</option>
+                                    <option value="processo">Inspeção em Processo</option>
+                                    <option value="final">Inspeção Final / Liberação</option>
+                                    <option value="expedicao">Inspeção de Expedição</option>
+                                </select>
+                            </div>
+                            <div class="mod-form-group">
+                                <label>Número do Pedido</label>
+                                <input class="mod-input" id="insp-pedido" placeholder="Ex: PED-2026-0158">
+                            </div>
+                        </div>
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Produto / Item <span>*</span></label>
+                                <input class="mod-input" id="insp-produto" list="produtosList" placeholder="Nome ou código do produto">
+                                <datalist id="produtosList">
+                                    <option value="Tampa Inox 304 - TP-001">
+                                    <option value="Parafuso M8x30 - PF-045">
+                                    <option value="Chapa Galvanizada 2mm - CH-012">
+                                    <option value="Tubo Quadrado 20x20 - TQ-007">
+                                </datalist>
+                            </div>
+                            <div class="mod-form-group">
+                                <label>Produção Total (unidades) <span>*</span></label>
+                                <input class="mod-input" type="number" id="insp-total" placeholder="Ex: 500" oninput="calcAmostragem()">
+                            </div>
+                        </div>
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Amostragem</label>
+                                <select class="mod-select-inp" id="insp-amostragem-tipo" onchange="calcAmostragem()">
+                                    <option value="pct">Percentual (%)</option>
+                                    <option value="total">100% - Inspeção Total</option>
+                                    <option value="qtd">Quantidade fixa</option>
+                                </select>
+                            </div>
+                            <div class="mod-form-group" id="insp-amostragem-val-group">
+                                <label id="insp-amostragem-val-label">Percentual (%)</label>
+                                <div style="display:flex;gap:10px;align-items:center">
+                                    <input class="mod-input" type="number" id="insp-amostragem-val" placeholder="Ex: 10" oninput="calcAmostragem()" style="flex:1">
+                                    <span style="font-size:.85rem;color:rgba(255,255,255,.5)">= <strong id="insp-qty-result" style="color:var(--primary-light)">0</strong> unidades</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Inspetor Responsável <span>*</span></label>
+                                <select class="mod-select-inp" id="insp-inspetor">
+                                    <option value="">Selecione...</option>
+                                    <option>Ana Carvalho - Qualidade</option>
+                                    <option>Carlos Ferreira - Produção</option>
+                                    <option>Maria Silva - CQ</option>
+                                    <option>João Teste - Qualidade</option>
+                                </select>
+                            </div>
+                            <div class="mod-form-group">
+                                <label>Instrumento de Medição</label>
+                                <select class="mod-select-inp" id="insp-instrumento">
+                                    <option value="">Nenhum (inspeção visual)</option>
+                                    <option value="1">Paquímetro Digital DP-01 - - Vigente</option>
+                                    <option value="2">Micrômetro MK-03 - - Vigente</option>
+                                    <option value="3" disabled>Calibrador C-07 -  Vencido (Calibração em 15/05/2026)</option>
+                                    <option value="4">Balanã Eletrônica BE-02 - - Vigente</option>
+                                </select>
+                                <p class="mod-form-hint">Instrumentos vencidos não podem ser selecionados</p>
+                            </div>
+                        </div>
+
+                        <hr class="mod-divider">
+                        <div class="mod-form-section-title">Características a Verificar</div>
+                        <div id="caracteristicas-list">
+                            <div class="chk-item">
+                                <input type="checkbox" checked>
+                                <span class="chk-label">Dimensão / Medidas conforme especificação</span>
+                            </div>
+                            <div class="chk-item">
+                                <input type="checkbox" checked>
+                                <span class="chk-label">Acabamento superficial</span>
+                            </div>
+                            <div class="chk-item">
+                                <input type="checkbox" checked>
+                                <span class="chk-label">Identificação / Rastreabilidade</span>
+                            </div>
+                            <div class="chk-item">
+                                <input type="checkbox">
+                                <span class="chk-label">Peso conforme especificação</span>
+                            </div>
+                            <div class="chk-item">
+                                <input type="checkbox">
+                                <span class="chk-label">Ausência de defeitos visuais</span>
+                            </div>
+                        </div>
+                        <button class="mod-btn ghost" style="margin-top:10px;font-size:.82rem" onclick="addCaracteristica()"><i class="fas fa-plus"></i> Adicionar Característica</button>
+
+                        <hr class="mod-divider">
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Aceitar Imagens na Inspeção</label>
+                                <div class="mod-toggle-row">
+                                    <label class="mod-toggle"><input type="checkbox" id="insp-imagens"><span class="mod-toggle-slider"></span></label>
+                                    <span class="mod-toggle-label">Permitir anexar fotos durante a inspeção</span>
+                                </div>
+                            </div>
+                            <div class="mod-form-group">
+                                <label>Salvar para Finalizar Depois</label>
+                                <div class="mod-toggle-row">
+                                    <label class="mod-toggle"><input type="checkbox" id="insp-salvar-depois"><span class="mod-toggle-slider"></span></label>
+                                    <span class="mod-toggle-label">Inspeção pode ser finalizada posteriormente</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mod-form-row full">
+                            <div class="mod-form-group">
+                                <label>Observações Iniciais</label>
+                                <textarea class="mod-textarea" id="insp-obs" placeholder="Observações sobre o lote, fornecedor, condições de recebimento..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+                    <button class="mod-btn ghost" onclick="switchView('dashboard')">Cancelar</button>
+                    <button class="mod-btn primary" onclick="criarInspecao()"><i class="fas fa-play"></i> Iniciar Inspeção</button>
+                </div>
+            </div>
+
+            <!-- ===== VIEW: EM ANDAMENTO ===== -->
+            <div id="view-andamento" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div>
+                        <h2>Inspeções em Andamento</h2>
+                        <p>Inspeções iniciadas aguardando conclusão</p>
+                    </div>
+                    <button class="mod-btn primary" onclick="switchView('nova')"><i class="fas fa-plus"></i> Nova Inspeção</button>
+                </div>
+                <div class="mod-filter-bar">
+                    <div class="mod-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchAndamento" placeholder="Buscar por produto ou pedido..." oninput="filterList('andamento')">
+                    </div>
+                    <select class="mod-select" onchange="filterList('andamento')">
+                        <option>Todos os tipos</option>
+                        <option>Recebimento</option>
+                        <option>Em Processo</option>
+                        <option>Final</option>
+                    </select>
+                </div>
+                <div id="list-andamento"></div>
+                <div class="mod-empty" id="empty-andamento" style="display:none">
+                    <i class="fas fa-spinner"></i>
+                    <h3>Nenhuma inspeção em andamento</h3>
+                    <p>Inicie uma nova inspeção para ver aqui</p>
+                </div>
+            </div>
+
+            <!-- ===== VIEW: FINALIZADAS ===== -->
+            <div id="view-finalizadas" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Inspeções Finalizadas</h2><p>Histórico completo de inspeções concluídas</p></div>
+                </div>
+                <div class="mod-filter-bar">
+                    <div class="mod-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchFinalizadas" placeholder="Buscar por produto, pedido ou inspetor..." oninput="filterList('finalizadas')">
+                    </div>
+                    <input type="date" class="mod-select" id="dateFrom" style="width:auto">
+                    <input type="date" class="mod-select" id="dateTo" style="width:auto">
+                    <select class="mod-select" id="resultFilter">
+                        <option value="">Todos</option>
+                        <option value="aprovado">Aprovados</option>
+                        <option value="reprovado">Reprovados</option>
+                    </select>
+                </div>
+                <div class="mod-table-wrap">
+                    <table class="mod-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Produto</th>
+                                <th>Pedido</th>
+                                <th>Tipo</th>
+                                <th>Inspetor</th>
+                                <th>Qt. Inspecionada</th>
+                                <th>Defeitos</th>
+                                <th>Resultado</th>
+                                <th>Início</th>
+                                <th>Fim</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-finalizadas"></tbody>
+                    </table>
+                </div>
+                <div class="mod-empty" id="empty-finalizadas" style="display:none">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Nenhuma inspeção finalizada</h3>
+                    <p>Inspeções concluídas aparecerão aqui</p>
+                </div>
+            </div>
+
+            <!-- ===== VIEW: PRODUTOS BLOQUEADOS ===== -->
+            <div id="view-bloqueados" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Produtos Bloqueados</h2><p>Produtos não conformes aguardando disposição</p></div>
+                </div>
+                <div id="list-bloqueados"></div>
+                <div class="mod-empty" id="empty-bloqueados" style="display:none">
+                    <i class="fas fa-check-circle" style="color:var(--accent)"></i>
+                    <h3>Nenhum produto bloqueado</h3>
+                    <p>Todos os produtos estáo liberados</p>
+                </div>
+            </div>
+
+            <!-- ===== VIEW: CONFIGURAÇÕES ===== -->
+            <div id="view-config" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Configurações de Inspeção</h2><p>Ajuste parâmetros e responsabilidades</p></div>
+                </div>
+                <div class="card" style="margin-bottom:20px">
+                    <div class="card-header"><h4><i class="fas fa-users" style="color:var(--primary);margin-right:8px"></i> Responsabilidades</h4></div>
+                    <div class="card-body">
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Setor Responsável pela Inspeção</label>
+                                <input class="mod-input" value="Controle de Qualidade">
+                            </div>
+                            <div class="mod-form-group">
+                                <label>Aprovador de Liberação</label>
+                                <input class="mod-input" value="João Teste">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="margin-bottom:20px">
+                    <div class="card-header"><h4><i class="fas fa-sliders" style="color:var(--accent);margin-right:8px"></i> Padrés de Amostragem</h4></div>
+                    <div class="card-body">
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Amostragem Padrão (%)</label>
+                                <input class="mod-input" type="number" value="10">
+                            </div>
+                            <div class="mod-form-group">
+                                <label>Todo pedido exige inspeção?</label>
+                                <div class="mod-toggle-row" style="margin-top:8px">
+                                    <label class="mod-toggle"><input type="checkbox" checked><span class="mod-toggle-slider"></span></label>
+                                    <span class="mod-toggle-label">Sim, toda entrada de pedido gera inspeção</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h4><i class="fas fa-tags" style="color:var(--warning);margin-right:8px"></i> Motivos de Bloqueio e Liberação</h4></div>
+                    <div class="card-body">
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Motivos de Bloqueio</label>
+                                <div id="motivos-bloqueio" style="display:flex;flex-direction:column;gap:6px">
+                                    <div style="display:flex;gap:6px;align-items:center">
+                                        <input class="mod-input" value="Dimensão fora do tolerado" style="flex:1">
+                                        <button class="mod-btn danger" style="padding:7px 10px"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                    <div style="display:flex;gap:6px;align-items:center">
+                                        <input class="mod-input" value="Defeito superficial" style="flex:1">
+                                        <button class="mod-btn danger" style="padding:7px 10px"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                    <div style="display:flex;gap:6px;align-items:center">
+                                        <input class="mod-input" value="Falta de rastreabilidade" style="flex:1">
+                                        <button class="mod-btn danger" style="padding:7px 10px"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <button class="mod-btn ghost" style="margin-top:8px;font-size:.82rem" onclick="addMotivoInput('motivos-bloqueio')"><i class="fas fa-plus"></i> Adicionar</button>
+                            </div>
+                            <div class="mod-form-group">
+                                <label>Motivos de Liberação (uso condicional)</label>
+                                <div id="motivos-liberacao" style="display:flex;flex-direction:column;gap:6px">
+                                    <div style="display:flex;gap:6px;align-items:center">
+                                        <input class="mod-input" value="Desvio aprovado pela engenharia" style="flex:1">
+                                        <button class="mod-btn danger" style="padding:7px 10px"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                    <div style="display:flex;gap:6px;align-items:center">
+                                        <input class="mod-input" value="Urgência produtiva - uso restrito" style="flex:1">
+                                        <button class="mod-btn danger" style="padding:7px 10px"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <button class="mod-btn ghost" style="margin-top:8px;font-size:.82rem" onclick="addMotivoInput('motivos-liberacao')"><i class="fas fa-plus"></i> Adicionar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                    <button class="mod-btn primary"><i class="fas fa-save"></i> Salvar Configurações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL: CONDUZIR INSPEÇÃO ===== -->
+<div class="mod-modal-overlay" id="modalInspecao">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-clipboard-check"></i> Conduzindo Inspeção</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalInspecao')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div id="modal-insp-info" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px;margin-bottom:20px">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+                    <div><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:3px">PRODUTO</div><div id="mi-produto" style="font-weight:600;color:#fff"></div></div>
+                    <div><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:3px">PEDIDO</div><div id="mi-pedido" style="font-weight:600;color:#fff"></div></div>
+                    <div><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:3px">QT. INSPECIONADA</div><div id="mi-qty" style="font-weight:600;color:var(--primary-light)"></div></div>
+                </div>
+            </div>
+
+            <div class="mod-form-section-title">Verificação de Características</div>
+            <div id="modal-caracteristicas"></div>
+
+            <hr class="mod-divider">
+            <div class="mod-form-section-title">Apontamento de Defeitos</div>
+            <div id="modal-defeitos-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
+            <button class="mod-btn ghost" style="font-size:.82rem" onclick="addDefeitoRow()"><i class="fas fa-plus"></i> Registrar Defeito</button>
+
+            <hr class="mod-divider">
+            <div class="mod-form-row">
+                <div class="mod-form-group">
+                    <label>Resultado da Inspeção</label>
+                    <select class="mod-select-inp" id="mi-resultado">
+                        <option value="aprovado">Aprovado - Liberar para uso</option>
+                        <option value="reprovado">Reprovado - Bloquear produto</option>
+                        <option value="condicional">Aprovado Condicional</option>
+                    </select>
+                </div>
+                <div class="mod-form-group" id="mi-motivo-bloqueio-group" style="display:none">
+                    <label>Motivo do Bloqueio</label>
+                    <select class="mod-select-inp" id="mi-motivo-bloqueio">
+                        <option>Dimensão fora do tolerado</option>
+                        <option>Defeito superficial</option>
+                        <option>Falta de rastreabilidade</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mod-form-group" style="margin-top:10px">
+                <label>Observações Finais</label>
+                <textarea class="mod-textarea" id="mi-obs-final" placeholder="Conclusés, observações e recomendações da inspeção..."></textarea>
+            </div>
+
+            <div id="mi-image-section" style="display:none;margin-top:12px">
+                <div class="mod-form-section-title">Imagens da Inspeção</div>
+                <label style="display:flex;align-items:center;gap:10px;padding:16px;border:2px dashed rgba(255,255,255,.1);border-radius:10px;cursor:pointer">
+                    <i class="fas fa-camera" style="color:rgba(255,255,255,.3);font-size:1.5rem"></i>
+                    <div><div style="font-size:.85rem;color:rgba(255,255,255,.5)">Clique para anexar fotos</div><div style="font-size:.75rem;color:rgba(255,255,255,.25)">PNG, JPG, até 10MB por imagem</div></div>
+                    <input type="file" multiple accept="image/*" style="display:none">
+                </label>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalInspecao')">Salvar e Continuar Depois</button>
+            <button class="mod-btn primary" onclick="finalizarInspecao()"><i class="fas fa-check"></i> Finalizar Inspeção</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL: LIBERAR PRODUTO BLOQUEADO ===== -->
+<div class="mod-modal-overlay" id="modalLiberar">
+    <div class="mod-modal sm">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-unlock" style="color:var(--accent)"></i> Liberar Produto Bloqueado</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalLiberar')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-alert warn" style="margin-bottom:16px">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>Certifique-se de que o motivo de liberação está documentado e aprovado pelo responsável.</div>
+            </div>
+            <div class="mod-form-group" style="margin-bottom:14px">
+                <label>Produto</label>
+                <input class="mod-input" id="lib-produto" readonly style="opacity:.6">
+            </div>
+            <div class="mod-form-group" style="margin-bottom:14px">
+                <label>Motivo de Liberação <span>*</span></label>
+                <select class="mod-select-inp" id="lib-motivo">
+                    <option value="">Selecione...</option>
+                    <option>Desvio aprovado pela engenharia</option>
+                    <option>Urgência produtiva - uso restrito</option>
+                    <option>Re-inspeção aprovada após correção</option>
+                </select>
+            </div>
+            <div class="mod-form-group" style="margin-bottom:14px">
+                <label>Aprovado por <span>*</span></label>
+                <input class="mod-input" id="lib-aprovado" placeholder="Nome do aprovador">
+            </div>
+            <div class="mod-form-group">
+                <label>Observações</label>
+                <textarea class="mod-textarea" id="lib-obs" placeholder="Justificativa e condições da liberação..." rows="3"></textarea>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalLiberar')">Cancelar</button>
+            <button class="mod-btn accent" onclick="confirmarLiberacao()"><i class="fas fa-unlock"></i> Confirmar Liberação</button>
+        </div>
+    </div>
+</div>
+
+<script>
+//  DATA 
+const DB_KEY = 'sgq_inspecoes';
+
+function getDB() {
+    return JSON.parse(localStorage.getItem(DB_KEY) || '{"inspecoes":[]}');
+}
+function saveDB(db) {
+    localStorage.setItem(DB_KEY, JSON.stringify(db));
+}
+
+// Seed data
+function seedData() {
+    const db = getDB();
+    if (db.inspecoes.length > 0) return;
+    const seed = [
+        { id: 1, tipo:'Final', produto:'Tampa Inox 304 - TP-001', pedido:'PED-2026-0155', inspetor:'Ana Carvalho', totalProd:200, qtInspecionada:20, status:'finalizada', resultado:'aprovado', defeitos:0, inicio:'2026-06-03T08:00', fim:'2026-06-03T09:30', obs:'' },
+        { id: 2, tipo:'Recebimento', produto:'Chapa Galvanizada 2mm', pedido:'PED-2026-0157', inspetor:'Carlos Ferreira', totalProd:500, qtInspecionada:50, status:'andamento', resultado:null, defeitos:0, inicio:'2026-06-04T07:45', fim:null, obs:'' },
+        { id: 3, tipo:'Final', produto:'Parafuso M8x30 - PF-045', pedido:'PED-2026-0152', inspetor:'Maria Silva', totalProd:1000, qtInspecionada:100, status:'finalizada', resultado:'reprovado', defeitos:8, inicio:'2026-06-02T14:00', fim:'2026-06-02T15:00', obs:'Lote com variação de comprimento', bloqueado:true, motivoBloqueio:'Dimensão fora do tolerado' },
+        { id: 4, tipo:'Em Processo', produto:'Tubo Quadrado 20x20', pedido:'PED-2026-0158', inspetor:'João Teste', totalProd:300, qtInspecionada:30, status:'andamento', resultado:null, defeitos:0, inicio:'2026-06-04T09:00', fim:null, obs:'' },
+    ];
+    db.inspecoes = seed;
+    saveDB(db);
+}
+
+//  VIEW MANAGEMENT 
+let currentView = 'dashboard';
+let currentInspId = null;
+
+function switchView(v) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-' + v).style.display = 'block';
+    const navEl = document.getElementById('nav-' + v);
+    if (navEl) navEl.classList.add('active');
+    currentView = v;
+    renderView(v);
+}
+
+function renderView(v) {
+    switch(v) {
+        case 'dashboard': renderDashboard(); break;
+        case 'andamento': renderList('andamento'); break;
+        case 'finalizadas': renderFinalizadas(); break;
+        case 'bloqueados': renderBloqueados(); break;
+    }
+    updateBadges();
+}
+
+//  DASHBOARD 
+function renderDashboard() {
+    const db = getDB();
+    const insp = db.inspecoes;
+    const today = new Date().toISOString().slice(0, 10);
+    const andamento = insp.filter(i => i.status === 'andamento');
+    const finHoje   = insp.filter(i => i.status === 'finalizada' && i.fim && i.fim.startsWith(today));
+    const bloqueados = insp.filter(i => i.bloqueado === true);
+    document.getElementById('stat-andamento').textContent = andamento.length;
+    document.getElementById('stat-hoje').textContent = finHoje.length;
+    document.getElementById('stat-bloqueados').textContent = bloqueados.length;
+    document.getElementById('stat-total').textContent = insp.length;
+
+    const recentEl = document.getElementById('recentList');
+    const emptyEl  = document.getElementById('recentEmpty');
+    const recent   = [...insp].reverse().slice(0, 5);
+    if (!recent.length) { recentEl.innerHTML = ''; emptyEl.style.display = 'flex'; return; }
+    emptyEl.style.display = 'none';
+    recentEl.innerHTML = recent.map(i => `
+        <div style="display:flex;align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer" onclick="openInspecao(${i.id})">
+            <div style="width:38px;height:38px;border-radius:9px;background:${i.resultado==='reprovado'?'rgba(239,68,68,.12)':i.status==='andamento'?'rgba(245,158,11,.12)':'rgba(16,185,129,.12)'};display:flex;align-items:center;justify-content:center;font-size:.85rem;color:${i.resultado==='reprovado'?'#f87171':i.status==='andamento'?'#fbbf24':'#34d399'}">
+                <i class="fas ${i.resultado==='reprovado'?'fa-ban':i.status==='andamento'?'fa-spinner':'fa-check'}"></i>
+            </div>
+            <div style="flex:1">
+                <div style="font-size:.88rem;font-weight:600;color:#fff">${i.produto}</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.35)">${i.tipo} � ${i.pedido||'Sem pedido'} � ${i.inspetor}</div>
+            </div>
+            <span class="sbadge ${i.status==='andamento'?'andamento':i.resultado||'concluida'}">${i.status==='andamento'?'Em Andamento':i.resultado==='aprovado'?'Aprovado':i.resultado==='reprovado'?'Reprovado':'Concluída'}</span>
+        </div>
+    `).join('');
+}
+
+//  LIST VIEWS 
+function renderList(type) {
+    const db = getDB();
+    const items = db.inspecoes.filter(i => i.status === (type === 'andamento' ? 'andamento' : 'finalizada'));
+    const listEl = document.getElementById('list-' + type);
+    const emptyEl = document.getElementById('empty-' + type);
+    if (!items.length) { listEl.innerHTML = ''; emptyEl.style.display = 'flex'; return; }
+    emptyEl.style.display = 'none';
+    listEl.innerHTML = items.map(i => `
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all .2s" onmouseenter="this.style.background='rgba(255,255,255,.06)'" onmouseleave="this.style.background='rgba(255,255,255,.03)'" onclick="openInspecao(${i.id})">
+            <div style="flex:1">
+                <div style="font-size:.95rem;font-weight:700;color:#fff;margin-bottom:4px">${i.produto}</div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:.78rem;color:rgba(255,255,255,.4)">
+                    <span><i class="fas fa-hashtag" style="margin-right:4px"></i>${i.pedido||'-'}</span>
+                    <span><i class="fas fa-user" style="margin-right:4px"></i>${i.inspetor}</span>
+                    <span><i class="fas fa-tag" style="margin-right:4px"></i>${i.tipo}</span>
+                    <span><i class="fas fa-clock" style="margin-right:4px"></i>${formatDate(i.inicio)}</span>
+                    <span><i class="fas fa-box" style="margin-right:4px"></i>${i.qtInspecionada} / ${i.totalProd} unid.</span>
+                </div>
+            </div>
+            <span class="sbadge ${type === 'andamento' ? 'andamento' : (i.resultado||'andamento')}">${type==='andamento'?'Em Andamento':i.resultado==='aprovado'?'Aprovado':'Reprovado'}</span>
+        </div>
+    `).join('');
+}
+
+function renderFinalizadas() {
+    const db = getDB();
+    const items = db.inspecoes.filter(i => i.status === 'finalizada');
+    const tbody = document.getElementById('tbody-finalizadas');
+    const empty = document.getElementById('empty-finalizadas');
+    if (!items.length) { tbody.innerHTML = ''; empty.style.display = 'flex'; document.querySelector('.mod-table-wrap').style.display='none'; return; }
+    empty.style.display = 'none';
+    document.querySelector('.mod-table-wrap').style.display='block';
+    tbody.innerHTML = items.map(i => `
+        <tr onclick="openInspecao(${i.id})">
+            <td><span style="font-weight:700;color:rgba(255,255,255,.4)">#${i.id}</span></td>
+            <td><span style="font-weight:600;color:#fff">${i.produto}</span></td>
+            <td>${i.pedido||'-'}</td>
+            <td>${i.tipo}</td>
+            <td>${i.inspetor}</td>
+            <td>${i.qtInspecionada}</td>
+            <td><span style="font-weight:700;color:${i.defeitos>0?'var(--danger)':'var(--accent)'}">${i.defeitos}</span></td>
+            <td><span class="sbadge ${i.resultado}">${i.resultado==='aprovado'?'Aprovado':'Reprovado'}</span></td>
+            <td style="font-size:.78rem">${formatDate(i.inicio)}</td>
+            <td style="font-size:.78rem">${i.fim?formatDate(i.fim):'-'}</td>
+            <td><button class="tbl-btn primary" onclick="event.stopPropagation();openInspecao(${i.id})">Ver</button></td>
+        </tr>
+    `).join('');
+}
+
+function renderBloqueados() {
+    const db = getDB();
+    const items = db.inspecoes.filter(i => i.bloqueado === true);
+    const listEl = document.getElementById('list-bloqueados');
+    const emptyEl = document.getElementById('empty-bloqueados');
+    if (!items.length) { listEl.innerHTML = ''; emptyEl.style.display = 'flex'; return; }
+    emptyEl.style.display = 'none';
+    listEl.innerHTML = items.map(i => `
+        <div style="display:flex;align-items:center;gap:14px;padding:16px 20px;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:10px;margin-bottom:8px">
+            <div style="width:44px;height:44px;border-radius:10px;background:rgba(239,68,68,.15);display:flex;align-items:center;justify-content:center;color:#f87171;font-size:1.1rem;flex-shrink:0"><i class="fas fa-ban"></i></div>
+            <div style="flex:1">
+                <div style="font-weight:700;color:#fff;font-size:.95rem">${i.produto}</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.4);margin-top:3px">
+                    Motivo: ${i.motivoBloqueio||'Não conforme'} � Pedido: ${i.pedido||'-'} � Bloqueado em: ${i.fim?formatDate(i.fim):'-'}
+                </div>
+            </div>
+            <button class="mod-btn accent" onclick="openLiberarModal(${i.id})"><i class="fas fa-unlock"></i> Liberar</button>
+            <button class="mod-btn danger" style="font-size:.82rem" onclick="descartarBloqueado(${i.id})"><i class="fas fa-trash"></i></button>
+        </div>
+    `).join('');
+}
+
+//  BADGES 
+function updateBadges() {
+    const db = getDB();
+    const andamento = db.inspecoes.filter(i => i.status === 'andamento').length;
+    const bloqueados = db.inspecoes.filter(i => i.bloqueado).length;
+    document.getElementById('badge-andamento').textContent = andamento;
+    document.getElementById('badge-bloqueados').textContent = bloqueados;
+}
+
+//  CREATE 
+function criarInspecao() {
+    const tipo = document.getElementById('insp-tipo').value;
+    const produto = document.getElementById('insp-produto').value.trim();
+    const total = parseInt(document.getElementById('insp-total').value) || 0;
+    const inspetor = document.getElementById('insp-inspetor').value;
+    if (!tipo) return alert('Selecione o tipo de inspeção.');
+    if (!produto) return alert('Informe o produto.');
+    if (!total) return alert('Informe a quantidade total.');
+    if (!inspetor) return alert('Selecione o inspetor responsável.');
+
+    const amoTipo = document.getElementById('insp-amostragem-tipo').value;
+    const amoVal = parseFloat(document.getElementById('insp-amostragem-val').value) || 10;
+    let qtInsp = total;
+    if (amoTipo === 'pct') qtInsp = Math.ceil(total * amoVal / 100);
+    else if (amoTipo === 'qtd') qtInsp = amoVal;
+
+    const db = getDB();
+    const newId = db.inspecoes.length ? Math.max(...db.inspecoes.map(i => i.id)) + 1 : 1;
+    db.inspecoes.push({
+        id: newId, tipo: tipo, produto, pedido: document.getElementById('insp-pedido').value,
+        inspetor, totalProd: total, qtInspecionada: qtInsp, status: 'andamento',
+        resultado: null, defeitos: 0, inicio: new Date().toISOString().slice(0,16),
+        fim: null, obs: document.getElementById('insp-obs').value, imagens: []
+    });
+    saveDB(db);
+    switchView('andamento');
+}
+
+//  MODAL INSPEÇÃO 
+function openInspecao(id) {
+    const db = getDB();
+    const insp = db.inspecoes.find(i => i.id === id);
+    if (!insp) return;
+    currentInspId = id;
+    document.getElementById('mi-produto').textContent = insp.produto;
+    document.getElementById('mi-pedido').textContent = insp.pedido || '-';
+    document.getElementById('mi-qty').textContent = insp.qtInspecionada + ' unidades';
+
+    // Caracteràsticas
+    const caract = ['Dimensão / Medidas', 'Acabamento superficial', 'Identificação / Rastreabilidade', 'Peso conforme especificação'];
+    document.getElementById('modal-caracteristicas').innerHTML = caract.map((c, idx) => `
+        <div class="chk-item ${insp.status==='finalizada'?'checked':''}">
+            <input type="checkbox" ${insp.status==='finalizada'?'checked disabled':''}>
+            <span class="chk-label">${c}</span>
+        </div>
+    `).join('');
+
+    const resultSel = document.getElementById('mi-resultado');
+    resultSel.value = insp.resultado || 'aprovado';
+    document.getElementById('mi-obs-final').value = insp.obs || '';
+
+    if (insp.status === 'finalizada') {
+        document.querySelector('#modalInspecao .mod-modal-footer .mod-btn.primary').disabled = true;
+        document.querySelector('#modalInspecao .mod-modal-footer .mod-btn.primary').textContent = '? Inspeção Concluída';
+    } else {
+        document.querySelector('#modalInspecao .mod-modal-footer .mod-btn.primary').disabled = false;
+        document.querySelector('#modalInspecao .mod-modal-footer .mod-btn.primary').innerHTML = '<i class="fas fa-check"></i> Finalizar Inspeção';
+    }
+    openModal('modalInspecao');
+}
+
+function addDefeitoRow() {
+    const list = document.getElementById('modal-defeitos-list');
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;align-items:center';
+    row.innerHTML = `
+        <select class="mod-select-inp" style="flex:2"><option>Selecione o defeito...</option><option>Dimensão fora do tolerado</option><option>Defeito superficial</option><option>Trinca</option><option>Oxidação</option><option>Falta de identificação</option></select>
+        <input class="mod-input" type="number" placeholder="Qt." style="width:70px">
+        <input class="mod-input" placeholder="Tamanho/detalhe" style="flex:1">
+        <button class="mod-btn danger" style="padding:7px 10px;flex-shrink:0" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>
+    `;
+    list.appendChild(row);
+}
+
+function finalizarInspecao() {
+    const db = getDB();
+    const insp = db.inspecoes.find(i => i.id === currentInspId);
+    if (!insp) return;
+    const resultado = document.getElementById('mi-resultado').value;
+    insp.status = 'finalizada';
+    insp.resultado = resultado;
+    insp.fim = new Date().toISOString().slice(0,16);
+    insp.obs = document.getElementById('mi-obs-final').value;
+    if (resultado === 'reprovado') insp.bloqueado = true;
+    saveDB(db);
+    closeModal('modalInspecao');
+    renderView(currentView);
+    showToast('Inspeção finalizada com sucesso!', 'success');
+}
+
+//  LIBERAR BLOQUEADO 
+function openLiberarModal(id) {
+    const db = getDB();
+    const insp = db.inspecoes.find(i => i.id === id);
+    if (!insp) return;
+    currentInspId = id;
+    document.getElementById('lib-produto').value = insp.produto;
+    openModal('modalLiberar');
+}
+
+function confirmarLiberacao() {
+    const motivo = document.getElementById('lib-motivo').value;
+    const aprovado = document.getElementById('lib-aprovado').value.trim();
+    if (!motivo) return alert('Selecione o motivo de liberação.');
+    if (!aprovado) return alert('Informe o aprovador.');
+    const db = getDB();
+    const insp = db.inspecoes.find(i => i.id === currentInspId);
+    if (!insp) return;
+    insp.bloqueado = false;
+    insp.liberadoPor = aprovado;
+    insp.motivoLiberacao = motivo;
+    saveDB(db);
+    closeModal('modalLiberar');
+    renderView(currentView);
+    showToast('Produto liberado com sucesso!', 'success');
+}
+
+function descartarBloqueado(id) {
+    if (!confirm('Confirmar descarte do produto não conforme? Esta ação não pode ser desfeita.')) return;
+    const db = getDB();
+    const insp = db.inspecoes.find(i => i.id === id);
+    if (insp) { insp.bloqueado = false; insp.descartado = true; }
+    saveDB(db);
+    renderView(currentView);
+}
+
+//  HELPERS 
+function calcAmostragem() {
+    const total = parseInt(document.getElementById('insp-total').value) || 0;
+    const tipo = document.getElementById('insp-amostragem-tipo').value;
+    const valGroup = document.getElementById('insp-amostragem-val-group');
+    const valLabel = document.getElementById('insp-amostragem-val-label');
+    if (tipo === 'total') { valGroup.style.display = 'none'; return; }
+    valGroup.style.display = 'flex';
+    valLabel.textContent = tipo === 'pct' ? 'Percentual (%)' : 'Quantidade fixa';
+    const val = parseFloat(document.getElementById('insp-amostragem-val').value) || 0;
+    const result = tipo === 'pct' ? Math.ceil(total * val / 100) : Math.min(val, total);
+    document.getElementById('insp-qty-result').textContent = result;
+}
+
+function addCaracteristica() {
+    const list = document.getElementById('caracteristicas-list');
+    const div = document.createElement('div');
+    div.className = 'chk-item';
+    div.innerHTML = `<input type="checkbox" checked><input class="mod-input" placeholder="Caracteràstica..." style="flex:1;margin-left:4px"><button class="mod-btn danger" style="padding:5px 8px;font-size:.75rem" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+    list.appendChild(div);
+}
+
+function addMotivoInput(containerId) {
+    const cont = document.getElementById(containerId);
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;gap:6px;align-items:center';
+    div.innerHTML = `<input class="mod-input" placeholder="Novo motivo..." style="flex:1"><button class="mod-btn danger" style="padding:7px 10px" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>`;
+    cont.appendChild(div);
+}
+
+function filterList(type) { renderView(type); }
+function globalSearchFn() { /* stub for cross-module search */ }
+function formatDate(str) {
+    if (!str) return '-';
+    const d = new Date(str);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+}
+
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;font-size:.88rem;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:all .3s;background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.mod-modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('active'); });
+});
+
+// Init
+seedData();
+renderDashboard();
+updateBadges();
+</script>
+<script>
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');});
+</script><script>
+function startModuleTour() {
+    alert('Tour deste módulo em breve! ');
+}
+</script></body>
+</html>
+

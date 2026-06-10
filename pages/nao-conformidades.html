@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Não Conformidades e Planos de Ação - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../assets/img/logo.png" style="width:100px;">
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-triangle-exclamation" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Não Conformidades</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Não Conformidades</div>
+                <a href="#" class="nav-item active" id="nav-todas" onclick="switchView('todas');return false"><i class="fas fa-list"></i> Todas as NCs / Planos</a>
+                <a href="#" class="nav-item" id="nav-nova" onclick="openNovoModal();return false"><i class="fas fa-plus-circle"></i> Novo Plano / NC</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Cadastros</div>
+                <a href="#" class="nav-item" id="nav-cadastros" onclick="switchView('cadastros');return false"><i class="fas fa-tags"></i> Motivos e Categorias</a>
+                <a href="#" class="nav-item" id="nav-config" onclick="switchView('config');return false"><i class="fas fa-gear"></i> Configurações</a>
+            </div>
+        </nav>
+        </aside>
+
+    <!-- ===== MAIN ===== -->
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar NC, plano ou responsável...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JD</div>
+                        <span class="user-btn-name">Jo\u00e3o Demo</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JD</div>
+                            <div><div class="user-name">Jo\u00e3o Demo</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- ===== VIEW: TODAS ===== -->
+            <div id="view-todas" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-bug" style="color:var(--danger);margin-right:10px"></i>Não Conformidades e Planos de Ação</h2>
+                        <p>Gestão de NCs, melhorias e ações corretivas - requisito 10.2</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn primary" onclick="openNovoModal()"><i class="fas fa-plus"></i> Novo Plano / NC</button>
+                    </div>
+                </div>
+
+                <div class="mod-stats">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fas fa-exclamation-circle"></i></div>
+                        </div>
+                        <div class="stat-value" id="stat-rnc">0</div>
+                        <div class="stat-label">RNCs Abertas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-list-check"></i></div>
+                        </div>
+                        <div class="stat-value" id="stat-planos">0</div>
+                        <div class="stat-label">Planos em Andamento</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-trending-up"></i></div>
+                        </div>
+                        <div class="stat-value" id="stat-melhorias">0</div>
+                        <div class="stat-label">Melhorias Ativas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)"><i class="fas fa-check-double"></i></div>
+                        </div>
+                        <div class="stat-value" id="stat-concluidos">0</div>
+                        <div class="stat-label">Concluídos (30d)</div>
+                    </div>
+                </div>
+
+                <!-- Filter tabs -->
+                <div class="mod-tabs" id="tipo-tabs">
+                    <button class="mod-tab active" data-tipo="" onclick="setTipoFilter(this,'')">Todos</button>
+                    <button class="mod-tab" data-tipo="rnc" onclick="setTipoFilter(this,'rnc')"><i class="fas fa-bug"></i> RNC</button>
+                    <button class="mod-tab" data-tipo="plano" onclick="setTipoFilter(this,'plano')"><i class="fas fa-list-check"></i> Plano de Ação</button>
+                    <button class="mod-tab" data-tipo="melhoria" onclick="setTipoFilter(this,'melhoria')"><i class="fas fa-trending-up"></i> Melhoria</button>
+                </div>
+
+                <div class="mod-filter-bar">
+                    <div class="mod-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchTodas" placeholder="Buscar..." oninput="renderTodas()">
+                    </div>
+                    <select class="mod-select" id="statusFilter" onchange="renderTodas()">
+                        <option value="">Todos os status</option>
+                        <option value="aberta">Aberta</option>
+                        <option value="andamento">Em Andamento</option>
+                        <option value="concluida">Concluída</option>
+                    </select>
+                    <select class="mod-select" id="criticidadeFilter" onchange="renderTodas()">
+                        <option value="">Todas as criticidades</option>
+                        <option value="critica">Crática</option>
+                        <option value="alta">Alta</option>
+                        <option value="media">Média</option>
+                        <option value="baixa">Baixa</option>
+                    </select>
+                </div>
+
+                <div id="lista-todas"></div>
+                <div class="mod-empty" id="empty-todas" style="display:none">
+                    <i class="fas fa-check-circle" style="color:var(--accent)"></i>
+                    <h3>Nenhum item encontrado</h3>
+                    <p>Crie a primeira NC ou plano de ação</p>
+                </div>
+            </div>
+
+            <!-- ===== VIEW: CADASTROS ===== -->
+            <div id="view-cadastros" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Motivos e Categorias</h2><p>Cadastre os motivos padrão para planos de ação e RNCs</p></div>
+                </div>
+                <div class="card" style="margin-bottom:20px">
+                    <div class="card-header"><h4><i class="fas fa-tags" style="color:var(--warning);margin-right:8px"></i> Motivos de Abertura</h4></div>
+                    <div class="card-body">
+                        <div id="motivos-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+                            <div style="display:flex;gap:8px;align-items:center"><span style="flex:0 0 100px;font-size:.78rem;color:rgba(255,255,255,.45);font-weight:600">TIPO</span><span style="flex:1;font-size:.78rem;color:rgba(255,255,255,.45);font-weight:600">DESCRIÇÃO</span></div>
+                            <div style="display:flex;gap:8px;align-items:center">
+                                <select class="mod-select-inp" style="flex:0 0 120px"><option>RNC</option><option>Plano de Ação</option><option>Melhoria</option></select>
+                                <input class="mod-input" style="flex:1" value="Reclamação de cliente">
+                                <button class="mod-btn danger" style="padding:7px 10px"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div style="display:flex;gap:8px;align-items:center">
+                                <select class="mod-select-inp" style="flex:0 0 120px"><option>RNC</option><option selected>Plano de Ação</option><option>Melhoria</option></select>
+                                <input class="mod-input" style="flex:1" value="Auditoria interna">
+                                <button class="mod-btn danger" style="padding:7px 10px"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div style="display:flex;gap:8px;align-items:center">
+                                <select class="mod-select-inp" style="flex:0 0 120px"><option selected>RNC</option><option>Plano de Ação</option><option>Melhoria</option></select>
+                                <input class="mod-input" style="flex:1" value="Resultado de inspeção">
+                                <button class="mod-btn danger" style="padding:7px 10px"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <button class="mod-btn ghost" style="font-size:.82rem"><i class="fas fa-plus"></i> Adicionar Motivo</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== VIEW: CONFIG ===== -->
+            <div id="view-config" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Configurações</h2></div></div>
+                <div class="card">
+                    <div class="card-header"><h4>Configurações Gerais de NCs</h4></div>
+                    <div class="card-body">
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Prazo padrão para resposta (dias)</label>
+                                <input class="mod-input" type="number" value="15">
+                            </div>
+                            <div class="mod-form-group">
+                                <label>Notificar responsável por e-mail</label>
+                                <div class="mod-toggle-row" style="margin-top:8px">
+                                    <label class="mod-toggle"><input type="checkbox" checked><span class="mod-toggle-slider"></span></label>
+                                    <span class="mod-toggle-label">Ativo</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                            <button class="mod-btn primary"><i class="fas fa-save"></i> Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== VIEW: DETAIL ===== -->
+            <div id="view-detail" class="mod-view" style="display:none"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL: NOVO PLANO / NC ===== -->
+<div class="mod-modal-overlay" id="modalNovo">
+    <div class="mod-modal xl">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-plus-circle"></i> Novo Plano de Ação / NC</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNovo')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <!-- Tipo -->
+            <div class="mod-form-section-title">Tipo e Identificação</div>
+            <div class="mod-form-row three">
+                <div class="mod-form-group">
+                    <label>Motivo / Tipo <span>*</span></label>
+                    <select class="mod-select-inp" id="nc-tipo" onchange="updateTipoBehavior()">
+                        <option value="">Selecione...</option>
+                        <option value="rnc">RNC - Registro de Não Conformidade</option>
+                        <option value="plano">Plano de Ação</option>
+                        <option value="melhoria">Melhoria Contínua</option>
+                    </select>
+                </div>
+                <div class="mod-form-group">
+                    <label>Criticidade <span>*</span></label>
+                    <select class="mod-select-inp" id="nc-criticidade">
+                        <option value="baixa">Baixa</option>
+                        <option value="media" selected>Média</option>
+                        <option value="alta">Alta</option>
+                        <option value="critica">Crática</option>
+                    </select>
+                </div>
+                <div class="mod-form-group">
+                    <label>Pedido Vinculado</label>
+                    <input class="mod-input" id="nc-pedido" placeholder="Ex: PED-2026-0158">
+                </div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group">
+                    <label>Título <span>*</span></label>
+                    <input class="mod-input" id="nc-titulo" placeholder="Descreva brevemente o problema ou melhoria">
+                </div>
+                <div class="mod-form-group">
+                    <label>Responsável <span>*</span></label>
+                    <select class="mod-select-inp" id="nc-responsavel">
+                        <option value="">Selecione...</option>
+                        <option>João Teste - Qualidade</option>
+                        <option>Ana Carvalho - Qualidade</option>
+                        <option>Carlos Ferreira - Produção</option>
+                        <option>Maria Silva - CQ</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mod-form-row full">
+                <div class="mod-form-group">
+                    <label>Descrição detalhada <span>*</span></label>
+                    <textarea class="mod-textarea" id="nc-descricao" rows="3" placeholder="Descreva o problema, evidências encontradas e impacto..."></textarea>
+                </div>
+            </div>
+
+            <!-- Análise de Causa -->
+            <div id="causa-section">
+                <hr class="mod-divider">
+                <div class="mod-form-section-title">Análise de Causa Raiz</div>
+                <div class="mod-form-row">
+                    <div class="mod-form-group">
+                        <label>Requer análise de causa?</label>
+                        <div class="mod-toggle-row" style="margin-top:6px">
+                            <label class="mod-toggle"><input type="checkbox" id="nc-analise-causa" onchange="toggleAnaliseCausa()"><span class="mod-toggle-slider"></span></label>
+                            <span class="mod-toggle-label">Sim, incluir análise de causa</span>
+                        </div>
+                    </div>
+                    <div class="mod-form-group" id="nc-metodo-group" style="display:none">
+                        <label>Método de análise</label>
+                        <select class="mod-select-inp" id="nc-metodo-causa" onchange="switchCausaMethod()">
+                            <option value="ishikawa">Diagrama de Ishikawa (6M)</option>
+                            <option value="5pqs">5 Porquês</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Ishikawa -->
+                <div id="ishikawa-section" style="display:none">
+                    <div class="ishikawa-wrap">
+                        <div class="ishikawa-title"><i class="fas fa-fish"></i> Diagrama de Ishikawa - Identifique as causas por categoria</div>
+                        <div class="ishikawa-grid" id="ishikawa-grid">
+                            <!-- populated by JS -->
+                        </div>
+                    </div>
+                    <div class="mod-form-hint" style="margin-bottom:12px"><i class="fas fa-lightbulb" style="color:var(--warning);margin-right:4px"></i> Dica: Clique em uma categoria para adicionar causas. Concentre-se em identificar a causa raiz, não apenas sintomas.</div>
+                </div>
+
+                <!-- 5 Porquês -->
+                <div id="cinco-pqs-section" style="display:none">
+                    <div id="cinco-pqs-list" style="display:flex;flex-direction:column;gap:8px"></div>
+                    <div class="mod-form-hint" style="margin-top:8px"><i class="fas fa-lightbulb" style="color:var(--warning);margin-right:4px"></i> Dica: Continue perguntando "Por quê?" até encontrar a causa raiz do problema, normalmente entre 3 a 5 vezes.</div>
+                </div>
+            </div>
+
+            <!-- 5W2H -->
+            <hr class="mod-divider">
+            <div class="mod-form-section-title">Plano de Ação - 5W2H</div>
+            <div class="mod-alert info" style="margin-bottom:16px">
+                <i class="fas fa-info-circle"></i>
+                <div>Cada ação será enviada ao responsável com prazo definido. O responsável será notificado e deverá preencher o status de execução.</div>
+            </div>
+            <div id="w5h2-acoes" style="display:flex;flex-direction:column;gap:10px">
+                <!-- populated by JS -->
+            </div>
+            <button class="mod-btn ghost" style="margin-top:10px;font-size:.82rem" onclick="addAcao5W2H()"><i class="fas fa-plus"></i> Adicionar Ação</button>
+
+            <hr class="mod-divider">
+            <div class="mod-form-row">
+                <div class="mod-form-group">
+                    <label>Prazo para Conclusão <span>*</span></label>
+                    <input class="mod-input" type="date" id="nc-prazo">
+                </div>
+                <div class="mod-form-group">
+                    <label>Setor Originador</label>
+                    <select class="mod-select-inp" id="nc-setor">
+                        <option value="">Selecione...</option>
+                        <option>Produção</option>
+                        <option>Qualidade</option>
+                        <option>Compras</option>
+                        <option>Logística</option>
+                        <option>Manutenção</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovo')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarNC()"><i class="fas fa-save"></i> Salvar e Abrir</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL: DETALHE ===== -->
+<div class="mod-modal-overlay" id="modalDetalhe">
+    <div class="mod-modal xl">
+        <div class="mod-modal-header">
+            <h3 id="detail-modal-title"><i class="fas fa-bug"></i> Detalhes</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalDetalhe')">&times;</button>
+        </div>
+        <div class="mod-modal-body" id="detail-modal-body"></div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalDetalhe')">Fechar</button>
+            <button class="mod-btn accent" id="detail-concluir-btn" onclick="concluirItem()"><i class="fas fa-check"></i> Marcar como Concluído</button>
+        </div>
+    </div>
+</div>
+
+<script>
+//  DATA 
+const DB_KEY = 'sgq_nc';
+let currentTipoFilter = '';
+let currentNcId = null;
+
+function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"items":[]}'); }
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+function seedData() {
+    const db = getDB();
+    if (db.items.length) return;
+    db.items = [
+        { id:1, tipo:'rnc', titulo:'Parafusos com rosca fora do especificado', descricao:'Lote recebido do fornecedor ABC com rosca M8 fora da tolerância de ±0,05mm. 12% do lote afetado.', criticidade:'alta', responsavel:'Ana Carvalho - Qualidade', status:'andamento', pedido:'PED-2026-0152', setor:'Qualidade', prazo:'2026-06-20', acoes:[{o:'Segregar lote','q':'100% das peças',r:'Carlos Ferreira',m:'Inspeção visual',q2:'Caixas vermelhas',h:'2026-06-05'}], abertaEm:'2026-06-02T14:00' },
+        { id:2, tipo:'plano', titulo:'Reduzir tempo de setup da linha de solda', descricao:'An?lise de produtividade identificou tempo de setup acima de 45 min. Meta: reduzir para 20 min.', criticidade:'media', responsavel:'Carlos Ferreira - Produção', status:'aberta', pedido:'', setor:'Produção', prazo:'2026-07-01', acoes:[], abertaEm:'2026-06-01T10:00' },
+        { id:3, tipo:'melhoria', titulo:'Digitalizar processo de inspeção de entrada', descricao:'Substituir planilhas manuais pelo módulo de inspeções do SGQ Online para ganho de rastreabilidade.', criticidade:'baixa', responsavel:'João Teste - Qualidade', status:'concluida', pedido:'', setor:'Qualidade', prazo:'2026-05-30', acoes:[], abertaEm:'2026-05-01T09:00', concluidaEm:'2026-05-28T16:00' },
+        { id:4, tipo:'rnc', titulo:'Documento PQ-003 desatualizado utilizado na produção', descricao:'Colaborador utilizou revisão 01 do PQ-003 sendo que revisão 02 estava vigente. Risco de não conformidade do produto.', criticidade:'critica', responsavel:'João Teste - Qualidade', status:'aberta', pedido:'PED-2026-0153', setor:'Produção', prazo:'2026-06-10', acoes:[], abertaEm:'2026-06-03T08:30' },
+    ];
+    saveDB(db);
+}
+
+//  VIEWS 
+function switchView(v) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-' + v).style.display = 'block';
+    const nav = document.getElementById('nav-' + v);
+    if (nav) nav.classList.add('active');
+    if (v === 'todas') renderTodas();
+}
+
+function setTipoFilter(btn, tipo) {
+    document.querySelectorAll('.mod-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    currentTipoFilter = tipo;
+    renderTodas();
+}
+
+function renderTodas() {
+    const db = getDB();
+    const search = (document.getElementById('searchTodas')?.value || '').toLowerCase();
+    const statusF = document.getElementById('statusFilter')?.value || '';
+    const critF = document.getElementById('criticidadeFilter')?.value || '';
+
+    const total30 = new Date(); total30.setDate(total30.getDate() + 30);
+    let items = db.items.filter(i => {
+        if (currentTipoFilter && i.tipo !== currentTipoFilter) return false;
+        if (statusF && i.status !== statusF) return false;
+        if (critF && i.criticidade !== critF) return false;
+        if (search && !i.titulo.toLowerCase().includes(search) && !i.responsavel.toLowerCase().includes(search)) return false;
+        return true;
+    });
+
+    const rnc = db.items.filter(i => i.tipo==='rnc' && i.status!=='concluida').length;
+    const planos = db.items.filter(i => i.tipo==='plano' && i.status==='andamento').length;
+    const melhorias = db.items.filter(i => i.tipo==='melhoria' && i.status!=='concluida').length;
+    const concluidos = db.items.filter(i => i.status==='concluida' && new Date(i.concluidaEm||'2000') > total30).length;
+    document.getElementById('stat-rnc').textContent = rnc;
+    document.getElementById('stat-planos').textContent = planos;
+    document.getElementById('stat-melhorias').textContent = melhorias;
+    document.getElementById('stat-concluidos').textContent = concluidos;
+
+    const listEl = document.getElementById('lista-todas');
+    const emptyEl = document.getElementById('empty-todas');
+    if (!items.length) { listEl.innerHTML = ''; emptyEl.style.display = 'flex'; return; }
+    emptyEl.style.display = 'none';
+
+    const tipoConfig = { rnc:{icon:'fa-bug',color:'var(--danger)',label:'RNC'}, plano:{icon:'fa-list-check',color:'var(--warning)',label:'Plano'}, melhoria:{icon:'fa-trending-up',color:'var(--accent)',label:'Melhoria'} };
+
+    listEl.innerHTML = items.map(i => {
+        const tc = tipoConfig[i.tipo] || tipoConfig.plano;
+        return `<div style="display:flex;align-items:flex-start;gap:14px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all .2s" onmouseenter="this.style.background='rgba(255,255,255,.06)'" onmouseleave="this.style.background='rgba(255,255,255,.03)'" onclick="openDetalhe(${i.id})">
+            <div style="width:44px;height:44px;border-radius:10px;background:${tc.color}18;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:${tc.color};flex-shrink:0"><i class="fas ${tc.icon}"></i></div>
+            <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap">
+                    <span style="font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;background:${tc.color}18;color:${tc.color}">${tc.label}</span>
+                    <span class="pri ${i.criticidade}">${i.criticidade.charAt(0).toUpperCase()+i.criticidade.slice(1)}</span>
+                    ${i.pedido ? `<span style="font-size:.72rem;color:rgba(255,255,255,.35)"><i class="fas fa-hashtag" style="margin-right:2px"></i>${i.pedido}</span>` : ''}
+                </div>
+                <div style="font-size:.95rem;font-weight:700;color:#fff;margin-bottom:4px">${i.titulo}</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.4)">${i.responsavel} � Prazo: ${formatDate(i.prazo)} � ${i.setor}</div>
+            </div>
+            <span class="sbadge ${i.status}">${{aberta:'Aberta',andamento:'Em Andamento',concluida:'Concluída'}[i.status]||i.status}</span>
+        </div>`;
+    }).join('');
+}
+
+function openDetalhe(id) {
+    const db = getDB();
+    const item = db.items.find(i => i.id === id);
+    if (!item) return;
+    currentNcId = id;
+    const tc = {rnc:{icon:'fa-bug',color:'var(--danger)',label:'RNC'},plano:{icon:'fa-list-check',color:'var(--warning)',label:'Plano'},melhoria:{icon:'fa-trending-up',color:'var(--accent)',label:'Melhoria'}};
+    const t = tc[item.tipo] || tc.plano;
+
+    document.getElementById('detail-modal-title').innerHTML = `<i class="fas ${t.icon}" style="color:${t.color}"></i> ${item.titulo}`;
+    document.getElementById('detail-concluir-btn').style.display = item.status === 'concluida' ? 'none' : 'inline-flex';
+
+    const w5html = item.acoes && item.acoes.length ? `
+        <div class="mod-form-section-title" style="margin-top:20px">Ações 5W2H</div>
+        <div style="overflow-x:auto">
+        <table class="mod-table" style="font-size:.8rem">
+            <thead><tr><th>O qu?</th><th>Quem</th><th>Quando</th><th>Como</th><th>Quanto</th></tr></thead>
+            <tbody>${item.acoes.map(a => `<tr><td style="color:#fff;font-weight:600">${a.o||'-'}</td><td>${a.r||'-'}</td><td>${formatDate(a.h)||'-'}</td><td>${a.m||'-'}</td><td>${a.q2||'-'}</td></tr>`).join('')}</tbody>
+        </table></div>` : '';
+
+    document.getElementById('detail-modal-body').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">TIPO</div><div style="font-weight:700;color:${t.color}">${t.label}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">CRITICIDADE</div><span class="pri ${item.criticidade}">${item.criticidade.charAt(0).toUpperCase()+item.criticidade.slice(1)}</span></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">PRAZO</div><div style="font-weight:700;color:#fff">${formatDate(item.prazo)}</div></div>
+        </div>
+        <div class="mod-form-section-title">Descrição</div>
+        <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:14px;margin-bottom:16px;font-size:.87rem;color:rgba(255,255,255,.7);line-height:1.6">${item.descricao}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">RESPONS?VEL</div><div style="font-weight:600;color:#fff">${item.responsavel}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">SETOR</div><div style="font-weight:600;color:#fff">${item.setor||'-'}</div></div>
+        </div>
+        ${w5html}
+        <div class="mod-form-section-title" style="margin-top:20px">Atualização de Status</div>
+        <div class="mod-form-row">
+            <div class="mod-form-group">
+                <label>Status Atual</label>
+                <select class="mod-select-inp" id="update-status" ${item.status==='concluida'?'disabled':''}>
+                    <option value="aberta" ${item.status==='aberta'?'selected':''}>Aberta</option>
+                    <option value="andamento" ${item.status==='andamento'?'selected':''}>Em Andamento</option>
+                    <option value="concluida" ${item.status==='concluida'?'selected':''}>Concluída</option>
+                </select>
+            </div>
+        </div>
+        <div class="mod-form-group" style="margin-top:10px">
+            <label>Coment?rio / Evid?ncia</label>
+            <textarea class="mod-textarea" id="update-comentario" placeholder="Descreva as ações tomadas ou evidências da conclusão..." rows="3"></textarea>
+        </div>
+    `;
+    openModal('modalDetalhe');
+}
+
+function concluirItem() {
+    const db = getDB();
+    const item = db.items.find(i => i.id === currentNcId);
+    if (!item) return;
+    const newStatus = document.getElementById('update-status').value;
+    item.status = newStatus;
+    if (newStatus === 'concluida') item.concluidaEm = new Date().toISOString();
+    saveDB(db);
+    closeModal('modalDetalhe');
+    renderTodas();
+    showToast('Item atualizado com sucesso!', 'success');
+}
+
+//  FORM LOGIC 
+function updateTipoBehavior() {
+    const tipo = document.getElementById('nc-tipo').value;
+    document.getElementById('causa-section').style.display = tipo === 'rnc' ? 'block' : 'block'; // always show
+}
+
+function toggleAnaliseCausa() {
+    const checked = document.getElementById('nc-analise-causa').checked;
+    document.getElementById('nc-metodo-group').style.display = checked ? 'flex' : 'none';
+    switchCausaMethod();
+}
+
+function switchCausaMethod() {
+    const checked = document.getElementById('nc-analise-causa').checked;
+    const metodo = document.getElementById('nc-metodo-causa')?.value;
+    document.getElementById('ishikawa-section').style.display = (checked && metodo === 'ishikawa') ? 'block' : 'none';
+    document.getElementById('cinco-pqs-section').style.display = (checked && metodo === '5pqs') ? 'block' : 'none';
+    if (checked && metodo === 'ishikawa') renderIshikawa();
+    if (checked && metodo === '5pqs') render5Pqs();
+}
+
+function renderIshikawa() {
+    const categories = [
+        {id:'m1', name:'M?todo', icon:'fa-cogs'},
+        {id:'m2', name:'Mão de Obra', icon:'fa-users'},
+        {id:'m3', name:'M?quina', icon:'fa-industry'},
+        {id:'m4', name:'Material', icon:'fa-boxes-stacked'},
+        {id:'m5', name:'Medição', icon:'fa-ruler'},
+        {id:'m6', name:'Meio Ambiente', icon:'fa-leaf'},
+    ];
+    const grid = document.getElementById('ishikawa-grid');
+    grid.style.cssText = 'grid-template-columns:1fr 1fr 1fr;';
+    grid.innerHTML = categories.map(c => `
+        <div class="ishikawa-bone">
+            <h5><i class="fas ${c.icon}"></i> ${c.name}</h5>
+            <div id="causes-${c.id}" style="display:flex;flex-wrap:wrap"></div>
+            <button class="cause-add" onclick="addCause('${c.id}')"><i class="fas fa-plus" style="margin-right:3px"></i> Causa</button>
+        </div>
+    `).join('');
+}
+
+function addCause(catId) {
+    const causa = prompt('Descreva a causa:');
+    if (!causa) return;
+    const cont = document.getElementById('causes-' + catId);
+    const tag = document.createElement('span');
+    tag.className = 'cause-tag';
+    tag.innerHTML = `${causa} <i class="fas fa-times" style="font-size:.6rem;opacity:.5" onclick="this.parentElement.remove()"></i>`;
+    cont.appendChild(tag);
+}
+
+function render5Pqs() {
+    const list = document.getElementById('cinco-pqs-list');
+    list.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex;gap:10px;align-items:flex-start';
+        div.innerHTML = `
+            <div style="width:28px;height:28px;border-radius:50%;background:rgba(15,117,189,.2);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:var(--primary-light);flex-shrink:0;margin-top:7px">${i}�</div>
+            <div style="flex:1">
+                <div style="font-size:.75rem;color:rgba(255,255,255,.35);margin-bottom:4px">Por quê ${i > 1 ? '(responda � causa anterior)' : '(o problema ocorreu)?'}</div>
+                <input class="mod-input" placeholder="Por quê...">
+            </div>
+        `;
+        list.appendChild(div);
+    }
+}
+
+let acaoCount = 0;
+function addAcao5W2H() {
+    acaoCount++;
+    const cont = document.getElementById('w5h2-acoes');
+    const div = document.createElement('div');
+    div.style.cssText = 'background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:16px;position:relative';
+    div.innerHTML = `
+        <button style="position:absolute;top:10px;right:10px;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.9rem" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+        <div style="font-size:.78rem;font-weight:700;color:var(--primary-light);margin-bottom:12px">Ação ${acaoCount}</div>
+        <div class="mod-form-row">
+            <div class="mod-form-group"><label>O qu? (ação) <span>*</span></label><input class="mod-input acao-o" placeholder="O que deve ser feito..."></div>
+            <div class="mod-form-group"><label>Por quê? (justificativa)</label><input class="mod-input acao-pq" placeholder="Motivo desta ação..."></div>
+        </div>
+        <div class="mod-form-row three">
+            <div class="mod-form-group"><label>Quem? (responsável) <span>*</span></label><select class="mod-select-inp acao-r"><option value="">Selecione...</option><option>João Teste</option><option>Ana Carvalho</option><option>Carlos Ferreira</option><option>Maria Silva</option></select></div>
+            <div class="mod-form-group"><label>Quando? (prazo) <span>*</span></label><input class="mod-input acao-h" type="date"></div>
+            <div class="mod-form-group"><label>Onde? (local)</label><input class="mod-input acao-w" placeholder="Local de execução..."></div>
+        </div>
+        <div class="mod-form-row">
+            <div class="mod-form-group"><label>Como? (m?todo)</label><input class="mod-input acao-m" placeholder="Como ser? executado..."></div>
+            <div class="mod-form-group"><label>Quanto? (custo estimado)</label><input class="mod-input acao-q2" placeholder="R$ 0,00 ou sem custo..."></div>
+        </div>
+    `;
+    cont.appendChild(div);
+}
+
+function salvarNC() {
+    const tipo = document.getElementById('nc-tipo').value;
+    const titulo = document.getElementById('nc-titulo').value.trim();
+    const descricao = document.getElementById('nc-descricao').value.trim();
+    const responsavel = document.getElementById('nc-responsavel').value;
+    const prazo = document.getElementById('nc-prazo').value;
+    if (!tipo) return alert('Selecione o tipo.');
+    if (!titulo) return alert('Informe o t?tulo.');
+    if (!responsavel) return alert('Selecione o responsável.');
+
+    const acoes = [];
+    document.querySelectorAll('#w5h2-acoes > div').forEach(row => {
+        const o = row.querySelector('.acao-o')?.value;
+        if (o) acoes.push({ o, r: row.querySelector('.acao-r')?.value, h: row.querySelector('.acao-h')?.value, m: row.querySelector('.acao-m')?.value, q2: row.querySelector('.acao-q2')?.value });
+    });
+
+    const db = getDB();
+    const newId = db.items.length ? Math.max(...db.items.map(i => i.id)) + 1 : 1;
+    db.items.push({
+        id: newId, tipo, titulo, descricao, responsavel, prazo, acoes,
+        criticidade: document.getElementById('nc-criticidade').value,
+        pedido: document.getElementById('nc-pedido').value,
+        setor: document.getElementById('nc-setor').value,
+        status: 'aberta', abertaEm: new Date().toISOString()
+    });
+    saveDB(db);
+    closeModal('modalNovo');
+    switchView('todas');
+    showToast('NC/Plano criado com sucesso!', 'success');
+}
+
+function openNovoModal() {
+    acaoCount = 0;
+    document.getElementById('w5h2-acoes').innerHTML = '';
+    document.getElementById('nc-tipo').value = '';
+    document.getElementById('nc-titulo').value = '';
+    document.getElementById('nc-descricao').value = '';
+    document.getElementById('nc-responsavel').value = '';
+    document.getElementById('nc-prazo').value = '';
+    document.getElementById('nc-analise-causa').checked = false;
+    document.getElementById('nc-metodo-group').style.display = 'none';
+    document.getElementById('ishikawa-section').style.display = 'none';
+    document.getElementById('cinco-pqs-section').style.display = 'none';
+    addAcao5W2H();
+    openModal('modalNovo');
+}
+
+//  HELPERS 
+function formatDate(str) {
+    if (!str) return '-';
+    const d = new Date(str + (str.length === 10 ? 'T00:00' : ''));
+    return d.toLocaleDateString('pt-BR');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;font-size:.88rem;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:all .3s;background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+document.querySelectorAll('.mod-modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); }));
+
+seedData();
+renderTodas();
+</script>
+<script>
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');});
+</script><script>
+function startModuleTour() {
+    alert('Tour deste módulo em breve! ');
+}
+</script></body>
+</html>
+

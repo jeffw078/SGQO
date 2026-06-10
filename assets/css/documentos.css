@@ -721,6 +721,142 @@ textarea.doc-form-input {
 }
 @keyframes docSlideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+/* ── Fix select option text/bg color ─────────────────────── */
+select.doc-form-input option { background: #1e1e32; color: #fff; }
+
+/* ── Status badges ──────────────────────────────────────── */
+.doc-status { display:inline-flex;align-items:center;gap:4px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:2px 8px;border-radius:10px;flex-shrink:0; }
+.doc-status.ativo    { background:rgba(16,185,129,.12);color:#10b981; }
+.doc-status.pendente { background:rgba(245,158,11,.12);color:#f59e0b; }
+.doc-status.revisao  { background:rgba(99,102,241,.12);color:#818cf8; }
+.doc-status.inativo  { background:rgba(255,255,255,.06);color:rgba(255,255,255,.3); }
+.doc-status.obsoleto { background:rgba(239,68,68,.08);color:#f87171; }
+.doc-copy-badge { display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:3px 8px;border-radius:10px;background:rgba(245,158,11,.12);color:#f59e0b;font-size:.66rem;font-weight:700;white-space:nowrap; }
+.doc-copy-inline { display:inline-flex;align-items:center;gap:4px;margin-left:6px;color:#f59e0b;font-size:.68rem;font-weight:700; }
+
+/* ── Active / Inactive filter tabs ─────────────────────── */
+.doc-filter-tabs { display:flex;gap:0;padding:0 28px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;background:rgba(255,255,255,.01); }
+.doc-filter-tab { padding:10px 18px;font-size:.82rem;font-weight:600;color:rgba(255,255,255,.35);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;user-select:none;display:flex;align-items:center;gap:5px; }
+.doc-filter-tab:hover { color:rgba(255,255,255,.65); }
+.doc-filter-tab.active { color:var(--primary-light);border-bottom-color:var(--primary); }
+.doc-filter-tab .tab-n { font-size:.68rem;background:rgba(255,255,255,.06);color:rgba(255,255,255,.3);padding:1px 6px;border-radius:8px; }
+.doc-filter-tab.active .tab-n { background:rgba(15,117,189,.15);color:var(--primary); }
+
+/* ── Approval info bar ──────────────────────────────────── */
+.doc-approval-bar { display:flex;align-items:center;gap:12px;padding:10px 28px;background:rgba(245,158,11,.06);border-bottom:1px solid rgba(245,158,11,.12);font-size:.8rem;color:rgba(255,255,255,.6);flex-shrink:0; }
+.doc-approval-bar i { color:#f59e0b; }
+.doc-approval-bar .approval-actions { display:flex;gap:6px;margin-left:auto; }
+
+/* ── Controlled copy modal ──────────────────────────────── */
+.cc-modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:6000;display:none;align-items:center;justify-content:center; }
+.cc-modal-overlay.open { display:flex; }
+.cc-modal { background:#1e1e32;border:1px solid rgba(255,255,255,.08);border-radius:16px;width:560px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5); }
+.cc-modal .doc-modal-header,.cc-modal .doc-modal-body,.cc-modal .doc-modal-footer { padding:20px 24px; }
+.cc-modal .doc-modal-header { border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0; }
+.cc-modal .doc-modal-footer { border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;justify-content:flex-end;gap:8px; }
+.cc-modal .doc-modal-body { flex:1;overflow-y:auto; }
+.cc-copy-row { display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04); }
+.cc-copy-row:last-child { border-bottom:none; }
+.cc-copy-info { flex:1; }
+.cc-copy-dest { font-size:.82rem;font-weight:600;color:rgba(255,255,255,.8); }
+.cc-copy-meta { font-size:.7rem;color:rgba(255,255,255,.3);margin-top:2px;line-height:1.5; }
+.cc-deact-btn { background:none;border:1px solid rgba(239,68,68,.25);color:#f87171;cursor:pointer;padding:3px 10px;border-radius:6px;font-size:.72rem;transition:all .2s;white-space:nowrap;flex-shrink:0; }
+.cc-deact-btn:hover { background:rgba(239,68,68,.1); }
+
+/* ── Multiple attachments list ──────────────────────────── */
+.att-list-item { display:flex;align-items:center;gap:10px;padding:9px 13px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:background .2s; }
+.att-list-item:hover { background:rgba(15,117,189,.08);border-color:rgba(15,117,189,.2); }
+.att-list-item .att-cb { width:16px;height:16px;accent-color:var(--primary);flex-shrink:0;cursor:pointer; }
+.att-list-item .att-name { flex:1;font-size:.82rem;color:rgba(255,255,255,.75); }
+.att-list-item .att-size { font-size:.7rem;color:rgba(255,255,255,.25); }
+.cc-field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+    margin-top: 8px;
+}
+.cc-field-grid label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: .82rem;
+    color: rgba(255,255,255,.65);
+    cursor: pointer;
+}
+.cc-field-grid input { accent-color: var(--primary); }
+
+/* ── Flow option (radio cards) ──────────────────────────── */
+.flow-option { display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(255,255,255,.03);border:2px solid rgba(255,255,255,.06);border-radius:8px;cursor:pointer;transition:all .2s; }
+.flow-option:hover { border-color:rgba(255,255,255,.12); }
+.flow-option.selected { border-color:var(--primary);background:rgba(15,117,189,.05); }
+
+/* ── Controlled copy watermark overlay in viewer ─────────── */
+.dv-cc-watermark { position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:.08;transform:rotate(-35deg);font-size:3rem;font-weight:900;color:#fff;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;z-index:10; }
+.dv-cc-badge { position:absolute;bottom:0;left:0;right:0;background:rgba(245,158,11,.15);border-top:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;gap:12px;font-size:.78rem;color:rgba(255,255,255,.7);z-index:11; }
+.dv-cc-badge strong { color:#f59e0b; }
+
+/* Keep the document viewer above every module/admin modal. */
+.doc-viewer-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 12000 !important;
+}
+.doc-viewer-overlay.open { display: flex !important; }
+.doc-viewer-iframe { width: 100%; height: 100%; min-height: 0; }
+.dv-fallback {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef2f7;
+    color: #172033;
+    padding: 32px;
+}
+.dv-fallback-card {
+    width: min(560px, 100%);
+    background: #fff;
+    border: 1px solid #d8dee8;
+    border-radius: 8px;
+    padding: 36px;
+    text-align: center;
+    box-shadow: 0 18px 48px rgba(15,23,42,.18);
+}
+.dv-fallback-kicker {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    color: #0f75bd;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+.dv-fallback-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+.dv-fallback-meta { color: #64748b; margin-bottom: 22px; }
+.dv-fallback a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 7px;
+    background: #0f75bd;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+}
+/* Modals opened from the viewer must sit above the viewer overlay. */
+.doc-modal-overlay.open,
+.cc-modal-overlay.open {
+    z-index: 14000 !important;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .doc-list-header, .doc-list-row {

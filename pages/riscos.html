@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Riscos - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-shield-halved" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Gestão de Riscos</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Gestão de Riscos</div>
+                <a href="#" class="nav-item active" id="nav-matriz" onclick="switchView('matriz');return false"><i class="fas fa-th"></i> Matriz de Riscos</a>
+                <a href="#" class="nav-item" id="nav-lista" onclick="switchView('lista');return false"><i class="fas fa-list"></i> Lista de Riscos</a>
+                <a href="#" class="nav-item" id="nav-ocorrencias" onclick="switchView('ocorrencias');return false"><i class="fas fa-exclamation-triangle"></i> Ocorrências</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Ações</div>
+                <a href="#" class="nav-item" id="nav-contingencias" onclick="switchView('contingencias');return false"><i class="fas fa-shield-halved"></i> Contingências</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Configurações</div>
+                <a href="#" class="nav-item" id="nav-config" onclick="switchView('config');return false"><i class="fas fa-gear"></i> Configurações</a>
+            </div>
+        </nav>
+        </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar risco..."></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <button class="mod-btn primary" onclick="openNovoRiscoModal()"><i class="fas fa-plus"></i> Novo Risco</button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JD</div>
+                        <span class="user-btn-name">João Teste</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JD</div>
+                            <div><div class="user-name">João Teste</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <!-- VIEW: MATRIZ -->
+            <div id="view-matriz" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-shield-virus" style="color:var(--danger);margin-right:10px"></i>Gestão de Riscos e Oportunidades</h2>
+                        <p>Identificação, análise e tratamento de riscos - requisito 6.1</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn primary" onclick="openNovoRiscoModal()"><i class="fas fa-plus"></i> Novo Risco</button>
+                    </div>
+                </div>
+
+                <div class="mod-stats">
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fas fa-skull-crossbones"></i></div></div><div class="stat-value" id="stat-criticos">0</div><div class="stat-label">Riscos Críticos</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(249,115,22,.1);color:var(--orange)"><i class="fas fa-fire"></i></div></div><div class="stat-value" id="stat-altos">0</div><div class="stat-label">Riscos Altos</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-exclamation"></i></div></div><div class="stat-value" id="stat-medios">0</div><div class="stat-label">Riscos Médios</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-check-circle"></i></div></div><div class="stat-value" id="stat-baixos">0</div><div class="stat-label">Riscos Baixos</div></div>
+                </div>
+
+                <!-- RISK MATRIX 5x5 -->
+                <div class="risk-matrix-wrap" id="risk-matrix"></div>
+
+                <div class="card" style="margin-top:20px">
+                    <div class="card-header">
+                        <h4>Legenda da Matriz</h4>
+                    </div>
+                    <div class="card-body" style="display:flex;gap:16px;flex-wrap:wrap">
+                        <div style="display:flex;align-items:center;gap:6px"><div style="width:14px;height:14px;border-radius:3px;background:rgba(239,68,68,.9)"></div><span style="font-size:.82rem;color:rgba(255,255,255,.6)">Crítico (15-25)</span></div>
+                        <div style="display:flex;align-items:center;gap:6px"><div style="width:14px;height:14px;border-radius:3px;background:rgba(249,115,22,.7)"></div><span style="font-size:.82rem;color:rgba(255,255,255,.6)">Alto (8-14)</span></div>
+                        <div style="display:flex;align-items:center;gap:6px"><div style="width:14px;height:14px;border-radius:3px;background:rgba(245,158,11,.7)"></div><span style="font-size:.82rem;color:rgba(255,255,255,.6)">Médio (4-7)</span></div>
+                        <div style="display:flex;align-items:center;gap:6px"><div style="width:14px;height:14px;border-radius:3px;background:rgba(16,185,129,.6)"></div><span style="font-size:.82rem;color:rgba(255,255,255,.6)">Baixo (1-3)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: LISTA -->
+            <div id="view-lista" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Lista de Riscos</h2><p>Todos os riscos identificados</p></div>
+                    <button class="mod-btn primary" onclick="openNovoRiscoModal()"><i class="fas fa-plus"></i> Novo Risco</button>
+                </div>
+                <div class="mod-filter-bar">
+                    <div class="mod-search"><i class="fas fa-search"></i><input type="text" id="searchRisco" placeholder="Buscar risco..." oninput="renderLista()"></div>
+                    <select class="mod-select" id="filterNivel" onchange="renderLista()"><option value="">Todos os náveis</option><option value="critico">Crítico</option><option value="alto">Alto</option><option value="medio">Médio</option><option value="baixo">Baixo</option></select>
+                    <select class="mod-select" id="filterCat" onchange="renderLista()"><option value="">Todas categorias</option><option>Processo</option><option>Qualidade</option><option>Fornecedor</option><option>Seguranã</option><option>Compliance</option></select>
+                </div>
+                <div id="lista-riscos"></div>
+                <div class="mod-empty" id="empty-riscos" style="display:none"><i class="fas fa-shield-halved"></i><h3>Nenhum risco cadastrado</h3></div>
+            </div>
+
+            <!-- VIEW: OCORRÊNCIAS -->
+            <div id="view-ocorrencias" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Ocorrências de Riscos</h2><p>Registre e acompanhe riscos que se materializaram</p></div>
+                    <button class="mod-btn danger" onclick="openNovaOcorrenciaModal()"><i class="fas fa-plus"></i> Registrar Ocorrência</button>
+                </div>
+                <div id="lista-ocorrencias"></div>
+                <div class="mod-empty" id="empty-ocorrencias" style="display:none"><i class="fas fa-check-circle" style="color:var(--accent)"></i><h3>Nenhuma ocorrência registrada</h3></div>
+            </div>
+
+            <!-- VIEW: CONTINGÊNCIAS -->
+            <div id="view-contingencias" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Planos de Contingência</h2><p>Respostas planejadas para riscos identificados</p></div><button class="mod-btn primary" onclick="openNovaContingenciaModal()"><i class="fas fa-plus"></i> Nova Contingência</button></div>
+                <div id="lista-contingencias"></div>
+                <div class="mod-empty" id="empty-contingencias" style="display:none"><i class="fas fa-shield-halved"></i><h3>Nenhum plano de contingência</h3></div>
+            </div>
+
+            <!-- VIEW: CONFIG -->
+            <div id="view-config" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Configurações da Matriz</h2></div></div>
+                <div class="card"><div class="card-header"><h4>Nomenclaturas da Matriz</h4></div>
+                    <div class="card-body">
+                        <div class="mod-form-row"><div class="mod-form-group"><label>Nome para Probabilidade</label><input class="mod-input" value="Probabilidade"></div><div class="mod-form-group"><label>Nome para Severidade</label><input class="mod-input" value="Severidade (Impacto)"></div></div>
+                        <div class="mod-form-group" style="margin-top:14px"><label>Tamanho da Matriz</label><select class="mod-select-inp"><option>3x3</option><option selected>5x5</option><option>4x4</option></select></div>
+                        <div style="display:flex;justify-content:flex-end;margin-top:16px"><button class="mod-btn primary"><i class="fas fa-save"></i> Salvar</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVO RISCO -->
+<div class="mod-modal-overlay" id="modalNovoRisco">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-shield-virus" style="color:var(--danger)"></i> Identificar Risco</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNovoRisco')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Título do Risco <span>*</span></label><input class="mod-input" id="nr-titulo" placeholder="Descreva o risco resumidamente"></div>
+                <div class="mod-form-group"><label>Categoria</label>
+                    <select class="mod-select-inp" id="nr-categoria"><option>Processo</option><option>Qualidade</option><option>Fornecedor</option><option>Seguranã</option><option>Compliance</option><option>Mercado</option></select>
+                </div>
+            </div>
+            <div class="mod-form-row full"><div class="mod-form-group"><label>Descrição Detalhada</label><textarea class="mod-textarea" id="nr-descricao" rows="2" placeholder="Descreva o cenário de risco, causas potenciais e impactos esperados..."></textarea></div></div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Setor / Operação Afetada</label><input class="mod-input" id="nr-setor" placeholder="Ex: Linha de Produção"></div>
+                <div class="mod-form-group"><label>Responsável</label>
+                    <select class="mod-select-inp" id="nr-responsavel"><option>João Teste</option><option>Ana Carvalho</option><option>Carlos Ferreira</option></select>
+                </div>
+            </div>
+            <div class="mod-form-section-title" style="margin-top:16px">Avaliação de Risco</div>
+            <div class="mod-form-row">
+                <div class="mod-form-group">
+                    <label>Probabilidade (1-5)</label>
+                    <div style="display:flex;gap:6px;margin-top:6px" id="prob-btns">
+                        ${[1,2,3,4,5].map(n=>`<button type="button" class="risk-rating-btn" data-type="prob" data-val="${n}" onclick="setRating('prob',${n})" title="${['Rara','Improvável','Possável','Provável','Quase Certa'][n-1]}">${n}</button>`).join('')}
+                    </div>
+                    <div style="font-size:.72rem;color:rgba(255,255,255,.3);margin-top:4px" id="prob-label">1=Rara, 5=Quase Certa</div>
+                </div>
+                <div class="mod-form-group">
+                    <label>Severidade (1-5)</label>
+                    <div style="display:flex;gap:6px;margin-top:6px" id="sev-btns">
+                        ${[1,2,3,4,5].map(n=>`<button type="button" class="risk-rating-btn" data-type="sev" data-val="${n}" onclick="setRating('sev',${n})" title="${['Insignificante','Pequeno','Moderado','Sário','Catastrófico'][n-1]}">${n}</button>`).join('')}
+                    </div>
+                    <div style="font-size:.72rem;color:rgba(255,255,255,.3);margin-top:4px" id="sev-label">1=Insignificante, 5=Catastrófico</div>
+                </div>
+                <div class="mod-form-group" style="display:flex;align-items:center;justify-content:center">
+                    <div style="text-align:center;padding:16px">
+                        <div style="font-size:.75rem;color:rgba(255,255,255,.35);margin-bottom:4px">ÍNDICE DE RISCO</div>
+                        <div id="risco-indice" style="font-size:2.5rem;font-weight:900;color:var(--accent)">-</div>
+                        <div id="risco-nivel" style="font-size:.8rem;font-weight:600;color:rgba(255,255,255,.5)">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mod-form-row full"><div class="mod-form-group"><label>Ação de Tratamento Prevista</label><textarea class="mod-textarea" id="nr-acao" rows="2" placeholder="Como este risco será mitigado, aceito ou transferido?"></textarea></div></div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovoRisco')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarRisco()"><i class="fas fa-save"></i> Registrar Risco</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVA OCORRÊNCIA -->
+<div class="mod-modal-overlay" id="modalNovaOcorrencia">
+    <div class="mod-modal md">
+        <div class="mod-modal-header"><h3><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> Registrar Ocorrência</h3><button class="mod-modal-close" onclick="closeModal('modalNovaOcorrencia')">&times;</button></div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row"><div class="mod-form-group"><label>Risco Materializado <span>*</span></label><select class="mod-select-inp" id="oc-risco"><option value="">Selecione...</option></select></div><div class="mod-form-group"><label>Data <span>*</span></label><input class="mod-input" type="date" id="oc-data"></div></div>
+            <div class="mod-form-group" style="margin-bottom:14px"><label>Descrição da Ocorrência <span>*</span></label><textarea class="mod-textarea" id="oc-desc" rows="3" placeholder="O que aconteceu? Qual foi o impacto real?"></textarea></div>
+            <div class="mod-form-group"><label>Ação Imediata Tomada</label><textarea class="mod-textarea" id="oc-acao" rows="2" placeholder="Ações imediatas para contenção..."></textarea></div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovaOcorrencia')">Cancelar</button>
+            <button class="mod-btn danger" onclick="salvarOcorrencia()"><i class="fas fa-save"></i> Registrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVA CONTINGÊNCIA -->
+<div class="mod-modal-overlay" id="modalNovaContingencia">
+    <div class="mod-modal md">
+        <div class="mod-modal-header"><h3><i class="fas fa-shield-halved" style="color:var(--primary)"></i> Plano de Contingência</h3><button class="mod-modal-close" onclick="closeModal('modalNovaContingencia')">&times;</button></div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row"><div class="mod-form-group"><label>Risco Associado <span>*</span></label><select class="mod-select-inp" id="cont-risco"><option value="">Selecione...</option></select></div><div class="mod-form-group"><label>Responsável</label><select class="mod-select-inp" id="cont-resp"><option>João Teste</option><option>Ana Carvalho</option></select></div></div>
+            <div class="mod-form-group" style="margin-bottom:14px"><label>Plano de Contingência <span>*</span></label><textarea class="mod-textarea" id="cont-plano" rows="3" placeholder="Descreva o plano de ação caso o risco se materialize..."></textarea></div>
+            <div class="mod-form-row"><div class="mod-form-group"><label>Gatilho / Condição de Ativação</label><input class="mod-input" id="cont-gatilho" placeholder="Quando este plano deve ser ativado?"></div><div class="mod-form-group"><label>Prazo para Ativação</label><input class="mod-input" id="cont-prazo" placeholder="Ex: Imediato, 24h, 48h"></div></div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovaContingencia')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarContingencia()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: DETALHE DO RISCO -->
+<div class="mod-modal-overlay" id="modalDetalheRisco">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3 id="det-risco-title"><i class="fas fa-triangle-exclamation" style="color:var(--warning)"></i> Detalhe do Risco</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalDetalheRisco')">&times;</button>
+        </div>
+        <div class="mod-modal-body" id="det-risco-body"></div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalDetalheRisco')">Fechar</button>
+            <button class="mod-btn primary" onclick="closeModal('modalDetalheRisco');openNovaOcorrenciaModal()"><i class="fas fa-plus"></i> Registrar Ocorrência</button>
+            <button class="mod-btn purple" onclick="closeModal('modalDetalheRisco');openNovaContingenciaModal()"><i class="fas fa-shield-halved"></i> Plano de Contingência</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.risk-rating-btn { width:36px;height:36px;border:2px solid rgba(255,255,255,.15);border-radius:8px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);font-weight:700;cursor:pointer;transition:all .15s;font-size:.9rem; }
+.risk-rating-btn:hover { border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.08); }
+.risk-rating-btn.active { color:#fff;border-color:transparent; }
+.risk-rating-btn[data-val="1"].active,.risk-rating-btn[data-val="2"].active { background:rgba(16,185,129,.5); }
+.risk-rating-btn[data-val="3"].active { background:rgba(245,158,11,.5); }
+.risk-rating-btn[data-val="4"].active { background:rgba(249,115,22,.6); }
+.risk-rating-btn[data-val="5"].active { background:rgba(239,68,68,.7); }
+.risk-detail-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:10px; padding:12px; }
+.risk-detail-card span { display:block; font-size:.7rem; color:rgba(255,255,255,.35); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px; }
+.risk-detail-card strong { color:#fff; font-size:.9rem; }
+</style>
+
+<script>
+const DB_KEY = 'sgq_riscos';
+let ratingProb = 0, ratingSev = 0;
+
+function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"riscos":[],"ocorrencias":[],"contingencias":[]}'); }
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+const nivelLabels = ['','Baixo','Baixo','Baixo','M?dio','M?dio','M?dio','M?dio','Alto','Alto','Alto','Alto','Alto','Alto','Alto','Crítico','Crítico','Crítico','Crítico','Crítico','Crítico','Crítico','Crítico','Crítico','Crítico','Crítico'];
+
+function getNivel(idx) {
+    if (idx >= 15) return 'critico';
+    if (idx >= 8) return 'alto';
+    if (idx >= 4) return 'medio';
+    return 'baixo';
+}
+
+function getNivelColor(n) { return {critico:'rgba(239,68,68,.85)',alto:'rgba(249,115,22,.7)',medio:'rgba(245,158,11,.65)',baixo:'rgba(16,185,129,.55)'}[n]; }
+
+function sanitizeText(str) {
+    return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function seedData() {
+    const db = getDB();
+    if (db.riscos.length) return;
+    db.riscos = [
+        { id:1, titulo:'Falha de equipamento crítico na linha', descricao:'Parada não planejada de equipamento vital para a produção', categoria:'Processo', setor:'Produção', responsavel:'João Teste', prob:3, sev:5, indice:15, nivel:'critico', acao:'Manutenção preventiva mensal + estoque de peças críticas', status:'ativo' },
+        { id:2, titulo:'Recebimento de mat?ria-prima fora de especificação', descricao:'Lote de MP entregue pelo fornecedor sem atender às especificações', categoria:'Fornecedor', setor:'Compras', responsavel:'Carlos Ferreira', prob:4, sev:3, indice:12, nivel:'alto', acao:'Inspeção 100% no recebimento + qualificação de fornecedores', status:'ativo' },
+        { id:3, titulo:'Perda de pessoal-chave com know-how crítico', descricao:'Saída de colaborador especializado sem transferência de conhecimento', categoria:'Processo', setor:'Qualidade', responsavel:'João Teste', prob:2, sev:4, indice:8, nivel:'alto', acao:'Documentação de processos + treinamento cruzado', status:'ativo' },
+        { id:4, titulo:'Falha no controle de documentos', descricao:'Uso de documento obsoleto no processo de produção', categoria:'Compliance', setor:'Qualidade', responsavel:'Ana Carvalho', prob:2, sev:3, indice:6, nivel:'medio', acao:'GED com controle de versão e treinamento periódico', status:'ativo' },
+        { id:5, titulo:'Atraso de fornecedor crítico', descricao:'Fornecedor único atrasando entrega de componente essencial', categoria:'Fornecedor', setor:'Compras', responsavel:'Carlos Ferreira', prob:3, sev:2, indice:6, nivel:'medio', acao:'Desenvolver fornecedor alternativo + estoque de segurança', status:'ativo' },
+        { id:6, titulo:'Variação de parâmetros do processo de pintura', descricao:'Pequenas variações de temperatura impactando acabamento', categoria:'Qualidade', setor:'Produção', responsavel:'João Teste', prob:3, sev:1, indice:3, nivel:'baixo', acao:'Monitoramento contínuo de temperatura', status:'ativo' },
+    ];
+    db.ocorrencias = [
+        { id:1, riscoId:2, descricao:'Lote #LC-2026-0022 recebido com dureza fora de spec. 18 peças rejeitadas.', acao:'Devolução ao fornecedor e abertura de NC.', data:'2026-04-15' }
+    ];
+    db.contingencias = [
+        { id:1, riscoId:1, plano:'Acionar manutenção de emergência imediatamente. Transferir produção para linha secundária. Comunicar cliente sobre possível atraso.', gatilho:'Parada não planejada superior a 2 horas', prazo:'Imediato', responsavel:'João Teste' }
+    ];
+    saveDB(db);
+}
+
+function switchView(v) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display='none');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-'+v).style.display='block';
+    const nav = document.getElementById('nav-'+v);
+    if (nav) nav.classList.add('active');
+    if (v==='matriz') renderMatriz();
+    if (v==='lista') renderLista();
+    if (v==='ocorrencias') renderOcorrencias();
+    if (v==='contingencias') renderContingencias();
+}
+
+function renderMatriz() {
+    const db = getDB();
+    const criticos = db.riscos.filter(r=>r.nivel==='critico').length;
+    const altos = db.riscos.filter(r=>r.nivel==='alto').length;
+    const medios = db.riscos.filter(r=>r.nivel==='medio').length;
+    const baixos = db.riscos.filter(r=>r.nivel==='baixo').length;
+    document.getElementById('stat-criticos').textContent = criticos;
+    document.getElementById('stat-altos').textContent = altos;
+    document.getElementById('stat-medios').textContent = medios;
+    document.getElementById('stat-baixos').textContent = baixos;
+
+    const matrixEl = document.getElementById('risk-matrix');
+    let html = '<div style="font-size:.72rem;color:rgba(255,255,255,.3);text-align:center;margin-bottom:8px">MATRIZ DE RISCO - Probabilidade � Severidade</div>';
+    html += '<div style="display:grid;grid-template-columns:40px repeat(5,1fr);gap:4px;width:100%;max-width:640px;margin:0 auto">';
+    
+    // Labels top
+    html += '<div></div>';
+    ['Insignificante','Pequeno','Moderado','S?rio','Catastr?fico'].forEach((l,i) => {
+        html += `<div style="text-align:center;font-size:.65rem;color:rgba(255,255,255,.3);padding:4px 0;font-weight:600">${l}<div style="font-size:.6rem;opacity:.6">Sev. ${i+1}</div></div>`;
+    });
+
+    const probLabels = ['Quase Certa','Provável','Possível','Improvável','Rara'];
+    for (let prob = 5; prob >= 1; prob--) {
+        html += `<div style="display:flex;align-items:center;justify-content:center;font-size:.6rem;color:rgba(255,255,255,.3);text-align:center;font-weight:600;writing-mode:horizontal-tb;padding:2px"><div>P${prob}<br><span style="font-size:.55rem;opacity:.7">${probLabels[5-prob]}</span></div></div>`;
+        for (let sev = 1; sev <= 5; sev++) {
+            const idx = prob * sev;
+            const nivel = getNivel(idx);
+            const color = getNivelColor(nivel);
+            const riscosAqui = db.riscos.filter(r => r.prob === prob && r.sev === sev);
+            html += `<div class="risk-cell" style="background:${color};min-height:64px;cursor:${riscosAqui.length?'pointer':'default'};position:relative" title="${riscosAqui.map(r=>r.titulo).join(', ')||''}" onclick="${riscosAqui.length?`openRiscoDetalhe(${riscosAqui[0].id})`:''}">
+                <div class="risk-cell-idx">${idx}</div>
+                ${riscosAqui.map(r=>`<div class="risk-dot" title="${r.titulo}"></div>`).join('')}
+            </div>`;
+        }
+    }
+    html += '</div>';
+
+    // Listed risks
+    html += '<div style="margin-top:20px"><div class="mod-form-section-title">Riscos Mapeados</div><div style="display:flex;flex-direction:column;gap:8px">';
+    [...db.riscos].sort((a,b)=>b.indice-a.indice).forEach(r => {
+        html += `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid ${getNivelColor(r.nivel)};border-radius:9px;cursor:pointer" onclick="openRiscoDetalhe(${r.id})">
+            <div style="width:38px;height:38px;border-radius:8px;background:${getNivelColor(r.nivel)};display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;color:#fff;flex-shrink:0">${r.indice}</div>
+            <div style="flex:1"><div style="font-weight:700;color:#fff;font-size:.9rem">${r.titulo}</div><div style="font-size:.75rem;color:rgba(255,255,255,.35)">${r.categoria} � ${r.setor} � P${r.prob}�S${r.sev}</div></div>
+            <span class="pri ${r.nivel}" style="min-width:60px;text-align:center">${r.nivel.charAt(0).toUpperCase()+r.nivel.slice(1)}</span>
+        </div>`;
+    });
+    html += '</div></div>';
+    matrixEl.innerHTML = html;
+}
+
+function openRiscoDetalhe(id) {
+    const db = getDB();
+    const r = db.riscos.find(x=>x.id===id);
+    if (!r) return;
+    const cont = db.contingencias.find(c=>c.riscoId===id);
+    const oc = db.ocorrencias.filter(o=>o.riscoId===id);
+    const nivelColor = getNivelColor(r.nivel);
+    document.getElementById('det-risco-title').innerHTML = `<i class="fas fa-triangle-exclamation" style="color:${nivelColor}"></i> ${sanitizeText(r.titulo)}`;
+    document.getElementById('det-risco-body').innerHTML = `
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px">
+            <div class="risk-detail-card"><span>Categoria</span><strong>${sanitizeText(r.categoria)}</strong></div>
+            <div class="risk-detail-card"><span>Setor</span><strong>${sanitizeText(r.setor)}</strong></div>
+            <div class="risk-detail-card"><span>Responsável</span><strong>${sanitizeText(r.responsavel)}</strong></div>
+            <div class="risk-detail-card"><span>Nível</span><strong style="color:${nivelColor}">${sanitizeText(r.nivel).toUpperCase()}</strong></div>
+        </div>
+        <div style="display:grid;grid-template-columns:140px 1fr;gap:18px;align-items:stretch;margin-bottom:20px">
+            <div style="border-radius:14px;background:${nivelColor};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;color:#fff">
+                <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;opacity:.8">Índice</div>
+                <div style="font-size:3rem;font-weight:900;line-height:1">${r.indice}</div>
+                <div style="font-size:.82rem;opacity:.85">P${r.prob} x S${r.sev}</div>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px">
+                <div class="mod-form-section-title" style="margin-top:0">Descrição</div>
+                <p style="color:rgba(255,255,255,.72);font-size:.9rem">${sanitizeText(r.descricao || 'Sem descrição detalhada.')}</p>
+                <div class="mod-form-section-title">Ação de Tratamento</div>
+                <p style="color:rgba(255,255,255,.72);font-size:.9rem">${sanitizeText(r.acao || 'Nenhuma ação definida.')}</p>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px">
+                <div class="mod-form-section-title" style="margin-top:0">Plano de Contingência</div>
+                <p style="color:rgba(255,255,255,.72);font-size:.86rem">${cont ? sanitizeText(cont.plano) : 'Nenhum plano de contingência cadastrado para este risco.'}</p>
+                ${cont ? `<div style="font-size:.75rem;color:rgba(255,255,255,.45);margin-top:10px">Gatilho: ${sanitizeText(cont.gatilho || '-')} · Prazo: ${sanitizeText(cont.prazo || '-')}</div>` : ''}
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px">
+                <div class="mod-form-section-title" style="margin-top:0">Ocorrências (${oc.length})</div>
+                ${oc.length ? oc.map(o => `<div style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)"><strong style="color:#fff;font-size:.84rem">${formatDate(o.data)}</strong><div style="font-size:.8rem;color:rgba(255,255,255,.62);margin-top:3px">${sanitizeText(o.descricao)}</div></div>`).join('') : '<p style="color:rgba(255,255,255,.45);font-size:.86rem">Nenhuma ocorrência registrada.</p>'}
+            </div>
+        </div>
+    `;
+    openModal('modalDetalheRisco');
+}
+
+function renderLista() {
+    const db = getDB();
+    const search = (document.getElementById('searchRisco')?.value||'').toLowerCase();
+    const nivel = document.getElementById('filterNivel')?.value||'';
+    const cat = document.getElementById('filterCat')?.value||'';
+    const items = db.riscos.filter(r => {
+        if (search && !r.titulo.toLowerCase().includes(search)) return false;
+        if (nivel && r.nivel !== nivel) return false;
+        if (cat && r.categoria !== cat) return false;
+        return true;
+    }).sort((a,b)=>b.indice-a.indice);
+
+    const listEl = document.getElementById('lista-riscos');
+    const emptyEl = document.getElementById('empty-riscos');
+    if (!items.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    listEl.innerHTML = items.map(r => `
+        <div style="display:flex;align-items:center;gap:14px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
+            <div style="width:46px;height:46px;border-radius:10px;background:${getNivelColor(r.nivel)};display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;color:#fff;flex-shrink:0">${r.indice}</div>
+            <div style="flex:1">
+                <div style="font-weight:700;color:#fff;font-size:.95rem;margin-bottom:4px">${r.titulo}</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.4)">${r.categoria} � ${r.setor} � Prob: ${r.prob} � Sev: ${r.sev} � Resp: ${r.responsavel}</div>
+                ${r.acao?`<div style="font-size:.78rem;color:rgba(255,255,255,.3);margin-top:3px"><i class="fas fa-shield-halved" style="margin-right:3px"></i>${r.acao}</div>`:''}
+            </div>
+            <span class="pri ${r.nivel}">${r.nivel.charAt(0).toUpperCase()+r.nivel.slice(1)}</span>
+        </div>
+    `).join('');
+}
+
+function renderOcorrencias() {
+    const db = getDB();
+    const listEl = document.getElementById('lista-ocorrencias');
+    const emptyEl = document.getElementById('empty-ocorrencias');
+    if (!db.ocorrencias.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    listEl.innerHTML = db.ocorrencias.map(o => {
+        const r = db.riscos.find(x=>x.id===o.riscoId);
+        return `<div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:16px 20px;margin-bottom:8px">
+            <div style="font-weight:700;color:#f87171;margin-bottom:6px"><i class="fas fa-exclamation-triangle" style="margin-right:6px"></i>Risco Materializado: ${r?r.titulo:'-'}</div>
+            <div style="font-size:.85rem;color:rgba(255,255,255,.65);margin-bottom:6px">${o.descricao}</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.35)"><i class="fas fa-calendar" style="margin-right:3px"></i>${formatDate(o.data)}</div>
+            ${o.acao?`<div style="margin-top:8px;font-size:.8rem;background:rgba(255,255,255,.04);border-radius:6px;padding:8px"><strong>Ação Imediata:</strong> ${o.acao}</div>`:''}
+        </div>`;
+    }).join('');
+}
+
+function renderContingencias() {
+    const db = getDB();
+    const listEl = document.getElementById('lista-contingencias');
+    const emptyEl = document.getElementById('empty-contingencias');
+    if (!db.contingencias.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    listEl.innerHTML = db.contingencias.map(c => {
+        const r = db.riscos.find(x=>x.id===c.riscoId);
+        return `<div style="background:rgba(15,117,189,.06);border:1px solid rgba(15,117,189,.2);border-radius:10px;padding:16px 20px;margin-bottom:8px">
+            <div style="font-weight:700;color:var(--primary-light);margin-bottom:6px"><i class="fas fa-shield-halved" style="margin-right:6px"></i>Risco: ${r?r.titulo:'-'}</div>
+            <div style="font-size:.85rem;color:rgba(255,255,255,.65);margin-bottom:6px">${c.plano}</div>
+            <div style="display:flex;gap:16px;font-size:.78rem;color:rgba(255,255,255,.35)">
+                <span><i class="fas fa-bolt" style="margin-right:3px"></i>Gatilho: ${c.gatilho}</span>
+                <span><i class="fas fa-clock" style="margin-right:3px"></i>Prazo: ${c.prazo}</span>
+                <span><i class="fas fa-user" style="margin-right:3px"></i>${c.responsavel}</span>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function setRating(type, val) {
+    if (type==='prob') ratingProb = val;
+    else ratingSev = val;
+    document.querySelectorAll(`.risk-rating-btn[data-type="${type}"]`).forEach(b => b.classList.toggle('active', parseInt(b.dataset.val)===val));
+    if (ratingProb && ratingSev) {
+        const idx = ratingProb * ratingSev;
+        const nivel = getNivel(idx);
+        const colors = {critico:'#f87171',alto:'#fb923c',medio:'#fbbf24',baixo:'#34d399'};
+        document.getElementById('risco-indice').textContent = idx;
+        document.getElementById('risco-indice').style.color = colors[nivel];
+        document.getElementById('risco-nivel').textContent = nivel.charAt(0).toUpperCase()+nivel.slice(1);
+        document.getElementById('risco-nivel').style.color = colors[nivel];
+    }
+}
+
+function salvarRisco() {
+    const titulo = document.getElementById('nr-titulo').value.trim();
+    if (!titulo) return alert('Informe o t?tulo do risco.');
+    if (!ratingProb || !ratingSev) return alert('Defina Probabilidade e Severidade.');
+    const db = getDB();
+    const newId = db.riscos.length ? Math.max(...db.riscos.map(r=>r.id))+1 : 1;
+    const indice = ratingProb * ratingSev;
+    db.riscos.push({ id:newId, titulo, descricao:document.getElementById('nr-descricao').value, categoria:document.getElementById('nr-categoria').value, setor:document.getElementById('nr-setor').value, responsavel:document.getElementById('nr-responsavel').value, prob:ratingProb, sev:ratingSev, indice, nivel:getNivel(indice), acao:document.getElementById('nr-acao').value, status:'ativo' });
+    saveDB(db);
+    closeModal('modalNovoRisco');
+    renderMatriz();
+    showToast('Risco registrado!', 'success');
+    ratingProb=0; ratingSev=0;
+}
+
+function salvarOcorrencia() {
+    const riscoId = parseInt(document.getElementById('oc-risco').value);
+    const descricao = document.getElementById('oc-desc').value.trim();
+    const data = document.getElementById('oc-data').value;
+    if (!riscoId || !descricao || !data) return alert('Preencha todos os campos.');
+    const db = getDB();
+    const newId = db.ocorrencias.length ? Math.max(...db.ocorrencias.map(o=>o.id))+1 : 1;
+    db.ocorrencias.push({ id:newId, riscoId, descricao, acao:document.getElementById('oc-acao').value, data });
+    saveDB(db);
+    closeModal('modalNovaOcorrencia');
+    renderOcorrencias();
+    showToast('Ocorrência registrada!', 'success');
+}
+
+function salvarContingencia() {
+    const riscoId = parseInt(document.getElementById('cont-risco').value);
+    const plano = document.getElementById('cont-plano').value.trim();
+    if (!riscoId || !plano) return alert('Selecione o risco e descreva o plano.');
+    const db = getDB();
+    const newId = db.contingencias.length ? Math.max(...db.contingencias.map(c=>c.id))+1 : 1;
+    db.contingencias.push({ id:newId, riscoId, plano, gatilho:document.getElementById('cont-gatilho').value, prazo:document.getElementById('cont-prazo').value, responsavel:document.getElementById('cont-resp').value });
+    saveDB(db);
+    closeModal('modalNovaContingencia');
+    renderContingencias();
+    showToast('Plano de conting?ncia criado!', 'success');
+}
+
+function populateRiscoSelects() {
+    const db = getDB();
+    ['oc-risco','cont-risco'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        sel.innerHTML = '<option value="">Selecione...</option>' + db.riscos.map(r=>`<option value="${r.id}">${r.titulo}</option>`).join('');
+    });
+}
+
+function openNovoRiscoModal() { ratingProb=0; ratingSev=0; document.querySelectorAll('.risk-rating-btn').forEach(b=>b.classList.remove('active')); document.getElementById('risco-indice').textContent='-'; document.getElementById('risco-nivel').textContent='-'; openModal('modalNovoRisco'); }
+function openNovaOcorrenciaModal() { populateRiscoSelects(); document.getElementById('oc-data').value=new Date().toISOString().slice(0,10); openModal('modalNovaOcorrencia'); }
+function openNovaContingenciaModal() { populateRiscoSelects(); openModal('modalNovaContingencia'); }
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function formatDate(str) { if(!str) return '-'; const d=new Date(str+(str.length===10?'T00:00':'')); return d.toLocaleDateString('pt-BR'); }
+function showToast(msg, type) {
+    const t=document.createElement('div'); t.style.cssText=`position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;z-index:9999;background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent=msg; document.body.appendChild(t); setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},3000);
+}
+document.querySelectorAll('.mod-modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active');}));
+seedData();
+renderMatriz();
+</script>
+<script>
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');});
+</script><script>
+function startModuleTour() {
+    alert('Tour deste módulo em breve! ');
+}
+</script></body>
+</html>

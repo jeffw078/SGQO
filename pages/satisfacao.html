@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satisfação e Reclamações - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-face-smile" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Satisfação e Reclamações</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Clientes</div>
+                <a href="#" class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard');return false"><i class="fas fa-chart-pie"></i> Visão Geral</a>
+                <a href="#" class="nav-item" id="nav-clientes" onclick="switchView('clientes');return false"><i class="fas fa-users"></i> Clientes Ativos</a>
+                <a href="#" class="nav-item" id="nav-nps" onclick="switchView('nps');return false"><i class="fas fa-star"></i> Pesquisa de Satisfação NPS</a>
+                <a href="#" class="nav-item" id="nav-reclamacoes" onclick="switchView('reclamacoes');return false">
+                    <i class="fas fa-comment-dots"></i> Reclamações
+                    <span class="badge" id="badge-reclamacoes" style="background:rgba(239,68,68,.3);color:#f87171">0</span>
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Configurações</div>
+                <a href="#" class="nav-item" id="nav-config" onclick="switchView('config');return false"><i class="fas fa-gear"></i> Configurações</a>
+            </div>
+        </nav>
+        </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar cliente, reclamação..."></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JD</div>
+                        <span class="user-btn-name">Jo\u00e3o Demo</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JD</div>
+                            <div><div class="user-name">Jo\u00e3o Demo</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-face-smile" style="color:var(--orange);margin-right:10px"></i>Satisfação e Reclamações de Clientes</h2>
+                        <p>Gestão de NPS, pesquisas e reclamações - requisitos 8.2.1, 9.1.2</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn warning" onclick="openNovaReclamacaoModal()"><i class="fas fa-plus"></i> Registrar Reclamação</button>
+                        <button class="mod-btn primary" onclick="openEnviarNPSModal()"><i class="fas fa-paper-plane"></i> Enviar NPS</button>
+                    </div>
+                </div>
+
+                <div class="mod-stats">
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-face-smile"></i></div></div>
+                        <div class="stat-value" id="stat-nps">-</div><div class="stat-label">NPS Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(249,115,22,.1);color:var(--orange)"><i class="fas fa-comment-dots"></i></div></div>
+                        <div class="stat-value" id="stat-rec-abertas">0</div><div class="stat-label">Reclamações Abertas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)"><i class="fas fa-users"></i></div></div>
+                        <div class="stat-value" id="stat-clientes">0</div><div class="stat-label">Clientes Ativos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-chart-bar"></i></div></div>
+                        <div class="stat-value" id="stat-resp-nps">0</div><div class="stat-label">Respostas NPS (30d)</div>
+                    </div>
+                </div>
+
+                <!-- NPS Overview -->
+                <div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-bottom:24px">
+                    <div class="card">
+                        <div class="card-header"><h4><i class="fas fa-star" style="color:var(--warning);margin-right:8px"></i> NPS Score</h4></div>
+                        <div class="card-body" style="text-align:center">
+                            <div style="font-size:4rem;font-weight:900;color:var(--accent)" id="nps-big">72</div>
+                            <div style="font-size:.85rem;color:rgba(255,255,255,.4);margin-bottom:16px">Net Promoter Score</div>
+                            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
+                                <div style="text-align:center;background:rgba(16,185,129,.1);border-radius:8px;padding:8px 14px"><div style="font-size:1.3rem;font-weight:800;color:#34d399" id="nps-promotores">0</div><div style="font-size:.72rem;color:rgba(255,255,255,.4)">Promotores</div></div>
+                                <div style="text-align:center;background:rgba(245,158,11,.1);border-radius:8px;padding:8px 14px"><div style="font-size:1.3rem;font-weight:800;color:#fbbf24" id="nps-passivos">0</div><div style="font-size:.72rem;color:rgba(255,255,255,.4)">Passivos</div></div>
+                                <div style="text-align:center;background:rgba(239,68,68,.1);border-radius:8px;padding:8px 14px"><div style="font-size:1.3rem;font-weight:800;color:#f87171" id="nps-detratores">0</div><div style="font-size:.72rem;color:rgba(255,255,255,.4)">Detratores</div></div>
+                            </div>
+                            <div class="nps-bar" id="nps-bar-viz"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h4><i class="fas fa-comment-dots" style="color:var(--orange);margin-right:8px"></i> Reclamações Recentes</h4>
+                            <button class="mod-btn ghost" onclick="switchView('reclamacoes')" style="font-size:.8rem;padding:5px 12px">Ver todas</button>
+                        </div>
+                        <div class="card-body" style="padding:0"><div id="reclamacoes-recentes"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: CLIENTES -->
+            <div id="view-clientes" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Clientes Ativos</h2><p>Cadastro e histórico de clientes</p></div>
+                    <button class="mod-btn primary" onclick="openNovoClienteModal()"><i class="fas fa-plus"></i> Novo Cliente</button>
+                </div>
+                <div id="lista-clientes"></div>
+                <div class="mod-empty" id="empty-clientes" style="display:none"><i class="fas fa-users"></i><h3>Nenhum cliente cadastrado</h3></div>
+            </div>
+
+            <!-- VIEW: NPS -->
+            <div id="view-nps" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Pesquisa de Satisfação NPS</h2><p>Envie e acompanhe pesquisas de satisfação</p></div>
+                    <button class="mod-btn primary" onclick="openEnviarNPSModal()"><i class="fas fa-paper-plane"></i> Enviar NPS</button>
+                </div>
+                <div class="card" style="margin-bottom:20px">
+                    <div class="card-header"><h4>Respostas Recentes</h4></div>
+                    <div class="card-body" style="padding:0"><div id="respostas-nps"></div></div>
+                </div>
+            </div>
+
+            <!-- VIEW: RECLAMAÇÕES -->
+            <div id="view-reclamacoes" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Reclamações de Clientes</h2><p>Registre, acompanhe e resolva reclamações</p></div>
+                    <button class="mod-btn warning" onclick="openNovaReclamacaoModal()"><i class="fas fa-plus"></i> Nova Reclamação</button>
+                </div>
+                <div class="mod-filter-bar">
+                    <div class="mod-search"><i class="fas fa-search"></i><input type="text" id="searchRec" placeholder="Buscar reclamação ou cliente..." oninput="renderReclamacoes()"></div>
+                    <select class="mod-select" id="filterStatusRec" onchange="renderReclamacoes()">
+                        <option value="">Todos</option>
+                        <option value="aberta">Abertas</option>
+                        <option value="andamento">Em Andamento</option>
+                        <option value="concluida">Concluídas</option>
+                    </select>
+                </div>
+                <div id="lista-reclamacoes"></div>
+                <div class="mod-empty" id="empty-reclamacoes" style="display:none"><i class="fas fa-smile"></i><h3>Nenhuma reclamação encontrada</h3></div>
+            </div>
+
+            <!-- VIEW: CONFIG -->
+            <div id="view-config" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Configurações</h2></div></div>
+                <div class="card"><div class="card-header"><h4>Configurações de NPS e Reclamações</h4></div>
+                    <div class="card-body">
+                        <div class="mod-form-row">
+                            <div class="mod-form-group"><label>Método de coleta de satisfação</label><select class="mod-select-inp"><option>NPS (Net Promoter Score)</option><option>CSAT (Escala 1-5)</option><option>Ambos</option></select></div>
+                            <div class="mod-form-group"><label>Perãodo de coleta</label><select class="mod-select-inp"><option>Por pedido finalizado</option><option>Mensal</option><option>Trimestral</option></select></div>
+                        </div>
+                        <div class="mod-form-group" style="margin-top:14px"><label>Prazo padrão para resposta de reclamação (dias)</label><input class="mod-input" type="number" value="5" style="max-width:100px"></div>
+                        <div style="display:flex;justify-content:flex-end;margin-top:16px"><button class="mod-btn primary"><i class="fas fa-save"></i> Salvar</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVA RECLAMAÇÃO -->
+<div class="mod-modal-overlay" id="modalNovaRec">
+    <div class="mod-modal md">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-comment-dots" style="color:var(--orange)"></i> Registrar Reclamação</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNovaRec')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Cliente <span>*</span></label>
+                    <select class="mod-select-inp" id="rec-cliente"><option value="">Selecione...</option></select>
+                </div>
+                <div class="mod-form-group"><label>Pedido Relacionado</label><input class="mod-input" id="rec-pedido" placeholder="Ex: PED-2026-0155"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Canal de Entrada</label>
+                    <select class="mod-select-inp" id="rec-canal">
+                        <option>E-mail</option><option>Telefone</option><option>WhatsApp</option><option>Presencial</option><option>Portal</option>
+                    </select>
+                </div>
+                <div class="mod-form-group"><label>Criticidade</label>
+                    <select class="mod-select-inp" id="rec-criticidade"><option value="baixa">Baixa</option><option value="media" selected>Média</option><option value="alta">Alta</option><option value="critica">Crática</option></select>
+                </div>
+            </div>
+            <div class="mod-form-row full"><div class="mod-form-group"><label>Título / Assunto <span>*</span></label><input class="mod-input" id="rec-titulo" placeholder="Descreva brevemente a reclamação"></div></div>
+            <div class="mod-form-row full"><div class="mod-form-group"><label>Descrição Detalhada <span>*</span></label><textarea class="mod-textarea" id="rec-descricao" rows="3" placeholder="Descreva o problema relatado pelo cliente..."></textarea></div></div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Responsável pela Tratativa</label>
+                    <select class="mod-select-inp" id="rec-responsavel"><option>João Teste</option><option>Ana Carvalho</option><option>Carlos Ferreira</option></select>
+                </div>
+                <div class="mod-form-group"><label>Prazo para Resposta</label><input class="mod-input" type="date" id="rec-prazo"></div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovaRec')">Cancelar</button>
+            <button class="mod-btn warning" onclick="salvarReclamacao()"><i class="fas fa-save"></i> Registrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: ENVIAR NPS -->
+<div class="mod-modal-overlay" id="modalNPS">
+    <div class="mod-modal md">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-paper-plane" style="color:var(--primary)"></i> Enviar Pesquisa NPS</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNPS')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-alert info" style="margin-bottom:16px">
+                <i class="fas fa-info-circle"></i>
+                <div>A pesquisa será enviada por e-mail para os clientes selecionados. Em ambiente de produção, integra com servidor de e-mail configurado.</div>
+            </div>
+            <div class="mod-form-row full"><div class="mod-form-group"><label>Clientes (selecione múltiplos)</label>
+                <select class="mod-select-inp" id="nps-clientes" multiple style="height:100px"><option>Todos os clientes ativos</option></select>
+            </div></div>
+            <div class="mod-form-row full"><div class="mod-form-group"><label>Pergunta NPS</label>
+                <input class="mod-input" value="Em uma escala de 0 a 10, qual a probabilidade de você recomendar nossa empresa a um amigo ou colega?">
+            </div></div>
+            <!-- Simulação de resposta -->
+            <hr class="mod-divider">
+            <div class="mod-form-section-title">Simular Resposta (para demonstração)</div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Cliente</label><select class="mod-select-inp" id="nps-resp-cliente"><option value="">Selecione...</option></select></div>
+                <div class="mod-form-group"><label>Nota (0-10)</label><input class="mod-input" type="number" id="nps-resp-nota" min="0" max="10" placeholder="0-10"></div>
+            </div>
+            <div class="mod-form-group"><label>Comentário</label><textarea class="mod-textarea" id="nps-resp-coment" rows="2" placeholder="Comentário do cliente..."></textarea></div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNPS')">Fechar</button>
+            <button class="mod-btn accent" onclick="salvarRespostaNPS()"><i class="fas fa-plus"></i> Adicionar Resposta</button>
+            <button class="mod-btn primary" onclick="showToast('NPS enviado para os clientes selecionados!','success');closeModal(\'modalNPS\')"><i class="fas fa-paper-plane"></i> Enviar NPS</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVO CLIENTE -->
+<div class="mod-modal-overlay" id="modalNovoCliente">
+    <div class="mod-modal sm">
+        <div class="mod-modal-header"><h3><i class="fas fa-user-plus" style="color:var(--primary)"></i> Novo Cliente</h3><button class="mod-modal-close" onclick="closeModal('modalNovoCliente')">&times;</button></div>
+        <div class="mod-modal-body">
+            <div class="mod-form-group" style="margin-bottom:14px"><label>Razão Social <span>*</span></label><input class="mod-input" id="cli-razao" placeholder="Nome do cliente"></div>
+            <div class="mod-form-group" style="margin-bottom:14px"><label>CNPJ / CPF</label><input class="mod-input" id="cli-cnpj" placeholder="00.000.000/0001-00"></div>
+            <div class="mod-form-group" style="margin-bottom:14px"><label>E-mail</label><input class="mod-input" type="email" id="cli-email" placeholder="contato@cliente.com"></div>
+            <div class="mod-form-group"><label>Telefone</label><input class="mod-input" id="cli-tel" placeholder="(11) 99999-9999"></div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovoCliente')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarCliente()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const DB_KEY = 'sgq_satisfacao';
+
+function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"clientes":[],"reclamacoes":[],"npsRespostas":[]}'); }
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+function seedData() {
+    const db = getDB();
+    if (db.clientes.length) return;
+    db.clientes = [
+        { id:1, razao:'Metalúrgica Alpha Ltda', cnpj:'11.222.333/0001-44', email:'compras@alpha.com', tel:'(11) 3333-4444' },
+        { id:2, razao:'Construtora Beta S.A.', cnpj:'22.333.444/0001-55', email:'suprimentos@beta.com', tel:'(11) 4444-5555' },
+        { id:3, razao:'Ind?stria Gama Eireli', cnpj:'33.444.555/0001-66', email:'qualidade@gama.com', tel:'(11) 5555-6666' },
+    ];
+    db.reclamacoes = [
+        { id:1, cliente:'Metalúrgica Alpha Ltda', titulo:'Peças entregues com dimensão incorreta', descricao:'Lote recebido com 5% das peças fora da tolerância especificada.', criticidade:'alta', canal:'E-mail', pedido:'PED-2026-0140', responsavel:'João Teste', prazo:'2026-06-10', status:'aberta', data:'2026-06-01T14:00' },
+        { id:2, cliente:'Construtora Beta S.A.', titulo:'Atraso na entrega do pedido', descricao:'Pedido chegou 3 dias apçs o prazo acordado.', criticidade:'media', canal:'Telefone', pedido:'PED-2026-0138', responsavel:'Ana Carvalho', prazo:'2026-06-08', status:'andamento', data:'2026-06-02T09:30' },
+        { id:3, cliente:'Ind?stria Gama Eireli', titulo:'Embalagem danificada no transporte', descricao:'Caixas chegaram amassadas, produto interno OK.', criticidade:'baixa', canal:'WhatsApp', pedido:'PED-2026-0142', responsavel:'Carlos Ferreira', prazo:'2026-06-12', status:'concluida', data:'2026-05-28T11:00' },
+    ];
+    db.npsRespostas = [
+        { id:1, cliente:'Metalúrgica Alpha Ltda', nota:9, comentario:'Ótima qualidade!', data:'2026-05-30' },
+        { id:2, cliente:'Construtora Beta S.A.', nota:7, comentario:'Bom serviço, mas prazo poderia melhorar.', data:'2026-05-28' },
+        { id:3, cliente:'Ind?stria Gama Eireli', nota:10, comentario:'Excelente! Sempre confiável.', data:'2026-05-25' },
+        { id:4, cliente:'Metalúrgica Alpha Ltda', nota:3, comentario:'Tivemos problemas com o último lote.', data:'2026-06-01' },
+    ];
+    saveDB(db);
+}
+
+function switchView(v) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display='none');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-'+v).style.display='block';
+    const nav = document.getElementById('nav-'+v);
+    if (nav) nav.classList.add('active');
+    if (v==='dashboard') renderDashboard();
+    if (v==='clientes') renderClientes();
+    if (v==='nps') renderNPS();
+    if (v==='reclamacoes') renderReclamacoes();
+}
+
+function calcNPS() {
+    const db = getDB();
+    const resp = db.npsRespostas;
+    if (!resp.length) return { score: null, promotores:0, passivos:0, detratores:0, total:0 };
+    const promotores = resp.filter(r=>r.nota>=9).length;
+    const detratores = resp.filter(r=>r.nota<=6).length;
+    const passivos = resp.filter(r=>r.nota>=7&&r.nota<=8).length;
+    const score = Math.round(((promotores-detratores)/resp.length)*100);
+    return { score, promotores, passivos, detratores, total:resp.length };
+}
+
+function renderDashboard() {
+    const db = getDB();
+    const nps = calcNPS();
+    const abertas = db.reclamacoes.filter(r=>r.status==='aberta').length;
+    document.getElementById('stat-nps').textContent = nps.score !== null ? nps.score : '-';
+    document.getElementById('stat-rec-abertas').textContent = abertas;
+    document.getElementById('stat-clientes').textContent = db.clientes.length;
+    document.getElementById('stat-resp-nps').textContent = nps.total;
+    document.getElementById('nps-big').textContent = nps.score !== null ? nps.score : '-';
+    document.getElementById('nps-promotores').textContent = nps.promotores;
+    document.getElementById('nps-passivos').textContent = nps.passivos;
+    document.getElementById('nps-detratores').textContent = nps.detratores;
+    document.getElementById('badge-reclamacoes').textContent = abertas;
+
+    // NPS bar
+    if (nps.total) {
+        const pProm = Math.round(nps.promotores/nps.total*100);
+        const pPass = Math.round(nps.passivos/nps.total*100);
+        const pDet = 100 - pProm - pPass;
+        document.getElementById('nps-bar-viz').innerHTML = `
+            <div style="flex:${pDet};background:rgba(239,68,68,.4);height:8px;border-radius:4px 0 0 4px" title="${pDet}% Detratores"></div>
+            <div style="flex:${pPass};background:rgba(245,158,11,.4);height:8px" title="${pPass}% Passivos"></div>
+            <div style="flex:${pProm};background:rgba(16,185,129,.4);height:8px;border-radius:0 4px 4px 0" title="${pProm}% Promotores"></div>
+        `;
+    }
+
+    const recentes = db.reclamacoes.slice(-4).reverse();
+    document.getElementById('reclamacoes-recentes').innerHTML = recentes.length ? recentes.map(r => `
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer" onclick="switchView('reclamacoes')">
+            <div style="width:8px;height:8px;border-radius:50%;background:${r.status==='aberta'?'var(--danger)':r.status==='andamento'?'var(--warning)':'var(--accent)'};flex-shrink:0"></div>
+            <div style="flex:1"><div style="font-size:.85rem;font-weight:600;color:#fff">${r.titulo}</div><div style="font-size:.75rem;color:rgba(255,255,255,.35)">${r.cliente} � ${formatDate(r.data)}</div></div>
+            <span class="sbadge ${r.status}">${{aberta:'Aberta',andamento:'Em Andamento',concluida:'Concluída'}[r.status]}</span>
+        </div>
+    `).join('') : '<div style="padding:24px;text-align:center;color:rgba(255,255,255,.25);font-size:.85rem">Nenhuma reclamação recente</div>';
+}
+
+function renderClientes() {
+    const db = getDB();
+    const listEl = document.getElementById('lista-clientes');
+    const emptyEl = document.getElementById('empty-clientes');
+    if (!db.clientes.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    listEl.innerHTML = db.clientes.map(c => {
+        const npsResp = db.npsRespostas.filter(r=>r.cliente===c.razao);
+        const avgNPS = npsResp.length ? (npsResp.reduce((a,b)=>a+b.nota,0)/npsResp.length).toFixed(1) : '-';
+        return `<div style="display:flex;align-items:center;gap:16px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
+            <div style="width:44px;height:44px;border-radius:10px;background:rgba(249,115,22,.12);display:flex;align-items:center;justify-content:center;color:var(--orange);font-size:.9rem;flex-shrink:0"><i class="fas fa-building"></i></div>
+            <div style="flex:1"><div style="font-weight:700;color:#fff;font-size:.95rem;margin-bottom:3px">${c.razao}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${c.email} � ${c.tel}</div></div>
+            <div style="text-align:right"><div style="font-size:1.3rem;font-weight:800;color:var(--accent)">${avgNPS}</div><div style="font-size:.72rem;color:rgba(255,255,255,.35)">NPS médio</div></div>
+        </div>`;
+    }).join('');
+}
+
+function renderNPS() {
+    const db = getDB();
+    const cont = document.getElementById('respostas-nps');
+    populateNPSClienteSelect();
+    if (!db.npsRespostas.length) { cont.innerHTML='<div class="mod-empty"><i class="fas fa-star"></i><h3>Nenhuma resposta NPS</h3></div>'; return; }
+    cont.innerHTML = db.npsRespostas.map(r => {
+        const cat = r.nota >= 9 ? 'promoter' : r.nota >= 7 ? 'passive' : 'detractor';
+        const catLabel = {promoter:'Promotor',passive:'Passivo',detractor:'Detrator'}[cat];
+        return `<div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.04)">
+            <div class="nps-score ${cat}" style="width:44px;height:44px;font-size:1.1rem;border-radius:10px;flex-shrink:0">${r.nota}</div>
+            <div style="flex:1"><div style="font-weight:600;color:#fff;font-size:.9rem">${r.cliente}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${r.comentario||'Sem comentário'} � ${formatDate(r.data)}</div></div>
+            <span class="sbadge ${cat==='promoter'?'concluida':cat==='passive'?'andamento':'aberta'}">${catLabel}</span>
+        </div>`;
+    }).join('');
+}
+
+function populateNPSClienteSelect() {
+    const db = getDB();
+    const sel = document.getElementById('nps-resp-cliente');
+    sel.innerHTML = '<option value="">Selecione...</option>' + db.clientes.map(c=>`<option>${c.razao}</option>`).join('');
+    const recSel = document.getElementById('rec-cliente');
+    if (recSel) recSel.innerHTML = '<option value="">Selecione...</option>' + db.clientes.map(c=>`<option>${c.razao}</option>`).join('');
+}
+
+function renderReclamacoes() {
+    const db = getDB();
+    const search = (document.getElementById('searchRec')?.value||'').toLowerCase();
+    const sf = document.getElementById('filterStatusRec')?.value||'';
+    const items = db.reclamacoes.filter(r => {
+        if (search && !r.titulo.toLowerCase().includes(search) && !r.cliente.toLowerCase().includes(search)) return false;
+        if (sf && r.status !== sf) return false;
+        return true;
+    }).reverse();
+    const listEl = document.getElementById('lista-reclamacoes');
+    const emptyEl = document.getElementById('empty-reclamacoes');
+    if (!items.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    listEl.innerHTML = items.map(r => `
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
+            <div style="width:44px;height:44px;border-radius:10px;background:rgba(249,115,22,.12);display:flex;align-items:center;justify-content:center;color:var(--orange);font-size:.9rem;flex-shrink:0"><i class="fas fa-comment-dots"></i></div>
+            <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+                    <span class="pri ${r.criticidade}">${r.criticidade.charAt(0).toUpperCase()+r.criticidade.slice(1)}</span>
+                    <span style="font-size:.72rem;color:rgba(255,255,255,.35)"><i class="fas fa-tag" style="margin-right:3px"></i>${r.canal}</span>
+                    ${r.pedido?`<span style="font-size:.72rem;color:rgba(255,255,255,.35)"><i class="fas fa-hashtag" style="margin-right:2px"></i>${r.pedido}</span>`:''}
+                </div>
+                <div style="font-weight:700;color:#fff;font-size:.95rem;margin-bottom:4px">${r.titulo}</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.4)">Cliente: ${r.cliente} � Responsável: ${r.responsavel} � Prazo: ${formatDate(r.prazo)}</div>
+            </div>
+            <span class="sbadge ${r.status}">${{aberta:'Aberta',andamento:'Em Andamento',concluida:'Concluída'}[r.status]}</span>
+        </div>
+    `).join('');
+}
+
+function salvarReclamacao() {
+    const cliente = document.getElementById('rec-cliente').value;
+    const titulo = document.getElementById('rec-titulo').value.trim();
+    const descricao = document.getElementById('rec-descricao').value.trim();
+    if (!cliente || !titulo) return alert('Preencha cliente e t?tulo.');
+    const db = getDB();
+    const newId = db.reclamacoes.length ? Math.max(...db.reclamacoes.map(r=>r.id))+1 : 1;
+    db.reclamacoes.push({ id:newId, cliente, titulo, descricao, criticidade:document.getElementById('rec-criticidade').value, canal:document.getElementById('rec-canal').value, pedido:document.getElementById('rec-pedido').value, responsavel:document.getElementById('rec-responsavel').value, prazo:document.getElementById('rec-prazo').value, status:'aberta', data:new Date().toISOString() });
+    saveDB(db);
+    closeModal('modalNovaRec');
+    switchView('reclamacoes');
+    showToast('Reclamação registrada!', 'success');
+}
+
+function salvarRespostaNPS() {
+    const cliente = document.getElementById('nps-resp-cliente').value;
+    const nota = parseInt(document.getElementById('nps-resp-nota').value);
+    if (!cliente || isNaN(nota) || nota < 0 || nota > 10) return alert('Selecione cliente e nota válida (0-10).');
+    const db = getDB();
+    const newId = db.npsRespostas.length ? Math.max(...db.npsRespostas.map(r=>r.id))+1 : 1;
+    db.npsRespostas.push({ id:newId, cliente, nota, comentario:document.getElementById('nps-resp-coment').value, data:new Date().toISOString().slice(0,10) });
+    saveDB(db);
+    renderNPS();
+    showToast('Resposta NPS registrada!', 'success');
+}
+
+function salvarCliente() {
+    const razao = document.getElementById('cli-razao').value.trim();
+    if (!razao) return alert('Informe a razão social.');
+    const db = getDB();
+    const newId = db.clientes.length ? Math.max(...db.clientes.map(c=>c.id))+1 : 1;
+    db.clientes.push({ id:newId, razao, cnpj:document.getElementById('cli-cnpj').value, email:document.getElementById('cli-email').value, tel:document.getElementById('cli-tel').value });
+    saveDB(db);
+    closeModal('modalNovoCliente');
+    renderClientes();
+    showToast('Cliente cadastrado!', 'success');
+}
+
+function openNovaReclamacaoModal() { populateNPSClienteSelect(); openModal('modalNovaRec'); }
+function openEnviarNPSModal() { populateNPSClienteSelect(); openModal('modalNPS'); }
+function openNovoClienteModal() { openModal('modalNovoCliente'); }
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function formatDate(str) { if(!str) return '-'; const d=new Date(str+(str.length===10?'T00:00':'')); return d.toLocaleDateString('pt-BR'); }
+function showToast(msg, type) {
+    const t=document.createElement('div'); t.style.cssText=`position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;z-index:9999;background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent=msg; document.body.appendChild(t); setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},3000);
+}
+document.querySelectorAll('.mod-modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active');}));
+seedData();
+renderDashboard();
+</script>
+<script>
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');});
+</script><script>
+function startModuleTour() {
+    alert('Tour deste módulo em breve! ');
+}
+</script></body>
+</html>
+

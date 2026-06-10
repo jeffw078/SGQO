@@ -1,0 +1,2407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Documentos - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/documentos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout doc-page">
+
+    <!-- ===== SIDEBAR (single, with folder tree) ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../assets/img/logo.png" style="width:100px;">
+        </div>
+
+        
+        <nav class="sidebar-nav" style="display:flex;flex-direction:column;flex:1;min-height:0">
+
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;justify-content:center">
+                    
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Gestão de Documentos</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+                
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            
+            <div class="nav-section" style="border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:8px">
+                <div class="nav-section-title" style="display:flex;align-items:center;justify-content:space-between">
+                    Setores / Pastas
+                    <button class="btn-new-folder" onclick="createRootFolder()" title="Nova pasta raiz" style="font-size:.72rem;padding:3px 7px"><i class="fas fa-folder-plus"></i></button>
+                </div>
+            </div>
+            <!-- Folder tree rendered here -->
+            <div class="doc-tree-scroll" id="docTreeContainer"></div>
+            <div class="nav-section" style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px;margin-top:auto;flex-shrink:0">
+                <div class="nav-section-title">Administração</div>
+                <a href="#" class="nav-item" id="navCategories" onclick="showView('categories');return false"><i class="fas fa-tags"></i> Categorias</a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- ===== MAIN ===== -->
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar documentos..." id="docSearch" oninput="filterDocuments()">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon" title="Notificações"><i class="fas fa-bell"></i></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JW</div>
+                        <span class="user-btn-name">Jefferson Willian</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JD</div>
+                            <div><div class="user-name">João Teste</div><div class="user-role">Administrador</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+           
+
+            <!-- ======= FOLDER VIEW ======= -->
+            <div id="viewFolders" style="display:flex;flex-direction:column;flex:1">
+                <div class="doc-content-header">
+                    <div class="doc-breadcrumb" id="docBreadcrumb">
+                        <span class="current"><i class="fas fa-home" style="margin-right:4px"></i> Documentos</span>
+                    </div>
+                    <div class="doc-content-actions" id="docContentActions" style="display:none">
+                        <div class="view-toggle" id="viewToggle">
+                            <button class="view-toggle-btn active" id="btnListView" onclick="setDocView('list')" title="Visualização em lista"><i class="fas fa-list"></i></button>
+                            <button class="view-toggle-btn" id="btnGridView" onclick="setDocView('grid')" title="Visualização em grade"><i class="fas fa-grip"></i></button>
+                        </div>
+                        <button class="doc-btn primary" onclick="openNewDocModal()"><i class="fas fa-plus"></i> Novo Documento</button>
+                    </div>
+                </div>
+                <!-- Active / Inactive tabs -->
+                <div class="doc-filter-tabs" id="docFilterTabs" style="display:none">
+                    <div class="doc-filter-tab active" id="tabAtivos" onclick="setDocTab('ativos')">Publicados <span class="tab-n" id="tabNAtivos">0</span></div>
+                    <div class="doc-filter-tab" id="tabPendentes" onclick="setDocTab('pendentes')">Pendentes <span class="tab-n" id="tabNPendentes">0</span></div>
+                    <div class="doc-filter-tab" id="tabInativos" onclick="setDocTab('inativos')">Inativos <span class="tab-n" id="tabNInativos">0</span></div>
+                </div>
+                <div class="doc-content-body" id="docContentBody">
+                    <div class="doc-empty">
+                        <i class="fas fa-folder-open"></i>
+                        <p>Selecione uma pasta no menu lateral</p>
+                        <small>Navegue pelos setores para visualizar os documentos</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ======= CATEGORIES VIEW ======= -->
+            <div id="viewCategories" style="display:none;flex-direction:column;flex:1">
+                <div class="doc-content-header">
+                    <div class="doc-breadcrumb">
+                        <span onclick="showView('folders')" style="cursor:pointer">Documentos</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span class="current">Categorias de Documentos</span>
+                    </div>
+                    <div class="doc-content-actions">
+                        <button class="doc-btn primary" onclick="openCategoryWizard()"><i class="fas fa-plus"></i> Nova Categoria</button>
+                    </div>
+                </div>
+                <div class="doc-content-body" id="catListContainer"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: NEW CATEGORY (3-step wizard)
+     ============================================================ -->
+<div class="doc-modal-overlay" id="catWizardModal">
+    <div class="doc-modal wide">
+        <div class="doc-modal-header">
+            <h3><i class="fas fa-tags"></i> <span id="catWizardTitle">Nova Categoria de Documento</span></h3>
+            <button class="doc-modal-close" onclick="closeCatWizard()">&times;</button>
+        </div>
+        <div class="doc-modal-body">
+            <!-- Steps indicator -->
+            <div class="wizard-steps" id="catWizardSteps">
+                <div class="wizard-step active" data-step="1">
+                    <span class="wizard-step-num">1</span> Identificação e Acesso
+                </div>
+                <div class="wizard-step-line"></div>
+                <div class="wizard-step" data-step="2">
+                    <span class="wizard-step-num">2</span> Aprovação
+                </div>
+                <div class="wizard-step-line"></div>
+                <div class="wizard-step" data-step="3">
+                    <span class="wizard-step-num">3</span> Formulário
+                </div>
+            </div>
+
+            <!-- STEP 1: Name + Access Permissions -->
+            <div class="wizard-page active" id="catStep1">
+                <div class="doc-form-group">
+                    <label class="doc-form-label">Nome da Categoria</label>
+                    <input class="doc-form-input" id="catName" placeholder="Ex: Procedimento Operacional, Instrução de Trabalho...">
+                </div>
+                <div class="doc-form-group">
+                    <label class="doc-form-label">Descrição (opcional)</label>
+                    <textarea class="doc-form-input" id="catDesc" rows="2" placeholder="Breve descrição da categoria..."></textarea>
+                </div>
+                <div class="doc-form-group">
+                    <label class="doc-form-label">Permissões de Acesso por Setor/Usuário</label>                    <p class="doc-form-hint">Defina quais setores ou usuários terão acesso e quais permissões</p>
+                    <div style="display:flex;gap:8px;margin-bottom:12px">
+                        <input class="doc-form-input" id="catPermEntity" placeholder="Nome do setor ou usuário" style="flex:1">
+                        <select class="doc-form-input" id="catPermType" style="width:120px">
+                            <option value="setor">Setor</option>
+                            <option value="usuario">Usuário</option>
+                        </select>
+                        <button class="doc-btn primary small" onclick="addPermEntity()"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table class="perm-table" id="permTable">
+                            <thead>
+                                <tr>
+                                    <th>Entidade</th>
+                                    <th title="Visualizar">Visualizar</th>
+                                    <th title="Criar">Criar</th>
+                                    <th title="Editar">Editar</th>
+                                    <th title="Remover">Remover</th>
+                                    <th title="Download">Download</th>
+                                    <th title="Solicitar Revisão">Pedir Revisão</th>
+                                    <th title="Emitir Cópia Controlada">Emitir CC</th>
+                                    <th title="Copiar Conteúdo">Copiar</th>
+                                    <th title="Imprimir">Imprimir</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="permTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: Approval -->
+            <div class="wizard-page" id="catStep2">
+                <div class="doc-form-group">
+                    <label class="doc-form-label">Tipo de Aprovação</label>
+                    <p class="doc-form-hint">Selecione como os documentos desta categoria serão aprovados</p>
+                    <div class="approval-type-cards" id="approvalTypeCards">
+                        <div class="approval-type-card selected" onclick="selectApprovalType(this, 'alcada')" data-type="alcada">
+                            <i class="fas fa-sitemap"></i>
+                            <div class="atc-title">Alçada (Hierárquica)</div>
+                            <div class="atc-desc">Aprovação sequencial por nível hierárquico</div>
+                        </div>
+                        <div class="approval-type-card" onclick="selectApprovalType(this, 'consenso')" data-type="consenso">
+                            <i class="fas fa-users"></i>
+                            <div class="atc-title">Consenso</div>
+                            <div class="atc-desc">Todos os aprovadores devem aprovar simultaneamente</div>
+                        </div>
+                        <div class="approval-type-card" onclick="selectApprovalType(this, 'maioria')" data-type="maioria">
+                            <i class="fas fa-scale-balanced"></i>
+                            <div class="atc-title">Maioria Simples</div>
+                            <div class="atc-desc">Aprovado quando mais da metade aprovar</div>
+                        </div>
+                        <div class="approval-type-card" onclick="selectApprovalType(this, 'qualquer')" data-type="qualquer">
+                            <i class="fas fa-user-check"></i>
+                            <div class="atc-title">Qualquer Um</div>
+                            <div class="atc-desc">Basta um aprovador para validar</div>
+                        </div>
+                        <div class="approval-type-card" onclick="selectApprovalType(this, 'sequencial')" data-type="sequencial">
+                            <i class="fas fa-arrow-right-arrow-left"></i>
+                            <div class="atc-title">Sequencial</div>
+                            <div class="atc-desc">Cada aprovador aprova em ordem definida</div>
+                        </div>
+                        <div class="approval-type-card" onclick="selectApprovalType(this, 'nenhum')" data-type="nenhum">
+                            <i class="fas fa-circle-xmark"></i>
+                            <div class="atc-title">Sem aprovação</div>
+                            <div class="atc-desc">Documento - publicado diretamente ao cadastrar</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="doc-form-group">
+                    <label class="doc-form-label">Respons?veis pela Aprovação</label>
+                    <p class="doc-form-hint">Adicione os usuários que aprovar?o documentos desta categoria</p>
+                    <div style="display:flex;gap:8px;margin-bottom:8px">
+                        <input class="doc-form-input" id="catApproverInput" placeholder="Nome do aprovador" style="flex:1">
+                        <button class="doc-btn primary small" onclick="addCatApprover()"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="catApproverChips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px"></div>
+                </div>
+                <div class="doc-form-group">
+                    <label class="doc-form-label">Quantidade m?nima de aprovações para publicar</label>
+                    <input type="number" class="doc-form-input" id="catMinApprovers" value="1" min="1" style="width:120px">
+                    <p class="doc-form-hint" style="margin-top:4px">Mínimo de aprovadores que devem aprovar para que o documento seja publicado</p>
+                </div>
+                <div class="doc-form-group">
+                    <label class="doc-form-label">Fluxo de Aprovação</label>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                        <label class="flow-option selected" id="flowStandard" onclick="selectApprovalFlow('standard')">
+                            <input type="radio" name="catApprovalFlow" value="standard" checked style="accent-color:var(--primary)">
+                            <div>
+                                <div style="color:#fff;font-size:.85rem;font-weight:600">Fluxo Padrão de Aprovação</div>
+                                <div style="font-size:.72rem;color:rgba(255,255,255,.4)">Elaboração ' Revisão ' Aprovação ' Publicação</div>
+                            </div>
+                        </label>
+                        <label class="flow-option" id="flowCustom" onclick="selectApprovalFlow('custom')">
+                            <input type="radio" name="catApprovalFlow" value="custom" style="accent-color:var(--primary)">
+                            <div>
+                                <div style="color:#fff;font-size:.85rem;font-weight:600">Fluxo Customizado (BPM)</div>
+                                <div style="font-size:.72rem;color:rgba(255,255,255,.4)">Selecione um fluxo criado no módulo BPM</div>
+                            </div>
+                        </label>
+                        <div id="customFlowSelect" style="display:none;margin-top:8px">
+                            <select class="doc-form-input" id="catCustomFlowId">
+                                <option value="">Selecione um fluxo BPM...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: Form Template -->
+            <div class="wizard-page" id="catStep3">
+                <div class="doc-form-group">
+                    <label class="doc-form-label">Formulário Padrão da Categoria</label>
+                    <p class="doc-form-hint">Estes campos serão exigidos ao cadastrar um documento nesta categoria. Você pode adicionar, remover ou reordenar campos.</p>
+                </div>
+                <div id="catFormFields"></div>
+                <div style="margin-top:12px;display:flex;gap:8px">
+                    <input class="doc-form-input" id="newFieldName" placeholder="Nome do novo campo" style="flex:1">
+                    <select class="doc-form-input" id="newFieldType" style="width:140px">
+                        <option value="texto">Texto</option>
+                        <option value="textarea">Texto Longo</option>
+                        <option value="numero">Número</option>
+                        <option value="data">Data</option>
+                        <option value="arquivo">Arquivo</option>
+                        <option value="opcoes">Opes</option>
+                        <option value="sim_nao">Sim/Não</option>
+                    </select>
+                    <button class="doc-btn primary small" onclick="addCatFormField()"><i class="fas fa-plus"></i></button>
+                </div>
+                <!-- Multiple attachments setting -->
+                <div class="doc-form-group" style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)">
+                    <label class="doc-form-label">Quantidade de Arquivos por Documento</label>
+                    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+                        <label class="flow-option selected" id="optSingleFile" onclick="selectFileCount('single')">
+                            <input type="radio" name="catFileCount" value="single" checked style="accent-color:var(--primary)">
+                            <div>
+                                <div style="color:#fff;font-size:.85rem;font-weight:600">?snico arquivo</div>
+                                <div style="font-size:.72rem;color:rgba(255,255,255,.4)">Um arquivo (PDF, Word, etc.) por documento</div>
+                            </div>
+                        </label>
+                        <label class="flow-option" id="optMultiFile" onclick="selectFileCount('multiple')">
+                            <input type="radio" name="catFileCount" value="multiple" style="accent-color:var(--primary)">
+                            <div>
+                                <div style="color:#fff;font-size:.85rem;font-weight:600">Múltiplos arquivos (anexos)</div>
+                                <div style="font-size:.72rem;color:rgba(255,255,255,.4)">Vários anexos - cópia controlada pode ser emitida por seleo de checkbox</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <!-- Controlled copy config -->
+                <div class="doc-form-group" style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)">
+                    <label class="doc-form-label">Configuração de cópia controlada</label>
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                        <input type="checkbox" id="catCCEnabled" style="accent-color:var(--primary);width:16px;height:16px" onchange="toggleCCConfig(this.checked)">
+                        <label for="catCCEnabled" style="color:rgba(255,255,255,.6);font-size:.82rem;cursor:pointer">Permitir emissão de Cópia Controlada nesta categoria</label>
+                    </div>
+                    <div id="catCCConfig" style="display:none">
+                        <div class="doc-form-group">
+                            <label class="doc-form-label">Posicionamento da marca</label>
+                            <select class="doc-form-input" id="catCCPlacement">
+                                <option value="watermark">Marca dágua central (padrão)</option>
+                                <option value="rodape">Rodapç</option>
+                                <option value="cabecalho">Cabeçalho</option>
+                            </select>
+                        </div>
+                        <div class="doc-form-group">
+                            <label class="doc-form-label">Campos obrigatérios na emissão</label>
+                            <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:6px">
+                                <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:rgba(255,255,255,.6);cursor:pointer"><input type="checkbox" id="catCCFEmissor" checked style="accent-color:var(--primary)"> Emissor</label>
+                                <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:rgba(255,255,255,.6);cursor:pointer"><input type="checkbox" id="catCCFDestinatario" checked style="accent-color:var(--primary)"> Destinatério</label>
+                                <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:rgba(255,255,255,.6);cursor:pointer"><input type="checkbox" id="catCCFValidade" checked style="accent-color:var(--primary)"> Validade</label>
+                                <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:rgba(255,255,255,.6);cursor:pointer"><input type="checkbox" id="catCCFNumDoc" checked style="accent-color:var(--primary)"> Número do documento</label>
+                                <label style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:rgba(255,255,255,.6);cursor:pointer"><input type="checkbox" id="catCCFDataEmissao" checked style="accent-color:var(--primary)"> Data de Emissão</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        </div>
+        <div class="doc-modal-footer">
+            <button class="doc-btn" id="catWizardBack" onclick="catWizardPrev()" style="display:none"><i class="fas fa-arrow-left"></i> Voltar</button>
+            <div></div>
+            <button class="doc-btn primary" id="catWizardNext" onclick="catWizardNext()">Próximo <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: NEW DOCUMENT (2-step)
+     ============================================================ -->
+<div class="doc-modal-overlay" id="newDocModal">
+    <div class="doc-modal wide">
+        <div class="doc-modal-header">
+            <h3><i class="fas fa-file-circle-plus"></i> Novo Documento</h3>
+            <button class="doc-modal-close" onclick="closeNewDocModal()">&times;</button>
+        </div>
+        <div class="doc-modal-body">
+            <div class="wizard-steps" id="docWizardSteps">
+                <div class="wizard-step active" data-step="1">
+                    <span class="wizard-step-num">1</span> Categoria
+                </div>
+                <div class="wizard-step-line"></div>
+                <div class="wizard-step" data-step="2">
+                    <span class="wizard-step-num">2</span> Dados do Documento
+                </div>
+            </div>
+
+            <!-- Step 1: Select category -->
+            <div class="wizard-page active" id="docStep1">
+                <div class="doc-form-group">
+                    <label class="doc-form-label">Selecione a Categoria do Documento</label>
+                    <p class="doc-form-hint">A categoria define as permissões, fluxo de aprovação e campos obrigatérios</p>
+                    <select class="doc-form-input" id="docCategorySelect" onchange="onDocCategoryChange()">
+                        <option value="">Selecione uma categoria...</option>
+                    </select>
+                </div>
+                <div id="docCategoryPreview" style="display:none;margin-top:16px">
+                    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px">
+                        <div style="color:#fff;font-size:.85rem;font-weight:600;margin-bottom:8px"><i class="fas fa-info-circle" style="color:var(--primary);margin-right:6px"></i> Detalhes da Categoria</div>
+                        <div id="docCatPreviewContent" style="font-size:.78rem;color:rgba(255,255,255,.5);line-height:1.6"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Fill document data -->
+            <div class="wizard-page" id="docStep2">
+                <div id="docFormContainer"></div>
+            </div>
+        </div>
+        <div class="doc-modal-footer">
+            <button class="doc-btn" id="docWizardBack" onclick="docWizardPrev()" style="display:none"><i class="fas fa-arrow-left"></i> Voltar</button>
+            <div></div>
+            <button class="doc-btn primary" id="docWizardNext" onclick="docWizardNext()">Próximo <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: NEW FOLDER
+     ============================================================ -->
+<div class="doc-modal-overlay" id="newFolderModal">
+    <div class="doc-modal" style="width:400px">
+        <div class="doc-modal-header">
+            <h3><i class="fas fa-folder-plus"></i> Nova Pasta</h3>
+            <button class="doc-modal-close" onclick="closeModal('newFolderModal')">&times;</button>
+        </div>
+        <div class="doc-modal-body">
+            <div class="doc-form-group">
+                <label class="doc-form-label">Nome da Pasta</label>
+                <input class="doc-form-input" id="newFolderName" placeholder="Ex: Qualidade, Produção...">
+            </div>
+        </div>
+        <div class="doc-modal-footer">
+            <button class="doc-btn" onclick="closeModal('newFolderModal')">Cancelar</button>
+            <button class="doc-btn primary" onclick="confirmNewFolder()"><i class="fas fa-check"></i> Criar Pasta</button>
+        </div>
+    </div>
+</div>
+
+<!-- Notification toast -->
+<div class="doc-notification" id="docNotification"></div>
+
+<!-- ============================================================
+     MODAL: CÓPIA CONTROLADA
+     ============================================================ -->
+<div class="cc-modal-overlay" id="ccModal">
+    <div class="cc-modal">
+        <div class="doc-modal-header" style="padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06)">
+            <h3 style="color:#fff;font-size:.95rem;font-weight:700;margin:0;display:flex;align-items:center;gap:8px"><i class="fas fa-stamp" style="color:var(--warning)"></i> Emitir Cópia Controlada</h3>
+            <button class="doc-modal-close" onclick="document.getElementById('ccModal').classList.remove('open')">&times;</button>
+        </div>
+        <div class="doc-modal-body" style="padding:24px;flex:1;overflow-y:auto">
+            <div id="ccAttachmentList" style="display:none;margin-bottom:20px">
+                <p class="doc-form-label" style="margin-bottom:8px">Selecione os anexos para incluir na cópia controlada</p>
+                <div id="ccAttachmentItems"></div>
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Emissor <span style="color:#f87171">*</span></label>
+                <select class="doc-form-input" id="ccEmissor">
+                    <option value="">Selecione o emissor...</option>
+                </select>
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Destinat?rio <span style="color:#f87171">*</span></label>
+                <select class="doc-form-input" id="ccDestinatario" onchange="toggleCCOutroDestinatario()">
+                    <option value="">Selecione o destinat?rio...</option>
+                    <optgroup label="Setores" id="ccSetoresGroup"></optgroup>
+                    <optgroup label="Usu?rios" id="ccUsuariosGroup"></optgroup>
+                    <option value="__outro__">Outro...</option>
+                </select>
+                <input class="doc-form-input" id="ccDestinatarioOutro" placeholder="Digite o nome do destinat?rio" style="display:none;margin-top:8px">
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Data de Emiss?o</label>
+                <input type="date" class="doc-form-input" id="ccDataEmissao">
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Data de Validade</label>
+                <input type="date" class="doc-form-input" id="ccValidade">
+                <p class="doc-form-hint" style="margin-top:4px">Deixe em branco para prazo indeterminado</p>
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Posi??o da marca de c?pia</label>
+                <select class="doc-form-input" id="ccPosicao">
+                    <option value="rodape">Rodap?</option>
+                    <option value="cabecalho">Cabe?alho</option>
+                    <option value="lateral-direita">Lateral direita</option>
+                    <option value="lateral-esquerda">Lateral esquerda</option>
+                </select>
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Informa??es na marca</label>
+                <div class="cc-field-grid">
+                    <label><input type="checkbox" id="ccInfoValidade" checked> Data de validade</label>
+                    <label><input type="checkbox" id="ccInfoEmissao" checked> Data de emiss?o</label>
+                    <label><input type="checkbox" id="ccInfoDestinatario" checked> Destinat?rio</label>
+                    <label><input type="checkbox" id="ccInfoEmissor" checked> Emissor</label>
+                </div>
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Observa??es</label>
+                <textarea class="doc-form-input" id="ccObs" rows="2" placeholder="Finalidade, localiza??o f?sica, etc..."></textarea>
+            </div>
+
+            <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:8px;padding:12px 14px;font-size:.78rem;color:rgba(255,255,255,.5)">
+                <i class="fas fa-circle-info" style="color:#f59e0b;margin-right:6px"></i>
+                Ao confirmar, será gerada uma marcação de cópia controlada <strong style="color:#f59e0b">CÓPIA CONTROLADA</strong> sobreposta ao documento no visualizador.
+            </div>
+        </div>
+        <div class="doc-modal-footer" style="padding:16px 24px;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:8px;justify-content:flex-end">
+            <button class="doc-btn" onclick="document.getElementById('ccModal').classList.remove('open')">Cancelar</button>
+            <button class="doc-btn primary" onclick="saveCopiaControlada()"><i class="fas fa-stamp"></i> Emitir Cópia</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: GERENCIAR C?PIAS
+     ============================================================ -->
+<div class="cc-modal-overlay" id="manageCCModal">
+    <div class="cc-modal">
+        <div class="doc-modal-header" style="padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06)">
+            <h3 style="color:#fff;font-size:.95rem;font-weight:700;margin:0;display:flex;align-items:center;gap:8px"><i class="fas fa-list-check" style="color:var(--primary)"></i> C?pias Controladas</h3>
+            <button class="doc-modal-close" onclick="document.getElementById('manageCCModal').classList.remove('open')">&times;</button>
+        </div>
+        <div class="doc-modal-body" style="padding:24px;flex:1;overflow-y:auto">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+                <span style="font-size:.82rem;color:rgba(255,255,255,.4)">C?pias ativas do documento atual</span>
+                <button class="doc-btn primary small" onclick="openCopiaControlada()"><i class="fas fa-plus"></i> Nova C?pia</button>
+            </div>
+            <div id="manageCCList"></div>
+        </div>
+        <div class="doc-modal-footer" style="padding:16px 24px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:flex-end">
+            <button class="doc-btn" onclick="document.getElementById('manageCCModal').classList.remove('open')">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: EDITAR DOCUMENTO
+     ============================================================ -->
+<div class="doc-modal-overlay" id="editDocModal">
+    <div class="doc-modal" style="width:560px">
+        <div class="doc-modal-header">
+            <h3><i class="fas fa-pen"></i> Editar Documento</h3>
+            <button class="doc-modal-close" onclick="closeModal('editDocModal')">&times;</button>
+        </div>
+        <div class="doc-modal-body">
+            <div class="doc-form-group">
+                <label class="doc-form-label">Código</label>
+                <input class="doc-form-input" id="editDocCode">
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Título <span style="color:#f87171">*</span></label>
+                <input class="doc-form-input" id="editDocTitle">
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Versão</label>
+                <input class="doc-form-input" id="editDocVersion" placeholder="Ex: 1.0, 2.1">
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Data</label>
+                <input type="date" class="doc-form-input" id="editDocDate">
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Status</label>
+                <select class="doc-form-input" id="editDocStatus">
+                    <option value="pendente">Pendente de Aprovação</option>
+                    <option value="ativo">Publicado / Ativo</option>
+                    <option value="revisao">Em Revisão</option>
+                    <option value="inativo">Inativo</option>
+                    <option value="obsoleto">Obsoleto</option>
+                </select>
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Substituir arquivo (opcional)</label>
+                <input type="file" class="doc-form-input" id="editDocFile" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg" style="padding:8px">
+                <p class="doc-form-hint" style="margin-top:4px">Deixe em branco para manter o arquivo atual</p>
+            </div>
+        </div>
+        <div class="doc-modal-footer">
+            <button class="doc-btn danger" onclick="deactivateCurrentDoc()"><i class="fas fa-ban"></i> Desativar</button>
+            <div></div>
+            <button class="doc-btn" onclick="closeModal('editDocModal')">Cancelar</button>
+            <button class="doc-btn primary" onclick="saveEditDoc()"><i class="fas fa-check"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     MODAL: SOLICITAR REVISAO
+     ============================================================ -->
+<div class="doc-modal-overlay" id="reviewRequestModal">
+    <div class="doc-modal" style="width:560px">
+        <div class="doc-modal-header">
+            <h3><i class="fas fa-rotate"></i> Solicitar Revisão</h3>
+            <button class="doc-modal-close" onclick="closeModal('reviewRequestModal')">&times;</button>
+        </div>
+        <div class="doc-modal-body">
+            <div style="background:rgba(15,117,189,.08);border:1px solid rgba(15,117,189,.18);border-radius:8px;padding:12px 14px;margin-bottom:16px;color:rgba(255,255,255,.65);font-size:.82rem;line-height:1.5">
+                Descreva o motivo e a necessidade da revisão. A solicitação ficará registrada no histórico do documento.
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Documento</label>
+                <input class="doc-form-input" id="reviewDocName" disabled>
+            </div>
+            <div class="doc-form-group">
+                <label class="doc-form-label">Necessidade da revisão <span style="color:#f87171">*</span></label>
+                <textarea class="doc-form-input" id="reviewReason" rows="5" placeholder="Descreva o que precisa ser revisado, motivo, prazo ou observações importantes..."></textarea>
+            </div>
+        </div>
+        <div class="doc-modal-footer">
+            <button class="doc-btn" onclick="closeModal('reviewRequestModal')">Cancelar</button>
+            <button class="doc-btn primary" onclick="submitReviewRequest()"><i class="fas fa-paper-plane"></i> Enviar solicitação</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const currentUser = 'João Teste';
+
+let docFolders = JSON.parse(localStorage.getItem('sgq_docFolders')) || null;
+if (!docFolders) {
+    docFolders = [
+        {
+            id: 1, name: 'Qualidade', children: [
+                { id: 11, name: 'Procedimentos', children: [], documents: [
+                    { id: 1001, code: 'PQ-001', title: 'Controle de Documentos e Registros', category: 'Procedimento Operacional', version: '3.0', date: '2026-03-15', type: 'pdf' },
+                    { id: 1002, code: 'PQ-002', title: 'Auditorias Internas', category: 'Procedimento Operacional', version: '2.1', date: '2026-02-20', type: 'pdf' },
+                    { id: 1003, code: 'PQ-003', title: 'Controle de Produto Não Conforme', category: 'Procedimento Operacional', version: '1.5', date: '2026-01-10', type: 'pdf' },
+                ]},
+                { id: 12, name: 'Instruções de Trabalho', children: [], documents: [
+                    { id: 1004, code: 'IT-001', title: 'Inspeção de Recebimento de Matéria-Prima', category: 'Instrução de Trabalho', version: '2.0', date: '2026-03-01', type: 'doc' },
+                    { id: 1005, code: 'IT-002', title: 'Calibração de Instrumentos', category: 'Instrução de Trabalho', version: '1.3', date: '2026-02-15', type: 'doc' },
+                ]},
+                { id: 13, name: 'Formulários', children: [], documents: [
+                    { id: 1006, code: 'FQ-001', title: 'Registro de Não Conformidade', category: 'Formulário', version: '4.0', date: '2026-03-20', type: 'xls' },
+                    { id: 1007, code: 'FQ-002', title: 'Checklist de Auditoria', category: 'Formulário', version: '2.2', date: '2025-12-10', type: 'xls' },
+                ]},
+                { id: 14, name: 'Política da Qualidade', children: [], documents: [
+                    { id: 1008, code: 'MQ-001', title: 'Manual da Qualidade', category: 'Manual', version: '5.0', date: '2026-01-05', type: 'pdf' },
+                ]},
+            ], documents: []
+        },
+        {
+            id: 2, name: 'Produção', children: [
+                { id: 21, name: 'Processos', children: [], documents: [
+                    { id: 2001, code: 'PP-001', title: 'Processo de Montagem Linha A', category: 'Procedimento Operacional', version: '3.2', date: '2026-03-10', type: 'pdf' },
+                    { id: 2002, code: 'PP-002', title: 'Processo de Embalagem', category: 'Procedimento Operacional', version: '2.0', date: '2026-02-28', type: 'pdf' },
+                ]},
+                { id: 22, name: 'Segurança', children: [], documents: [
+                    { id: 2003, code: 'PS-001', title: 'Procedimento de Segurança - EPI', category: 'Procedimento Operacional', version: '1.1', date: '2026-01-20', type: 'pdf' },
+                ]},
+            ], documents: []
+        },
+        {
+            id: 3, name: 'Engenharia', children: [
+                { id: 31, name: 'Projetos', children: [], documents: [
+                    { id: 3001, code: 'ENG-001', title: 'Especificação Técnica Produto X', category: 'Especificação Técnica', version: '1.0', date: '2026-04-01', type: 'doc' },
+                ]},
+                { id: 32, name: 'Desenhos Técnicos', children: [], documents: [
+                    { id: 3002, code: 'DT-001', title: 'Desenho Peça A-100', category: 'Desenho Técnico', version: '2.0', date: '2026-03-05', type: 'img' },
+                    { id: 3003, code: 'DT-002', title: 'Desenho Conjunto Montagem B', category: 'Desenho Técnico', version: '1.1', date: '2026-02-12', type: 'img' },
+                ]},
+            ], documents: []
+        },
+        {
+            id: 4, name: 'Recursos Humanos', children: [
+                { id: 41, name: 'Treinamentos', children: [], documents: [
+                    { id: 4001, code: 'RH-001', title: 'Plano Anual de Treinamentos 2026', category: 'Plano', version: '1.0', date: '2026-01-02', type: 'xls' },
+                ]},
+                { id: 42, name: 'Políticas', children: [], documents: [
+                    { id: 4002, code: 'RH-002', title: 'Política de Integração de Novos Colaboradores', category: 'Política', version: '2.0', date: '2025-11-15', type: 'pdf' },
+                ]},
+            ], documents: []
+        },
+        {
+            id: 5, name: 'Manutenção', children: [
+                { id: 51, name: 'Preventiva', children: [], documents: [
+                    { id: 5001, code: 'MN-001', title: 'Plano de Manutenção Preventiva', category: 'Plano', version: '3.0', date: '2026-02-01', type: 'xls' },
+                ]},
+                { id: 52, name: 'Corretiva', children: [], documents: [
+                    { id: 5002, code: 'MN-002', title: 'Registro de Manutenção Corretiva', category: 'Formulário', version: '1.5', date: '2026-03-18', type: 'xls' },
+                ]},
+            ], documents: []
+        },
+        {
+            id: 6, name: 'Logística', children: [], documents: [
+                { id: 6001, code: 'LG-001', title: 'Procedimento de Expedição', category: 'Procedimento Operacional', version: '2.1', date: '2026-03-12', type: 'pdf' },
+                { id: 6002, code: 'LG-002', title: 'Controle de Estoque - Política', category: 'Política', version: '1.0', date: '2026-01-08', type: 'doc' },
+            ]
+        },
+    ];
+    localStorage.setItem('sgq_docFolders', JSON.stringify(docFolders));
+}
+
+let docCategories = JSON.parse(localStorage.getItem('sgq_docCategories')) || null;
+if (!docCategories) {
+    docCategories = [
+        {
+            id: 1, name: 'Procedimento Operacional', description: 'Documentos que descrevem processos operacionais',
+            permissions: [
+                { name: 'Qualidade', type: 'setor', view: true, download: true, edit: true, delete: false, copy: true, controlled: true },
+                { name: 'Produção', type: 'setor', view: true, download: true, edit: false, delete: false, copy: false, controlled: false },
+            ],
+            approvalType: 'alcada',
+            approvers: ['Gerente da Qualidade', 'Diretor Técnico'],
+            approvalFlow: 'standard',
+            customFlowId: null,
+            formFields: [
+                { name: 'Código', type: 'texto', required: true, system: true },
+                { name: 'Título', type: 'texto', required: true, system: true },
+                { name: 'Documento', type: 'arquivo', required: true, system: true },
+                { name: 'Objetivo', type: 'textarea', required: false, system: false },
+                { name: 'Abrangência', type: 'texto', required: false, system: false },
+            ]
+        },
+        {
+            id: 2, name: 'Instrução de Trabalho', description: 'Instruções detalhadas para tarefas específicas',
+            permissions: [
+                { name: 'Qualidade', type: 'setor', view: true, download: true, edit: true, delete: true, copy: true, controlled: true },
+                { name: 'Produção', type: 'setor', view: true, download: true, edit: false, delete: false, copy: true, controlled: false },
+            ],
+            approvalType: 'consenso',
+            approvers: ['Supervisor de Qualidade', 'Líder de Produção'],
+            approvalFlow: 'standard',
+            customFlowId: null,
+            formFields: [
+                { name: 'Código', type: 'texto', required: true, system: true },
+                { name: 'Título', type: 'texto', required: true, system: true },
+                { name: 'Documento', type: 'arquivo', required: true, system: true },
+            ]
+        },
+        {
+            id: 3, name: 'Formulário', description: 'Templates e formulários padronizados',
+            permissions: [
+                { name: 'Qualidade', type: 'setor', view: true, download: true, edit: true, delete: true, copy: true, controlled: false },
+            ],
+            approvalType: 'qualquer',
+            approvers: ['Analista da Qualidade'],
+            approvalFlow: 'standard',
+            customFlowId: null,
+            formFields: [
+                { name: 'Código', type: 'texto', required: true, system: true },
+                { name: 'Título', type: 'texto', required: true, system: true },
+                { name: 'Documento', type: 'arquivo', required: true, system: true },
+            ]
+        },
+        {
+            id: 4, name: 'Manual', description: 'Manuais de referência e sistemas de gestáo',
+            permissions: [
+                { name: 'Qualidade', type: 'setor', view: true, download: true, edit: true, delete: false, copy: true, controlled: true },
+            ],
+            approvalType: 'alcada',
+            approvers: ['Diretor da Qualidade', 'Diretor Geral'],
+            approvalFlow: 'standard',
+            customFlowId: null,
+            formFields: [
+                { name: 'Código', type: 'texto', required: true, system: true },
+                { name: 'Título', type: 'texto', required: true, system: true },
+                { name: 'Documento', type: 'arquivo', required: true, system: true },
+                { name: 'Escopo', type: 'textarea', required: true, system: false },
+            ]
+        },
+        {
+            id: 5, name: 'Especificação Técnica', description: 'Especificações de produtos e processos',
+            permissions: [
+                { name: 'Engenharia', type: 'setor', view: true, download: true, edit: true, delete: true, copy: true, controlled: true },
+                { name: 'Qualidade', type: 'setor', view: true, download: true, edit: false, delete: false, copy: true, controlled: false },
+            ],
+            approvalType: 'sequencial',
+            approvers: ['Engenheiro Chefe', 'Gerente de Qualidade'],
+            approvalFlow: 'standard',
+            customFlowId: null,
+            formFields: [
+                { name: 'Código', type: 'texto', required: true, system: true },
+                { name: 'Título', type: 'texto', required: true, system: true },
+                { name: 'Documento', type: 'arquivo', required: true, system: true },
+                { name: 'Norma de Referência', type: 'texto', required: false, system: false },
+            ]
+        },
+    ];
+    persistData();
+}
+
+function persistData() {
+    localStorage.setItem('sgq_docFolders', JSON.stringify(docFolders));
+    localStorage.setItem('sgq_docCategories', JSON.stringify(docCategories));
+}
+
+function assignValidationPdfUrls(folders) {
+    folders.forEach(folder => {
+        (folder.documents || []).forEach(doc => {
+            if (!doc.fileUrl && doc.id < 10000) {
+                doc.fileUrl = '../docs/documentos_validacao/' + doc.id + '.pdf';
+                doc.type = 'pdf';
+            }
+        });
+        assignValidationPdfUrls(folder.children || []);
+    });
+}
+
+assignValidationPdfUrls(docFolders);
+persistData();
+
+function sanitize(str) {
+    const el = document.createElement('span');
+    el.textContent = str || '';
+    return el.innerHTML;
+}
+
+function showNotification(msg) {
+    const n = document.getElementById('docNotification');
+    n.textContent = msg;
+    n.style.display = 'block';
+    setTimeout(() => n.style.display = 'none', 2500);
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+}
+
+let nextId = 10000;
+function genId() { return nextId++; }
+
+// ============================================================
+// VIEW SWITCHING
+// ============================================================
+let currentView = 'folders';
+
+function showView(view) {
+    currentView = view;
+    const vf = document.getElementById('viewFolders');
+    const vc = document.getElementById('viewCategories');
+
+    if (view === 'folders') {
+        vf.style.display = 'flex';
+        vc.style.display = 'none';
+    } else {
+        vf.style.display = 'none';
+        vc.style.display = 'flex';
+        renderCategoryList();
+    }
+
+    // Update sidebar active - use IDs for reliability
+    document.getElementById('navCategories').classList.toggle('active', view === 'categories');
+}
+
+// ============================================================
+// FOLDER TREE
+// ============================================================
+let selectedFolderId = null;
+let newFolderParentId = null;
+let expandedFolders = new Set();
+
+function renderDocTree() {
+    const container = document.getElementById('docTreeContainer');
+    container.innerHTML = buildTreeHtml(docFolders, 0);
+}
+
+function buildTreeHtml(folders, depth) {
+    let html = '';
+    folders.forEach(f => {
+        const hasChildren = f.children && f.children.length > 0;
+        const isActive = selectedFolderId === f.id;
+        const docCount = countDocs(f);
+        const paddingLeft = 16 + depth * 20;
+        html += `<div class="doc-tree-item${isActive ? ' active' : ''}" style="padding-left:${paddingLeft}px" onclick="event.stopPropagation();selectFolder(${f.id})">`;
+        if (hasChildren) {
+            html += `<span class="tree-toggle${isFolderExpanded(f.id) ? ' open' : ''}" onclick="event.stopPropagation();toggleFolder(${f.id})"><i class="fas fa-chevron-right"></i></span>`;
+        } else {
+            html += `<span style="width:14px"></span>`;
+        }
+        html += `<i class="folder-icon fas fa-folder${isActive ? '-open' : ''}"></i>`;
+        html += `<span style="flex:1">${sanitize(f.name)}</span>`;
+        if (docCount > 0) html += `<span class="item-count">${docCount}</span>`;
+        if (depth < 2) html += `<button class="btn-new-folder" onclick="event.stopPropagation();openNewFolderModal(${f.id})" title="Nova subpasta"><i class="fas fa-folder-plus"></i></button>`;
+        html += `</div>`;
+        if (hasChildren) {
+            html += `<div class="doc-tree-children${isFolderExpanded(f.id) ? ' open' : ''}" data-parent="${f.id}">`;
+            html += buildTreeHtml(f.children, depth + 1);
+            html += `</div>`;
+        }
+    });
+    return html;
+}
+
+function isFolderExpanded(id) { return expandedFolders.has(id); }
+
+function toggleFolder(id) {
+    if (expandedFolders.has(id)) expandedFolders.delete(id);
+    else expandedFolders.add(id);
+    renderDocTree();
+}
+
+function countDocs(folder) {
+    let count = (folder.documents || []).length;
+    if (folder.children) folder.children.forEach(c => count += countDocs(c));
+    return count;
+}
+
+function findFolder(folders, id) {
+    for (const f of folders) {
+        if (f.id === id) return f;
+        if (f.children) {
+            const found = findFolder(f.children, id);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+function getFolderPath(folders, id, path = []) {
+    for (const f of folders) {
+        if (f.id === id) return [...path, f];
+        if (f.children) {
+            const found = getFolderPath(f.children, id, [...path, f]);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+function selectFolder(id) {
+    selectedFolderId = id;
+    const path = getFolderPath(docFolders, id);
+    if (path) path.forEach(p => expandedFolders.add(p.id));
+    renderDocTree();
+    renderFolderContent(id);
+    // Ensure we're in folders view
+    if (currentView !== 'folders') showView('folders');
+}
+
+let currentDocTab = 'ativos';
+
+function setDocTab(tab) {
+    currentDocTab = tab;
+    ['ativos','pendentes','inativos'].forEach(t => {
+        document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+    });
+    if (selectedFolderId) renderFolderContent(selectedFolderId);
+}
+
+function renderFolderContent(id) {
+    const folder = findFolder(docFolders, id);
+    if (!folder) return;
+
+    const path = getFolderPath(docFolders, id);
+    const bc = document.getElementById('docBreadcrumb');
+    let bcHtml = '<span onclick="clearFolderSelection()"><i class="fas fa-home" style="margin-right:4px"></i> Documentos</span>';
+    if (path) {
+        path.forEach((p, i) => {
+            bcHtml += ' <i class="fas fa-chevron-right"></i> ';
+            if (i < path.length - 1) {
+                bcHtml += `<span onclick="selectFolder(${p.id})">${sanitize(p.name)}</span>`;
+            } else {
+                bcHtml += `<span class="current">${sanitize(p.name)}</span>`;
+            }
+        });
+    }
+    bc.innerHTML = bcHtml;
+    document.getElementById('docContentActions').style.display = 'flex';
+
+    // Show tabs and update counts
+    const allDocs = folder.documents || [];
+    const ativos    = allDocs.filter(d => !d.status || d.status === 'ativo');
+    const pendentes = allDocs.filter(d => d.status === 'pendente' || d.status === 'revisao');
+    const inativos  = allDocs.filter(d => d.status === 'inativo' || d.status === 'obsoleto');
+    document.getElementById('docFilterTabs').style.display = allDocs.length > 0 ? 'flex' : 'none';
+    document.getElementById('tabNAtivos').textContent    = ativos.length;
+    document.getElementById('tabNPendentes').textContent = pendentes.length;
+    document.getElementById('tabNInativos').textContent  = inativos.length;
+
+    const tabMap = { ativos, pendentes, inativos };
+    const q = document.getElementById('docSearch').value.toLowerCase().trim();
+    let docs = tabMap[currentDocTab] || ativos;
+    if (q) {
+        docs = docs.filter(d => [d.title, d.code, d.category, d.version, d.status]
+            .some(v => String(v || '').toLowerCase().includes(q)));
+    }
+
+    const body = document.getElementById('docContentBody');
+
+    let html = '';
+
+    if (folder.children && folder.children.length > 0) {
+        html += '<div style="margin-bottom:20px">';
+        html += '<div class="doc-section-label">Subpastas</div>';
+        html += '<div class="subfolder-grid">';
+        folder.children.forEach(sub => {
+            const count = countDocs(sub);
+            html += `
+                <div class="subfolder-card" onclick="selectFolder(${sub.id})">
+                    <i class="fas fa-folder" style="color:#fbbf24;font-size:1.1rem"></i>
+                    <div>
+                        <div style="color:#fff;font-size:.82rem;font-weight:600">${sanitize(sub.name)}</div>
+                        <div style="font-size:.7rem;color:rgba(255,255,255,.35)">${count} doc(s)</div>
+                    </div>
+                </div>`;
+        });
+        html += '</div></div>';
+    }
+
+    if (allDocs.length === 0 && (!folder.children || folder.children.length === 0)) {
+        body.innerHTML = `<div class="doc-empty"><i class="fas fa-folder-open"></i><p>Nenhum documento nesta pasta</p><small>Clique em "Novo Documento" para adicionar</small></div>`;
+        return;
+    }
+
+    if (docs.length > 0) {
+        html += `<div class="doc-section-label">Documentos " ${docs.length} resultado(s)</div>`;
+        const isGrid = (localStorage.getItem('sgq_doc_view') === 'grid');
+        const iconMap = { pdf: 'fa-file-pdf', doc: 'fa-file-word', xls: 'fa-file-excel', img: 'fa-file-image', default: 'fa-file' };
+        const statusLabels = { ativo: 'Publicado', pendente: 'Pendente', revisao: 'Revisão', inativo: 'Inativo', obsoleto: 'Obsoleto' };
+        if (isGrid) {
+            html += '<div class="doc-grid-view">';
+            docs.forEach(d => {
+                const st = d.status || 'ativo';
+                const activeCopies = (d.copias || []).filter(c => c.ativa).length;
+                html += `
+                    <div class="doc-grid-card" onclick="openDocViewer(${d.id})">
+                        <div class="doc-icon ${d.type||'default'}"><i class="fas ${iconMap[d.type]||iconMap.default}"></i></div>
+                        <div class="doc-name">${sanitize(d.title)}</div>
+                        <div class="doc-code">${sanitize(d.code)}</div>
+                        <div class="doc-version">v${sanitize(d.version)}</div>
+                        <span class="doc-status ${st}">${statusLabels[st]||st}</span>
+                        ${activeCopies ? `<span class="doc-copy-badge"><i class="fas fa-stamp"></i> ${activeCopies} c&oacute;pia${activeCopies > 1 ? 's' : ''} ativa${activeCopies > 1 ? 's' : ''}</span>` : ''}
+                    </div>`;
+            });
+            html += '</div>';
+        } else {
+            html += `<div class="doc-list-header"><div></div><div>Nome</div><div>Categoria</div><div>Data</div><div>Status</div><div></div></div>`;
+            docs.forEach(d => {
+                const st = d.status || 'ativo';
+                const activeCopies = (d.copias || []).filter(c => c.ativa).length;
+                html += `
+                    <div class="doc-list-row" onclick="openDocViewer(${d.id})">
+                        <div class="doc-icon ${d.type||'default'}"><i class="fas ${iconMap[d.type]||iconMap.default}"></i></div>
+                        <div>
+                            <div class="doc-name">${sanitize(d.title)}</div>
+                            <div class="doc-code">${sanitize(d.code)} - v${sanitize(d.version)} ${activeCopies ? `<span class="doc-copy-inline"><i class="fas fa-stamp"></i> ${activeCopies} ativa${activeCopies > 1 ? 's' : ''}</span>` : ''}</div>
+                        </div>
+                        <div><span class="doc-category-tag">${sanitize(d.category)}</span></div>
+                        <div class="doc-date">${d.date ? new Date(d.date+'T00:00:00').toLocaleDateString('pt-BR') : '-'}</div>
+                        <div><span class="doc-status ${st}">${statusLabels[st]||st}</span></div>
+                        <div class="doc-actions-cell" onclick="event.stopPropagation()">
+                            <button title="Visualizar" onclick="openDocViewer(${d.id})"><i class="fas fa-eye"></i></button>
+                            <button title="Baixar" onclick="downloadDoc(${d.id})"><i class="fas fa-download"></i></button>
+                            <button title="Editar" onclick="openEditDocById(${d.id})"><i class="fas fa-pen"></i></button>
+                        </div>
+                    </div>`;
+            });
+        }
+    } else {
+        html += `<div class="doc-empty" style="padding:40px 20px"><i class="fas fa-inbox"></i><p>Nenhum documento nesta aba</p></div>`;
+    }
+
+    body.innerHTML = html;
+}
+
+function clearFolderSelection() {
+    selectedFolderId = null;
+    renderDocTree();
+    document.getElementById('docBreadcrumb').innerHTML = '<span class="current"><i class="fas fa-home" style="margin-right:4px"></i> Documentos</span>';
+    document.getElementById('docContentActions').style.display = 'none';
+    document.getElementById('docContentBody').innerHTML = `
+        <div class="doc-empty">
+            <i class="fas fa-folder-open"></i>
+            <p>Selecione uma pasta no menu lateral</p>
+            <small>Navegue pelos setores para visualizar os documentos</small>
+        </div>`;
+}
+
+function filterDocuments() {
+    if (selectedFolderId) renderFolderContent(selectedFolderId);
+}
+
+// --- New Folder ---
+function createRootFolder() {
+    newFolderParentId = null;
+    document.getElementById('newFolderName').value = '';
+    document.getElementById('newFolderModal').classList.add('open');
+}
+
+function openNewFolderModal(parentId) {
+    newFolderParentId = parentId;
+    document.getElementById('newFolderName').value = '';
+    document.getElementById('newFolderModal').classList.add('open');
+}
+
+function confirmNewFolder() {
+    const name = document.getElementById('newFolderName').value.trim();
+    if (!name) { alert('Digite o nome da pasta.'); return; }
+    const newFolder = { id: genId(), name, children: [], documents: [] };
+    if (newFolderParentId === null) {
+        docFolders.push(newFolder);
+    } else {
+        const parent = findFolder(docFolders, newFolderParentId);
+        if (parent) {
+            if (!parent.children) parent.children = [];
+            parent.children.push(newFolder);
+            expandedFolders.add(newFolderParentId);
+        }
+    }
+    persistData();
+    renderDocTree();
+    closeModal('newFolderModal');
+    showNotification('Pasta criada com sucesso!');
+}
+
+// ============================================================
+// CATEGORIES
+// ============================================================
+function renderCategoryList() {
+    const container = document.getElementById('catListContainer');
+    if (docCategories.length === 0) {
+        container.innerHTML = `
+            <div class="doc-empty">
+                <i class="fas fa-tags"></i>
+                <p>Nenhuma categoria cadastrada</p>
+                <small>Clique em "Nova Categoria" para começar</small>
+            </div>`;
+        return;
+    }
+    const approvalLabels = { alcada: 'Alçada', consenso: 'Consenso', maioria: 'Maioria', qualquer: 'Qualquer Um', sequencial: 'Sequencial' };
+    let html = '<div class="cat-list">';
+    docCategories.forEach(cat => {
+        html += `
+            <div class="cat-card" onclick="editCategory(${cat.id})">
+                <div class="cat-card-info">
+                    <div class="cat-card-icon"><i class="fas fa-tag"></i></div>
+                    <div>
+                        <div class="cat-card-name">${sanitize(cat.name)}</div>
+                        <div class="cat-card-meta">
+                            Aprovação: ${approvalLabels[cat.approvalType] || cat.approvalType} ?
+                            ${cat.approvers.length} aprovador(es) ?
+                            ${cat.permissions.length} permissões ?
+                            ${cat.formFields.length} campo(s)
+                        </div>
+                    </div>
+                </div>
+                <div class="cat-card-actions">
+                    <button onclick="event.stopPropagation();editCategory(${cat.id})" title="Editar"><i class="fas fa-pen"></i></button>
+                    <button onclick="event.stopPropagation();deleteCategory(${cat.id})" title="Excluir"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function deleteCategory(id) {
+    if (!confirm('Deseja excluir esta categoria?')) return;
+    docCategories = docCategories.filter(c => c.id !== id);
+    persistData();
+    renderCategoryList();
+    showNotification('Categoria exclu?da.');
+}
+
+// ============================================================
+// CATEGORY WIZARD
+// ============================================================
+let catWizardStep = 1;
+let catEditId = null;
+let catPermissions = [];
+let catApprovers = [];
+let catFormFields = [];
+
+function openCategoryWizard() {
+    catEditId = null;
+    catWizardStep = 1;
+    catPermissions = [];
+    catApprovers = [];
+    catFormFields = [
+        { name: 'Código', type: 'texto', required: true, system: true },
+        { name: 'Título', type: 'texto', required: true, system: true },
+        { name: 'Documento', type: 'arquivo', required: true, system: true },
+    ];
+    document.getElementById('catName').value = '';
+    document.getElementById('catDesc').value = '';
+    document.getElementById('catMinApprovers').value = 1;
+    document.getElementById('catWizardTitle').textContent = 'Nova Categoria de Documento';
+    resetApprovalTypeSelection('alcada');
+    renderPermTable();
+    renderCatApproverChips();
+    renderCatFormFields();
+    loadBpmFlows();
+    selectApprovalFlow('standard');
+    selectFileCount('single');
+    document.getElementById('catCCEnabled').checked = false;
+    toggleCCConfig(false);
+    updateCatWizardUI();
+    document.getElementById('catWizardModal').classList.add('open');
+}
+
+function editCategory(id) {
+    const cat = docCategories.find(c => c.id === id);
+    if (!cat) return;
+    catEditId = id;
+    catWizardStep = 1;
+    catPermissions = JSON.parse(JSON.stringify(cat.permissions));
+    catApprovers = [...cat.approvers];
+    catFormFields = JSON.parse(JSON.stringify(cat.formFields));
+    document.getElementById('catName').value = cat.name;
+    document.getElementById('catDesc').value = cat.description || '';
+    document.getElementById('catMinApprovers').value = cat.minApprovers || 1;
+    document.getElementById('catWizardTitle').textContent = 'Editar Categoria: ' + cat.name;
+    resetApprovalTypeSelection(cat.approvalType);
+    renderPermTable();
+    renderCatApproverChips();
+    renderCatFormFields();
+    loadBpmFlows();
+    selectApprovalFlow(cat.approvalFlow || 'standard');
+    if (cat.customFlowId) document.getElementById('catCustomFlowId').value = cat.customFlowId;
+    selectFileCount(cat.multipleAttachments ? 'multiple' : 'single');
+    const ccEnabled = cat.ccConfig?.enabled || false;
+    document.getElementById('catCCEnabled').checked = ccEnabled;
+    toggleCCConfig(ccEnabled);
+    if (ccEnabled && cat.ccConfig) {
+        document.getElementById('catCCPlacement').value = cat.ccConfig.placement || 'watermark';
+        document.getElementById('catCCFEmissor').checked = cat.ccConfig.fields?.emissor !== false;
+        document.getElementById('catCCFDestinatario').checked = cat.ccConfig.fields?.destinatario !== false;
+        document.getElementById('catCCFValidade').checked = cat.ccConfig.fields?.validade !== false;
+        document.getElementById('catCCFNumDoc').checked = cat.ccConfig.fields?.numDoc !== false;
+        document.getElementById('catCCFDataEmissao').checked = cat.ccConfig.fields?.dataEmissao !== false;
+    }
+    updateCatWizardUI();
+    document.getElementById('catWizardModal').classList.add('open');
+}
+
+function toggleCCConfig(show) {
+    document.getElementById('catCCConfig').style.display = show ? 'block' : 'none';
+}
+
+function selectFileCount(val) {
+    document.getElementById('optSingleFile').classList.toggle('selected', val === 'single');
+    document.getElementById('optMultiFile').classList.toggle('selected', val === 'multiple');
+    const radios = document.querySelectorAll('input[name="catFileCount"]');
+    radios.forEach(r => { if (r.value === val) r.checked = true; });
+}
+
+function closeCatWizard() {
+    document.getElementById('catWizardModal').classList.remove('open');
+}
+
+function updateCatWizardUI() {
+    document.querySelectorAll('#catWizardSteps .wizard-step').forEach((el, i) => {
+        el.classList.remove('active', 'done');
+        if (i + 1 === catWizardStep) el.classList.add('active');
+        if (i + 1 < catWizardStep) el.classList.add('done');
+    });
+    document.querySelectorAll('#catWizardSteps .wizard-step-line').forEach((el, i) => {
+        el.classList.toggle('done', i + 1 < catWizardStep);
+    });
+    for (let i = 1; i <= 3; i++) {
+        document.getElementById('catStep' + i).classList.toggle('active', i === catWizardStep);
+    }
+    document.getElementById('catWizardBack').style.display = catWizardStep > 1 ? '' : 'none';
+    const nextBtn = document.getElementById('catWizardNext');
+    if (catWizardStep === 3) {
+        nextBtn.innerHTML = '<i class="fas fa-check"></i> Salvar Categoria';
+    } else {
+        nextBtn.innerHTML = 'Pr?ximo <i class="fas fa-arrow-right"></i>';
+    }
+}
+
+function catWizardNext() {
+    if (catWizardStep === 1) {
+        if (!document.getElementById('catName').value.trim()) { alert('Digite o nome da categoria.'); return; }
+    }
+    if (catWizardStep === 3) { saveCategory(); return; }
+    catWizardStep++;
+    updateCatWizardUI();
+}
+
+function catWizardPrev() {
+    if (catWizardStep > 1) catWizardStep--;
+    updateCatWizardUI();
+}
+
+function saveCategory() {
+    const name = document.getElementById('catName').value.trim();
+    const description = document.getElementById('catDesc').value.trim();
+    const approvalType = document.querySelector('.approval-type-card.selected')?.dataset.type || 'alcada';
+    const approvalFlow = document.querySelector('input[name="catApprovalFlow"]:checked')?.value || 'standard';
+    const customFlowId = approvalFlow === 'custom' ? document.getElementById('catCustomFlowId').value : null;
+    const minApprovers = parseInt(document.getElementById('catMinApprovers').value) || 1;
+    const multipleAttachments = document.querySelector('input[name="catFileCount"]:checked')?.value === 'multiple';
+    const ccEnabled = document.getElementById('catCCEnabled').checked;
+    const ccConfig = ccEnabled ? {
+        enabled: true,
+        placement: document.getElementById('catCCPlacement').value,
+        fields: {
+            emissor: document.getElementById('catCCFEmissor').checked,
+            destinatario: document.getElementById('catCCFDestinatario').checked,
+            validade: document.getElementById('catCCFValidade').checked,
+            numDoc: document.getElementById('catCCFNumDoc').checked,
+            dataEmissao: document.getElementById('catCCFDataEmissao').checked,
+        }
+    } : { enabled: false };
+
+    const catData = {
+        name, description,
+        permissions: catPermissions,
+        approvalType,
+        approvers: catApprovers,
+        approvalFlow,
+        customFlowId,
+        minApprovers,
+        multipleAttachments,
+        ccConfig,
+        formFields: catFormFields
+    };
+
+    if (catEditId) {
+        const idx = docCategories.findIndex(c => c.id === catEditId);
+        if (idx >= 0) { catData.id = catEditId; docCategories[idx] = catData; }
+    } else {
+        catData.id = genId();
+        docCategories.push(catData);
+    }
+    persistData();
+    closeCatWizard();
+    renderCategoryList();
+    showNotification(catEditId ? 'Categoria atualizada!' : 'Categoria criada!');
+}
+
+// Permissions table
+function addPermEntity() {
+    const name = document.getElementById('catPermEntity').value.trim();
+    const type = document.getElementById('catPermType').value;
+    if (!name) return;
+    if (catPermissions.find(p => p.name === name)) { alert('Entidade j? adicionada.'); return; }
+    catPermissions.push({ name, type, view: true, create: false, edit: false, delete: false, download: true, requestReview: false, controlled: false, copy: false, print: false });
+    document.getElementById('catPermEntity').value = '';
+    renderPermTable();
+}
+
+function renderPermTable() {
+    const tbody = document.getElementById('permTableBody');
+    if (catPermissions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:rgba(255,255,255,.25);font-size:.78rem;padding:20px">Nenhuma permissão adicionada</td></tr>';
+        return;
+    }
+    tbody.innerHTML = catPermissions.map((p, i) => `
+        <tr>
+            <td><div class="perm-entity"><i class="fas fa-${p.type === 'setor' ? 'building' : 'user'}"></i>${sanitize(p.name)}</div></td>
+            <td><input type="checkbox" class="perm-check" ${p.view?'checked':''} onchange="catPermissions[${i}].view=this.checked"></td>
+            <td><input type="checkbox" class="perm-check" ${p.create?'checked':''} onchange="catPermissions[${i}].create=this.checked"></td>
+            <td><input type="checkbox" class="perm-check" ${p.edit?'checked':''} onchange="catPermissions[${i}].edit=this.checked"></td>
+            <td><input type="checkbox" class="perm-check" ${p.delete?'checked':''} onchange="catPermissions[${i}].delete=this.checked"></td>
+            <td><input type="checkbox" class="perm-check" ${p.download?'checked':''} onchange="catPermissions[${i}].download=this.checked"></td>
+            <td><input type="checkbox" class="perm-check" ${p.requestReview?'checked':''} onchange="catPermissions[${i}].requestReview=this.checked"></td>
+            <td><input type="checkbox" class="perm-check" ${p.controlled?'checked':''} onchange="catPermissions[${i}].controlled=this.checked"></td>
+            <td><input type="checkbox" class="perm-check" ${p.copy?'checked':''} onchange="catPermissions[${i}].copy=this.checked"></td>
+            <td><input type="checkbox" class="perm-check" ${p.print?'checked':''} onchange="catPermissions[${i}].print=this.checked"></td>
+            <td><button style="background:none;border:none;color:#f87171;cursor:pointer;font-size:.75rem" onclick="catPermissions.splice(${i},1);renderPermTable()" title="Remover"><i class="fas fa-times"></i></button></td>
+        </tr>
+    `).join('');
+}
+
+// Approval type
+function selectApprovalType(el, type) {
+    document.querySelectorAll('.approval-type-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+}
+function resetApprovalTypeSelection(type) {
+    document.querySelectorAll('.approval-type-card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.type === type);
+    });
+}
+
+// Approval flow
+function selectApprovalFlow(type) {
+    document.getElementById('customFlowSelect').style.display = type === 'custom' ? 'block' : 'none';
+    document.getElementById('flowStandard').classList.toggle('selected', type === 'standard');
+    document.getElementById('flowCustom').classList.toggle('selected', type === 'custom');
+}
+
+function loadBpmFlows() {
+    const sel = document.getElementById('catCustomFlowId');
+    sel.innerHTML = '<option value="">Selecione um fluxo BPM...</option>';
+    try {
+        const bpmFlows = JSON.parse(localStorage.getItem('sgq_flows')) || [];
+        bpmFlows.forEach(f => {
+            sel.innerHTML += `<option value="${f.id}">${sanitize(f.name)}</option>`;
+        });
+    } catch(e) {}
+}
+
+// Approvers
+function addCatApprover() {
+    const name = document.getElementById('catApproverInput').value.trim();
+    if (!name) return;
+    if (catApprovers.includes(name)) return;
+    catApprovers.push(name);
+    document.getElementById('catApproverInput').value = '';
+    renderCatApproverChips();
+}
+function renderCatApproverChips() {
+    document.getElementById('catApproverChips').innerHTML = catApprovers.map((a, i) => `
+        <span class="approver-chip">
+            <i class="fas fa-user" style="font-size:.7rem"></i> ${sanitize(a)}
+            <button onclick="catApprovers.splice(${i},1);renderCatApproverChips()">&times;</button>
+        </span>
+    `).join('');
+}
+
+// Form fields
+function renderCatFormFields() {
+    const container = document.getElementById('catFormFields');
+    const typeLabels = { texto: 'Texto', textarea: 'Texto Longo', numero: 'Número', data: 'Data', arquivo: 'Arquivo', opcoes: 'Opções', sim_nao: 'Sim/Não' };
+    container.innerHTML = catFormFields.map((f, i) => `
+        <div class="form-field-row">
+            <span class="ff-drag"><i class="fas fa-grip-vertical"></i></span>
+            <span class="ff-name">${sanitize(f.name)}</span>
+            <span class="ff-type">${typeLabels[f.type] || f.type}</span>
+            ${f.required ? '<span class="ff-required">Obrigat?rio</span>' : ''}
+            ${f.system ? '<span style="font-size:.65rem;color:rgba(255,255,255,.2)">Sistema</span>' : ''}
+            <span class="ff-actions">
+                ${!f.system ? `<button onclick="catFormFields.splice(${i},1);renderCatFormFields()" title="Remover"><i class="fas fa-times"></i></button>` : ''}
+            </span>
+        </div>
+    `).join('');
+}
+
+function addCatFormField() {
+    const name = document.getElementById('newFieldName').value.trim();
+    const type = document.getElementById('newFieldType').value;
+    if (!name) return;
+    catFormFields.push({ name, type, required: false, system: false });
+    document.getElementById('newFieldName').value = '';
+    renderCatFormFields();
+}
+
+// ============================================================
+// NEW DOCUMENT
+// ============================================================
+let docWizardStep = 1;
+
+function openNewDocModal() {
+    ensureWritableFolderSelected();
+    docWizardStep = 1;
+    const sel = document.getElementById('docCategorySelect');
+    sel.innerHTML = '<option value="">Selecione uma categoria...</option>';
+    docCategories.forEach(c => {
+        sel.innerHTML += `<option value="${c.id}">${sanitize(c.name)}</option>`;
+    });
+    document.getElementById('docCategoryPreview').style.display = 'none';
+    document.getElementById('docFormContainer').innerHTML = '';
+    updateDocWizardUI();
+    document.getElementById('newDocModal').classList.add('open');
+}
+
+function ensureWritableFolderSelected() {
+    if (selectedFolderId && findFolder(docFolders, selectedFolderId)) return selectedFolderId;
+
+    function firstFolderWithDocs(folders) {
+        for (const folder of folders) {
+            if (Array.isArray(folder.documents)) return folder.id;
+            const childId = firstFolderWithDocs(folder.children || []);
+            if (childId) return childId;
+        }
+        return null;
+    }
+
+    let targetId = firstFolderWithDocs(docFolders);
+    if (!targetId) {
+        const newFolder = { id: genId(), name: 'Documentos Gerais', children: [], documents: [] };
+        docFolders.push(newFolder);
+        targetId = newFolder.id;
+    }
+    selectedFolderId = targetId;
+    const path = getFolderPath(docFolders, targetId);
+    if (path) path.forEach(p => expandedFolders.add(p.id));
+    renderDocTree();
+    renderFolderContent(targetId);
+    return targetId;
+}
+
+function closeNewDocModal() {
+    document.getElementById('newDocModal').classList.remove('open');
+}
+
+function updateDocWizardUI() {
+    document.querySelectorAll('#docWizardSteps .wizard-step').forEach((el, i) => {
+        el.classList.remove('active', 'done');
+        if (i + 1 === docWizardStep) el.classList.add('active');
+        if (i + 1 < docWizardStep) el.classList.add('done');
+    });
+    document.querySelectorAll('#docWizardSteps .wizard-step-line').forEach((el, i) => {
+        el.classList.toggle('done', i + 1 < docWizardStep);
+    });
+    document.getElementById('docStep1').classList.toggle('active', docWizardStep === 1);
+    document.getElementById('docStep2').classList.toggle('active', docWizardStep === 2);
+    document.getElementById('docWizardBack').style.display = docWizardStep > 1 ? '' : 'none';
+    const nextBtn = document.getElementById('docWizardNext');
+    if (docWizardStep === 2) {
+        nextBtn.innerHTML = '<i class="fas fa-check"></i> Cadastrar Documento';
+    } else {
+        nextBtn.innerHTML = 'Pr?ximo <i class="fas fa-arrow-right"></i>';
+    }
+}
+
+function onDocCategoryChange() {
+    const catId = parseInt(document.getElementById('docCategorySelect').value);
+    const cat = docCategories.find(c => c.id === catId);
+    const preview = document.getElementById('docCategoryPreview');
+    if (!cat) { preview.style.display = 'none'; return; }
+    preview.style.display = 'block';
+    const approvalLabels = { alcada: 'Alçada (Hierárquica)', consenso: 'Consenso', maioria: 'Maioria Simples', qualquer: 'Qualquer Um', sequencial: 'Sequencial' };
+    document.getElementById('docCatPreviewContent').innerHTML = `
+        <div><strong>Tipo de aprovação:</strong> ${approvalLabels[cat.approvalType] || cat.approvalType}</div>
+        <div><strong>Aprovadores:</strong> ${cat.approvers.map(a => sanitize(a)).join(', ') || 'Nenhum'}</div>
+        <div><strong>Campos do formulário:</strong> ${cat.formFields.map(f => sanitize(f.name)).join(', ')}</div>
+        ${cat.description ? `<div style="margin-top:4px;font-style:italic">${sanitize(cat.description)}</div>` : ''}
+    `;
+}
+
+function buildDocForm(cat) {
+    const container = document.getElementById('docFormContainer');
+    const multi = cat.multipleAttachments;
+    const typeMap = {
+        texto:    (f, i) => `<input class="doc-form-input" id="docField_${i}" placeholder="${sanitize(f.name)}">`,
+        textarea: (f, i) => `<textarea class="doc-form-input" id="docField_${i}" rows="3" placeholder="${sanitize(f.name)}"></textarea>`,
+        numero:   (f, i) => `<input type="number" class="doc-form-input" id="docField_${i}" placeholder="${sanitize(f.name)}">`,
+        data:     (f, i) => `<input type="date" class="doc-form-input" id="docField_${i}">`,
+        arquivo:  (f, i) => `<input type="file" class="doc-form-input" id="docField_${i}" ${multi ? 'multiple' : ''} accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg" style="padding:8px">${multi ? '<p class="doc-form-hint" style="margin-top:4px">Voc? pode selecionar múltiplos arquivos</p>' : ''}`,
+        opcoes:   (f, i) => `<input class="doc-form-input" id="docField_${i}" placeholder="Digite a opção...">`,
+        sim_nao:  (f, i) => `<select class="doc-form-input" id="docField_${i}"><option value="">Selecione...</option><option value="sim">Sim</option><option value="nao">Não</option></select>`,
+    };
+    container.innerHTML = cat.formFields.map((f, i) => `
+        <div class="doc-form-group">
+            <label class="doc-form-label">${sanitize(f.name)} ${f.required ? '<span style="color:#f87171">*</span>' : ''}</label>
+            ${(typeMap[f.type] || typeMap.texto)(f, i)}
+        </div>
+    `).join('');
+}
+
+function docWizardNext() {
+    if (docWizardStep === 1) {
+        const catId = parseInt(document.getElementById('docCategorySelect').value);
+        if (!catId) { alert('Selecione uma categoria.'); return; }
+        const cat = docCategories.find(c => c.id === catId);
+        if (!cat) return;
+        buildDocForm(cat);
+        docWizardStep = 2;
+        updateDocWizardUI();
+        return;
+    }
+    if (docWizardStep === 2) {
+        saveNewDocument();
+    }
+}
+
+function docWizardPrev() {
+    if (docWizardStep > 1) { docWizardStep--; updateDocWizardUI(); }
+}
+
+function readFileAsBase64(file) {
+    return new Promise(resolve => {
+        const r = new FileReader();
+        r.onload = e => resolve(e.target.result);
+        r.onerror = () => resolve(null);
+        r.readAsDataURL(file);
+    });
+}
+
+async function saveNewDocument() {
+    const catId = parseInt(document.getElementById('docCategorySelect').value);
+    const cat = docCategories.find(c => c.id === catId);
+    if (!cat) return;
+
+    for (let i = 0; i < cat.formFields.length; i++) {
+        const f = cat.formFields[i];
+        if (f.required && f.type !== 'arquivo') {
+            const el = document.getElementById('docField_' + i);
+            if (el && !el.value.trim()) {
+                alert(`O campo "${f.name}" - obrigat?rio.`);
+                return;
+            }
+        }
+    }
+
+    const codeField = cat.formFields.findIndex(f => f.name === 'Código');
+    const titleField = cat.formFields.findIndex(f => f.name === 'Título');
+    const code = codeField >= 0 ? document.getElementById('docField_' + codeField)?.value?.trim() || '' : 'DOC-' + Date.now();
+    const title = titleField >= 0 ? document.getElementById('docField_' + titleField)?.value?.trim() || '' : 'Sem t?tulo';
+
+    const docId = genId();
+
+    if (cat.multipleAttachments) {
+        // Multiple files: collect all file inputs
+        const attachments = [];
+        for (let i = 0; i < cat.formFields.length; i++) {
+            const f = cat.formFields[i];
+            if (f.type === 'arquivo') {
+                const fileEl = document.getElementById('docField_' + i);
+                if (fileEl && fileEl.files) {
+                    for (const file of fileEl.files) {
+                        const base64 = await readFileAsBase64(file);
+                        if (base64) {
+                            const attId = genId();
+                            try { localStorage.setItem('sgq_docfile_' + docId + '_' + attId, base64); } catch(e) {}
+                            attachments.push({ id: attId, name: file.name, size: file.size, type: file.type });
+                        }
+                    }
+                }
+            }
+        }
+        try { localStorage.setItem('sgq_docatt_' + docId, JSON.stringify(attachments)); } catch(e) {}
+    } else {
+        // Single file
+        const arqIdx = cat.formFields.findIndex(f => f.type === 'arquivo');
+        if (arqIdx >= 0) {
+            const fileEl = document.getElementById('docField_' + arqIdx);
+            if (fileEl && fileEl.files && fileEl.files[0]) {
+                const base64 = await readFileAsBase64(fileEl.files[0]);
+                if (base64) {
+                    try { localStorage.setItem('sgq_docfile_' + docId, base64); } catch(e) { showNotification('Arquivo muito grande para armazenar localmente.'); }
+                }
+            }
+        }
+    }
+
+    // Determine initial status based on approval type
+    const needsApproval = cat.approvalType !== 'nenhum' && cat.approvers && cat.approvers.length > 0;
+    const newDoc = {
+        id: docId, code, title,
+        category: cat.name, categoryId: catId,
+        version: '1.0',
+        date: new Date().toISOString().split('T')[0],
+        type: 'pdf',
+        status: needsApproval ? 'pendente' : 'ativo',
+        author: currentUser,
+        approvals: [],
+        copias: [],
+        multipleAttachments: cat.multipleAttachments || false
+    };
+
+    const targetFolderId = ensureWritableFolderSelected();
+    const folder = findFolder(docFolders, targetFolderId);
+    if (folder) {
+        if (!folder.documents) folder.documents = [];
+        folder.documents.push(newDoc);
+    }
+
+    persistData();
+    closeNewDocModal();
+    renderFolderContent(targetFolderId);
+    showNotification(needsApproval ? 'Documento enviado para aprovação!' : 'Documento publicado com sucesso!');
+}
+
+// ?""? User menu ?""?
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');}, { passive: true });
+
+// ?""? View toggle (grid / list) ?""?
+function setDocView(mode) {
+    localStorage.setItem('sgq_doc_view', mode);
+    document.getElementById('btnListView').classList.toggle('active', mode === 'list');
+    document.getElementById('btnGridView').classList.toggle('active', mode === 'grid');
+    if (selectedFolderId) renderFolderContent(selectedFolderId);
+}
+
+(function initViewToggle() {
+    const saved = localStorage.getItem('sgq_doc_view') || 'list';
+    const btnL = document.getElementById('btnListView');
+    const btnG = document.getElementById('btnGridView');
+    if (btnL && btnG) {
+        btnL.classList.toggle('active', saved === 'list');
+        btnG.classList.toggle('active', saved === 'grid');
+    }
+})();
+
+// ?""? PDF / Document Viewer ?""?
+let currentViewerDoc = null;
+
+function closeDocumentModalsBeforeViewer() {
+    ['catWizardModal', 'newDocModal', 'newFolderModal', 'editDocModal'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('open');
+    });
+    ['ccModal', 'manageCCModal'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('open');
+    });
+}
+
+function bringModalAboveViewer(id) {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    el.style.setProperty('z-index', '14000', 'important');
+    return el;
+}
+
+function openDocViewer(docId) {
+    function findDocById(folders, id) {
+        for (const f of folders) {
+            if (f.documents) { const d = f.documents.find(function(d){ return d.id === id; }); if (d) return d; }
+            if (f.children) { const d = findDocById(f.children, id); if (d) return d; }
+        }
+        return null;
+    }
+    const doc = findDocById(docFolders, docId);
+    if (!doc) {
+        console.warn('Doc not found:', docId);
+        return;
+    }
+    currentViewerDoc = doc;
+    closeDocumentModalsBeforeViewer();
+
+    // Show overlay immediately
+    var overlay = document.getElementById('docViewerOverlay');
+    overlay.style.cssText = 'display:flex;position:fixed;top:0;right:0;bottom:0;left:0;width:100vw;height:100vh;z-index:12000';
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    // Header
+    var titleEl = document.getElementById('dv-title');
+    var metaEl  = document.getElementById('dv-meta');
+    if (titleEl) titleEl.textContent = doc.title + ' (' + doc.code + ')';
+    var st = doc.status || 'ativo';
+    var stLabel = { ativo:'Publicado', pendente:'Pendente de Aprovação', revisao:'Em Revisão', inativo:'Inativo', obsoleto:'Obsoleto' };
+    if (metaEl) metaEl.textContent = 'v' + doc.version + ' - ' + (doc.date ? new Date(doc.date+'T00:00:00').toLocaleDateString('pt-BR') : '') + ' - ' + (stLabel[st]||st);
+    var fallbackEl = document.getElementById('dvFallback');
+    if (fallbackEl) {
+        fallbackEl.innerHTML = `
+            <div class="dv-fallback-card">
+                <div class="dv-fallback-kicker">Documento selecionado</div>
+                <div class="dv-fallback-title">${sanitize(doc.title)}</div>
+                <div class="dv-fallback-meta">${sanitize(doc.code)} - v${sanitize(doc.version || '1.0')}</div>
+                ${doc.fileUrl ? `<a href="${sanitize(doc.fileUrl)}" target="_blank" rel="noopener">Abrir arquivo em nova aba</a>` : ''}
+            </div>`;
+    }
+
+    // Toolbar buttons
+    var reviewBtn  = document.getElementById('dv-review-btn');
+    var approveBtn = document.getElementById('dv-approve-btn');
+    var ccBtn      = document.getElementById('dv-cc-btn');
+    if (reviewBtn)  reviewBtn.style.display  = (st === 'ativo') ? '' : 'none';
+    if (approveBtn) approveBtn.style.display = (st === 'pendente' || st === 'revisao') ? '' : 'none';
+    if (ccBtn)      ccBtn.style.display      = (st === 'ativo') ? '' : 'none';
+
+    // Watermark
+    var wmEl  = document.getElementById('dvCCWatermark');
+    var bdgEl = document.getElementById('dvCCBadge');
+    if (wmEl)  wmEl.style.display  = 'none';
+    if (bdgEl) bdgEl.style.display = 'none';
+
+    // Load file
+    var dvIframe = document.getElementById('dvIframe');
+    if (!dvIframe) {
+        return;
+    }
+    if (dvIframe._blobUrl) { URL.revokeObjectURL(dvIframe._blobUrl); dvIframe._blobUrl = null; }
+    if (dvIframe._htmlUrl) { URL.revokeObjectURL(dvIframe._htmlUrl); dvIframe._htmlUrl = null; }
+    dvIframe.onload = function() {
+        if (fallbackEl) fallbackEl.style.display = 'none';
+    };
+
+    var storedBase64 = localStorage.getItem('sgq_docfile_' + doc.id);
+    if (storedBase64) {
+        try {
+            var arr  = storedBase64.split(',');
+            var mime = arr[0].match(/:(.*?);/)[1];
+            if (mime === 'application/pdf') {
+                setIframeHtml(dvIframe, buildPdfCanvasViewerHtml(doc, { dataUrl: storedBase64 }));
+            } else {
+                var bstr = atob(arr[1]);
+                var n    = bstr.length;
+                var u8   = new Uint8Array(n);
+                for (var i = 0; i < n; i++) u8[i] = bstr.charCodeAt(i);
+                var blobUrl = URL.createObjectURL(new Blob([u8], { type: mime }));
+                dvIframe._blobUrl = blobUrl;
+                dvIframe.src = blobUrl;
+            }
+        } catch(e) { dvIframe.src = storedBase64; }
+    } else if (doc.fileUrl) {
+        if (/\.pdf($|\?)/i.test(doc.fileUrl)) {
+            setIframeHtml(dvIframe, buildPdfCanvasViewerHtml(doc, { url: new URL(doc.fileUrl, location.href).href }));
+        } else {
+            dvIframe.src = 'about:blank';
+            requestAnimationFrame(function(){ dvIframe.src = doc.fileUrl; });
+        }
+    } else {
+        setIframeHtml(dvIframe, buildDocPreviewHtml(doc));
+    }
+}
+
+function setIframeHtml(iframe, html) {
+    if (iframe._htmlUrl) URL.revokeObjectURL(iframe._htmlUrl);
+    const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+    iframe._htmlUrl = url;
+    iframe.src = url;
+}
+
+function buildPdfCanvasViewerHtml(doc, source) {
+    const safeTitle = sanitize(doc.title || 'Documento sem título');
+    const safeCode = sanitize(doc.code || '-');
+    const payload = JSON.stringify(source || {});
+    return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#202635;color:#e5edf8;font-family:Inter,Arial,sans-serif}body{overflow:auto}.viewer-head{position:sticky;top:0;z-index:5;height:44px;background:#111827;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px;padding:0 16px}.doc-id{font-size:12px;color:#93c5fd;font-weight:800}.doc-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.status{margin-left:auto;font-size:12px;color:#9ca3af}.pages{padding:22px;display:flex;flex-direction:column;align-items:center;gap:18px}.page-wrap{background:#f8fafc;box-shadow:0 16px 40px rgba(0,0,0,.35);border-radius:3px;overflow:hidden}.page-wrap canvas{display:block;max-width:100%;height:auto}.loading,.error{min-height:calc(100vh - 44px);display:flex;align-items:center;justify-content:center;text-align:center;padding:32px;color:#cbd5e1}.error{color:#fecaca}.watermark{position:fixed;inset:44px 0 0;pointer-events:none;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:900;letter-spacing:.08em;color:rgba(15,23,42,.05);transform:rotate(-28deg);z-index:4}
+@media print{body{display:none!important}}
+</style></head><body oncontextmenu="return false"><div class="viewer-head"><span class="doc-id">${safeCode}</span><span class="doc-title">${safeTitle}</span><span class="status" id="status">Carregando...</span></div><div class="watermark">DOCUMENTO CONTROLADO</div><main id="pages" class="pages"><div class="loading">Carregando documento...</div></main><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"><\/script><script>
+const SOURCE=${payload};
+const statusEl=document.getElementById('status');
+const pagesEl=document.getElementById('pages');
+function b64ToBytes(dataUrl){const b64=String(dataUrl).split(',')[1]||'';const bin=atob(b64);const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return bytes;}
+async function render(){try{
+  if(!window.pdfjsLib) throw new Error('PDF.js não carregou. Verifique a conexão com a internet.');
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const loadingTask=SOURCE.dataUrl ? pdfjsLib.getDocument({data:b64ToBytes(SOURCE.dataUrl)}) : pdfjsLib.getDocument({url:SOURCE.url});
+  const pdf=await loadingTask.promise;
+  pagesEl.innerHTML='';
+  statusEl.textContent=pdf.numPages+' página(s)';
+  for(let pageNum=1;pageNum<=pdf.numPages;pageNum++){
+    const page=await pdf.getPage(pageNum);
+    const baseViewport=page.getViewport({scale:1});
+    const maxWidth=Math.min(window.innerWidth-44,980);
+    const scale=Math.max(.5,Math.min(1.6,maxWidth/baseViewport.width));
+    const viewport=page.getViewport({scale});
+    const wrap=document.createElement('div');wrap.className='page-wrap';
+    const canvas=document.createElement('canvas');
+    const ctx=canvas.getContext('2d');
+    canvas.width=Math.floor(viewport.width);canvas.height=Math.floor(viewport.height);
+    canvas.style.width=viewport.width+'px';canvas.style.height=viewport.height+'px';
+    wrap.appendChild(canvas);pagesEl.appendChild(wrap);
+    await page.render({canvasContext:ctx,viewport}).promise;
+  }
+}catch(err){statusEl.textContent='Falha';pagesEl.innerHTML='<div class="error">'+String(err.message||err)+'</div>';}}
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['p','s'].includes(e.key.toLowerCase()))e.preventDefault();});
+render();
+<\/script></body></html>`;
+}
+
+function buildValidationPdfPreviewHtml(doc) {
+    const safeTitle = sanitize(doc.title || 'Documento sem título');
+    const safeCode = sanitize(doc.code || '-');
+    const pdfUrl = sanitize(doc.fileUrl || '#');
+    return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{font-family:Inter,Arial,sans-serif;background:#eef2f7;color:#111827;display:flex;align-items:center;justify-content:center}.sheet{width:min(760px,calc(100vw - 48px));height:min(520px,calc(100vh - 48px));background:#fff;border:1px solid #d8dee8;border-radius:8px;box-shadow:0 18px 48px rgba(15,23,42,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px}.badge{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#0f75bd;margin-bottom:24px}.code{font-size:32px;font-weight:900;color:#0c2340;margin-bottom:14px}.title{font-size:24px;font-weight:800;line-height:1.25;color:#172033;max-width:620px}.hint{margin-top:28px;color:#64748b;font-size:14px}.actions{display:flex;gap:10px;margin-top:24px}.btn{display:inline-flex;align-items:center;justify-content:center;height:38px;padding:0 16px;border-radius:7px;text-decoration:none;font-size:14px;font-weight:700}.btn.primary{background:#0f75bd;color:#fff}.btn.ghost{background:#f1f5f9;color:#334155;border:1px solid #d8dee8}
+</style></head><body><main class="sheet"><div class="badge">PDF de validação</div><div class="code">${safeCode}</div><div class="title">${safeTitle}</div><div class="hint">Prévia HTML gerada para validar a abertura do documento no módulo.</div><div class="actions"><a class="btn primary" href="${pdfUrl}" target="_blank" rel="noopener">Abrir PDF real</a></div></main></body></html>`;
+}
+
+function buildDocPreviewHtml(doc) {
+    const safeTitle = sanitize(doc.title || 'Documento sem título');
+    const safeCode = sanitize(doc.code || '-');
+    const safeCategory = sanitize(doc.category || '-');
+    const safeAuthor = sanitize(doc.author || currentUser || '-');
+    const safeStatus = sanitize(({ ativo:'Publicado', pendente:'Pendente de aprovação', revisao:'Em revisão', inativo:'Inativo', obsoleto:'Obsoleto' }[doc.status] || doc.status || '-'));
+    const safeDate = doc.date ? new Date(doc.date + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
+    return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fb;color:#172033;font-family:Inter,Arial,sans-serif;line-height:1.55}.page{max-width:880px;margin:36px auto;background:#fff;min-height:calc(100vh - 72px);box-shadow:0 18px 50px rgba(12,35,64,.18);border-radius:8px;padding:52px 64px}.doc-kicker{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#0f75bd;font-weight:800}.doc-title{font-size:30px;line-height:1.2;margin:10px 0 22px;color:#0c2340}.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 30px}.meta div{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:7px;padding:10px 12px}.meta span{display:block;font-size:11px;color:#6b7280;text-transform:uppercase;font-weight:700}.meta strong{font-size:14px;color:#111827}.section{border-top:1px solid #e5e7eb;padding-top:24px;margin-top:20px}.section h2{font-size:18px;color:#0c2340;margin:0 0 10px}.section p{color:#4b5563;margin:0 0 10px}.stamp{display:inline-flex;gap:8px;align-items:center;background:rgba(15,117,189,.08);border:1px solid rgba(15,117,189,.18);color:#0f75bd;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:800;margin-top:24px}
+</style></head><body><main class="page"><div class="doc-kicker">Pré-visualização do protótipo</div><h1 class="doc-title">${safeTitle}</h1><div class="meta"><div><span>Código</span><strong>${safeCode}</strong></div><div><span>Categoria</span><strong>${safeCategory}</strong></div><div><span>Versão</span><strong>${sanitize(doc.version || '1.0')}</strong></div><div><span>Data</span><strong>${safeDate}</strong></div><div><span>Status</span><strong>${safeStatus}</strong></div><div><span>Autor</span><strong>${safeAuthor}</strong></div></div><section class="section"><h2>Resumo</h2><p>Este documento foi cadastrado no protótipo. Quando um arquivo original é anexado, o visualizador abre o PDF, imagem ou arquivo suportado diretamente nesta área.</p><p>Sem anexo, esta prévia permite validar o fluxo de navegação, aprovação, edição, download e cópia controlada.</p></section><section class="section"><h2>Rastreabilidade</h2><p>Categoria, versão, status e usuário responsável já ficam disponíveis para validação das telas.</p></section><div class="stamp">SGQ Online · Documento controlado</div></main></body></html>`;
+}
+
+function closeDocViewer() {
+    var overlay = document.getElementById('docViewerOverlay');
+    overlay.classList.remove('open');
+    overlay.style.display = 'none';
+    var dvIframe = document.getElementById('dvIframe');
+    if (dvIframe._blobUrl) { URL.revokeObjectURL(dvIframe._blobUrl); dvIframe._blobUrl = null; }
+    if (dvIframe._htmlUrl) { URL.revokeObjectURL(dvIframe._htmlUrl); dvIframe._htmlUrl = null; }
+    dvIframe.src = 'about:blank';
+    document.body.style.overflow = '';
+    currentViewerDoc = null;
+}
+
+function dvFullscreen() {
+    var overlay = document.getElementById('docViewerOverlay');
+    if (!document.fullscreenElement) { if (overlay.requestFullscreen) overlay.requestFullscreen(); }
+    else { if (document.exitFullscreen) document.exitFullscreen(); }
+}
+
+function downloadCurrentDoc() { if (currentViewerDoc) downloadDoc(currentViewerDoc.id); }
+
+function downloadDoc(docId) {
+    var base64 = localStorage.getItem('sgq_docfile_' + docId);
+    var d = findDocInFolders(docFolders, docId);
+    if (base64) {
+        try {
+            var arr  = base64.split(',');
+            var mime = arr[0].match(/:(.*?);/)[1];
+            var bstr = atob(arr[1]);
+            var u8   = new Uint8Array(bstr.length);
+            for (var i = 0; i < bstr.length; i++) u8[i] = bstr.charCodeAt(i);
+            var url = URL.createObjectURL(new Blob([u8], { type: mime }));
+            var a   = document.createElement('a');
+            a.href  = url;
+            a.download = (d ? d.code + '_' + d.title : 'documento') + '.pdf';
+            a.click();
+            setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+        } catch(e) { showNotification('Erro ao baixar o arquivo.'); }
+        return;
+    }
+    if (d) {
+        var html = buildDocPreviewHtml(d);
+        var urlHtml = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+        var aHtml = document.createElement('a');
+        aHtml.href = urlHtml;
+        aHtml.download = (d.code || 'documento') + '_' + (d.title || 'preview').replace(/[\\/:*?"<>|]+/g, '-') + '.html';
+        aHtml.click();
+        setTimeout(function(){ URL.revokeObjectURL(urlHtml); }, 5000);
+        showNotification('Prévia HTML baixada.');
+        return;
+    }
+    showNotification('Nenhum documento disponável para download.');
+}
+
+function findDocInFolders(folders, id) {
+    for (var i = 0; i < folders.length; i++) {
+        var f = folders[i];
+        if (f.documents) { var d = f.documents.find(function(x){ return x.id === id; }); if (d) return d; }
+        if (f.children) { var r = findDocInFolders(f.children, id); if (r) return r; }
+    }
+    return null;
+}
+
+function approveDocument() {
+    if (!currentViewerDoc) return;
+    if (!confirm('Aprovar o documento "' + currentViewerDoc.title + '"? Isso ir? public?-lo.')) return;
+    currentViewerDoc.status = 'ativo';
+    if (!currentViewerDoc.approvals) currentViewerDoc.approvals = [];
+    currentViewerDoc.approvals.push({ user: currentUser, date: new Date().toISOString(), action: 'aprovado' });
+    persistData();
+    showNotification('Documento aprovado e publicado!');
+    if (selectedFolderId) renderFolderContent(selectedFolderId);
+    openDocViewer(currentViewerDoc.id);
+}
+
+function requestReview() {
+    if (!currentViewerDoc) return;
+    document.getElementById('reviewDocName').value = (currentViewerDoc.code || '') + ' - ' + (currentViewerDoc.title || '');
+    document.getElementById('reviewReason').value = '';
+    const modal = bringModalAboveViewer('reviewRequestModal');
+    modal.classList.add('open');
+    setTimeout(function(){ document.getElementById('reviewReason').focus(); }, 50);
+}
+
+function submitReviewRequest() {
+    if (!currentViewerDoc) return;
+    var motivo = document.getElementById('reviewReason').value.trim();
+    if (!motivo) {
+        alert('Descreva a necessidade da revis\u00e3o.');
+        document.getElementById('reviewReason').focus();
+        return;
+    }
+    currentViewerDoc.status = 'revisao';
+    if (!currentViewerDoc.approvals) currentViewerDoc.approvals = [];
+    currentViewerDoc.approvals.push({ user: currentUser, date: new Date().toISOString(), action: 'revisao', motivo: motivo });
+    persistData();
+    closeModal('reviewRequestModal');
+    showNotification('Solicita\u00e7\u00e3o de revis\u00e3o enviada. Em breve o usu\u00e1rio ir\u00e1 receber o documento por email para revis\u00e3o.');
+    if (selectedFolderId) renderFolderContent(selectedFolderId);
+    openDocViewer(currentViewerDoc.id);
+}
+
+function openEditDocById(docId) {
+    var doc = findDocInFolders(docFolders, docId);
+    if (!doc) return;
+    currentViewerDoc = doc;
+    openEditDocModal();
+}
+
+function openEditDocModal() {
+    if (!currentViewerDoc) {
+        return;
+    }
+    var d = currentViewerDoc;
+    document.getElementById('editDocCode').value    = d.code    || '';
+    document.getElementById('editDocTitle').value   = d.title   || '';
+    document.getElementById('editDocVersion').value = d.version || '';
+    document.getElementById('editDocDate').value    = d.date    || '';
+    document.getElementById('editDocStatus').value  = d.status  || 'ativo';
+    document.getElementById('editDocFile').value    = '';
+    const modal = bringModalAboveViewer('editDocModal');
+    modal.classList.add('open');
+}
+
+async function saveEditDoc() {
+    if (!currentViewerDoc) return;
+    var title = document.getElementById('editDocTitle').value.trim();
+    if (!title) { alert('Título - obrigatério.'); return; }
+    currentViewerDoc.code    = document.getElementById('editDocCode').value.trim();
+    currentViewerDoc.title   = title;
+    currentViewerDoc.version = document.getElementById('editDocVersion').value.trim() || currentViewerDoc.version;
+    currentViewerDoc.date    = document.getElementById('editDocDate').value || currentViewerDoc.date;
+    currentViewerDoc.status  = document.getElementById('editDocStatus').value;
+    var fileEl = document.getElementById('editDocFile');
+    if (fileEl.files && fileEl.files[0]) {
+        var base64 = await readFileAsBase64(fileEl.files[0]);
+        if (base64) { try { localStorage.setItem('sgq_docfile_' + currentViewerDoc.id, base64); } catch(e) {} }
+    }
+    persistData();
+    closeModal('editDocModal');
+    if (selectedFolderId) renderFolderContent(selectedFolderId);
+    showNotification('Documento atualizado!');
+    openDocViewer(currentViewerDoc.id);
+}
+
+function deactivateCurrentDoc() {
+    if (!currentViewerDoc) return;
+    if (!confirm('Desativar o documento "' + currentViewerDoc.title + '"?')) return;
+    currentViewerDoc.status = 'inativo';
+    persistData();
+    closeModal('editDocModal');
+    if (selectedFolderId) renderFolderContent(selectedFolderId);
+    openDocViewer(currentViewerDoc.id);
+    showNotification('Documento desativado.');
+}
+
+function getDocumentPeople() {
+    var raw = localStorage.getItem('sgq_pessoas');
+    if (!raw) return [];
+    try {
+        var data = JSON.parse(raw);
+        if (Array.isArray(data)) return data;
+        if (Array.isArray(data.colaboradores)) return data.colaboradores.filter(function(p){ return p.ativo !== false; });
+        if (Array.isArray(data.pessoas)) return data.pessoas.filter(function(p){ return p.ativo !== false; });
+        if (Array.isArray(data.usuarios)) return data.usuarios.filter(function(p){ return p.ativo !== false; });
+    } catch(e) {}
+    return [];
+}
+
+function openCopiaControlada() {
+    if (!currentViewerDoc) {
+        return;
+    }
+    var pessoas = getDocumentPeople();
+    var emissorSel = document.getElementById('ccEmissor');
+    var setGroup   = document.getElementById('ccSetoresGroup');
+    var usrGroup   = document.getElementById('ccUsuariosGroup');
+    emissorSel.innerHTML = '<option value="">Selecione o emissor...</option>';
+    setGroup.innerHTML   = '';
+    usrGroup.innerHTML   = '';
+    var setores = [];
+    pessoas.forEach(function(p){ var s = p.setor || p.department; if (s && setores.indexOf(s) < 0) setores.push(s); });
+    setores.forEach(function(s){
+        emissorSel.innerHTML += '<option value="' + sanitize(s) + '">' + sanitize(s) + ' (Setor)</option>';
+        setGroup.innerHTML   += '<option value="' + sanitize(s) + '">' + sanitize(s) + '</option>';
+    });
+    var nomes = [];
+    pessoas.forEach(function(p){
+        var nome = p.nome || p.name || '';
+        if (nome && nomes.indexOf(nome) < 0) nomes.push(nome);
+    });
+    ['João Teste', 'Jefferson Willian', 'Gerente da Qualidade', 'Supervisor de Qualidade', 'Analista da Qualidade'].forEach(function(nome) {
+        if (nomes.indexOf(nome) < 0) nomes.push(nome);
+    });
+    nomes.forEach(function(nome){
+        if (nome) {
+            emissorSel.innerHTML += '<option value="' + sanitize(nome) + '">' + sanitize(nome) + '</option>';
+            usrGroup.innerHTML   += '<option value="' + sanitize(nome) + '">' + sanitize(nome) + '</option>';
+        }
+    });
+    emissorSel.innerHTML += '<option value="' + sanitize(currentUser) + '" selected>' + sanitize(currentUser) + ' (eu)</option>';
+    if (!pessoas.some(function(p){ return (p.nome || p.name) === currentUser; })) {
+        usrGroup.innerHTML += '<option value="' + sanitize(currentUser) + '">' + sanitize(currentUser) + ' (eu)</option>';
+    }
+    emissorSel.value = currentUser;
+    document.getElementById('ccDestinatario').value = '';
+    document.getElementById('ccDestinatarioOutro').value = '';
+    toggleCCOutroDestinatario();
+    var attEl    = document.getElementById('ccAttachmentList');
+    var attItems = document.getElementById('ccAttachmentItems');
+    if (currentViewerDoc.multipleAttachments) {
+        var atts = JSON.parse(localStorage.getItem('sgq_docatt_' + currentViewerDoc.id) || '[]');
+        if (atts.length > 0) {
+            attEl.style.display = 'block';
+            attItems.innerHTML  = atts.map(function(a){
+                return '<div class="att-list-item"><input type="checkbox" class="att-cb" id="ccAtt_' + a.id + '" value="' + a.id + '" checked><label for="ccAtt_' + a.id + '" class="att-name">' + sanitize(a.name) + '</label><span class="att-size">' + (a.size/1024).toFixed(1) + ' KB</span></div>';
+            }).join('');
+        } else { attEl.style.display = 'none'; }
+    } else { attEl.style.display = 'none'; }
+    document.getElementById('ccDataEmissao').value = new Date().toISOString().slice(0,10);
+    document.getElementById('ccValidade').value = '';
+    document.getElementById('ccPosicao').value = 'rodape';
+    ['ccInfoValidade','ccInfoEmissao','ccInfoDestinatario','ccInfoEmissor'].forEach(function(id){ document.getElementById(id).checked = true; });
+    document.getElementById('ccObs').value      = '';
+    const modal = bringModalAboveViewer('ccModal');
+    modal.classList.add('open');
+}
+
+function toggleCCOutroDestinatario() {
+    var sel = document.getElementById('ccDestinatario');
+    var input = document.getElementById('ccDestinatarioOutro');
+    if (!sel || !input) return;
+    input.style.display = sel.value === '__outro__' ? 'block' : 'none';
+    if (sel.value === '__outro__') setTimeout(function(){ input.focus(); }, 50);
+}
+
+async function saveCopiaControlada() {
+    if (!currentViewerDoc) return;
+    var emissor  = document.getElementById('ccEmissor').value;
+    var destSel  = document.getElementById('ccDestinatario').value;
+    var dest     = destSel === '__outro__' ? document.getElementById('ccDestinatarioOutro').value.trim() : destSel;
+    if (!emissor || !dest) { alert('Selecione o emissor e o destinat\u00e1rio.'); return; }
+    var validade = document.getElementById('ccValidade').value;
+    var emissao  = document.getElementById('ccDataEmissao').value || new Date().toISOString().slice(0,10);
+    var posicao  = document.getElementById('ccPosicao').value || 'rodape';
+    var campos   = {
+        validade: document.getElementById('ccInfoValidade').checked,
+        emissao: document.getElementById('ccInfoEmissao').checked,
+        destinatario: document.getElementById('ccInfoDestinatario').checked,
+        emissor: document.getElementById('ccInfoEmissor').checked
+    };
+    var obs      = document.getElementById('ccObs').value.trim();
+    var selAtts  = Array.prototype.slice.call(document.querySelectorAll('#ccAttachmentItems .att-cb:checked')).map(function(cb){ return cb.value; });
+    if (!currentViewerDoc.copias) currentViewerDoc.copias = [];
+    var newCC = { id: Date.now(), emissor: emissor, destinatario: dest,
+        validade: validade ? new Date(validade + 'T00:00:00').toLocaleDateString('pt-BR') : 'Indeterminado',
+        validadeISO: validade || null,
+        emissao: new Date(emissao + 'T00:00:00').toLocaleDateString('pt-BR'),
+        emissaoISO: emissao,
+        posicao: posicao,
+        campos: campos,
+        obs: obs,
+        ativa: true,
+        attachments: selAtts.length > 0 ? selAtts : null };
+    currentViewerDoc.copias.push(newCC);
+    persistData();
+    await downloadControlledCopyPdf(currentViewerDoc, newCC);
+    showCCWatermark(newCC);
+    document.getElementById('ccModal').classList.remove('open');
+    if (selectedFolderId) renderFolderContent(selectedFolderId);
+    showNotification('C\u00f3pia controlada emitida e baixada para ' + dest + '!');
+}
+
+function showCCWatermark(cc) {
+    var wm  = document.getElementById('dvCCWatermark');
+    var bdg = document.getElementById('dvCCBadge');
+    var inf = document.getElementById('dvCCBadgeInfo');
+    if (wm)  wm.style.display  = 'flex';
+    if (bdg) bdg.style.display = 'flex';
+    if (inf) inf.textContent   = 'Emissor: ' + cc.emissor + ' - Destinat\u00e1rio: ' + cc.destinatario + ' - Validade: ' + cc.validade + ' - Emitida em: ' + cc.emissao;
+}
+
+function pdfSafeText(value) {
+    return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\x20-\x7E]/g, '')
+        .replace(/\\/g, '\\\\')
+        .replace(/\(/g, '\\(')
+        .replace(/\)/g, '\\)');
+}
+
+function pdfLine(text, x, y, size, font) {
+    return 'BT /' + (font || 'F1') + ' ' + (size || 10) + ' Tf ' + x + ' ' + y + ' Td (' + pdfSafeText(text) + ') Tj ET\n';
+}
+
+function pdfRotatedLine(text, x, y, size) {
+    return 'BT /F2 ' + (size || 10) + ' Tf 0 1 -1 0 ' + x + ' ' + y + ' Tm (' + pdfSafeText(text) + ') Tj ET\n';
+}
+
+function getControlledCopyLines(cc) {
+    var fields = cc.campos || { validade: true, emissao: true, destinatario: true, emissor: true };
+    var lines = ['COPIA CONTROLADA'];
+    if (fields.destinatario) lines.push('Destinatario: ' + cc.destinatario);
+    if (fields.emissor) lines.push('Emissor: ' + cc.emissor);
+    if (fields.emissao) lines.push('Data emissao: ' + cc.emissao);
+    if (fields.validade) lines.push('Data validade: ' + cc.validade);
+    lines.push('Controle ativo: ' + cc.id);
+    return lines;
+}
+
+function dataUrlToBytes(dataUrl) {
+    var b64 = String(dataUrl || '').split(',')[1] || '';
+    var bin = atob(b64);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+}
+
+function isPdfDataUrl(dataUrl) {
+    return /^data:application\/pdf[;,]/i.test(String(dataUrl || ''));
+}
+
+async function getSourcePdfBytes(doc) {
+    var storedBase64 = localStorage.getItem('sgq_docfile_' + doc.id);
+    if (isPdfDataUrl(storedBase64)) {
+        return dataUrlToBytes(storedBase64);
+    }
+    if (doc.fileUrl && /\.pdf($|\?)/i.test(doc.fileUrl)) {
+        var response = await fetch(new URL(doc.fileUrl, location.href).href);
+        if (response.ok) return new Uint8Array(await response.arrayBuffer());
+    }
+    return null;
+}
+
+function ensurePdfLib() {
+    if (window.PDFLib) return Promise.resolve(window.PDFLib);
+    return new Promise(function(resolve, reject) {
+        var existing = document.querySelector('script[data-pdf-lib]');
+        if (existing) {
+            existing.addEventListener('load', function(){ resolve(window.PDFLib); }, { once: true });
+            existing.addEventListener('error', reject, { once: true });
+            return;
+        }
+        var script = document.createElement('script');
+        script.src = 'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js';
+        script.async = true;
+        script.dataset.pdfLib = '1';
+        script.onload = function(){ resolve(window.PDFLib); };
+        script.onerror = reject;
+        document.head.appendChild(script);
+        setTimeout(function(){ if (!window.PDFLib) reject(new Error('pdf-lib timeout')); }, 6000);
+    });
+}
+
+function drawControlledCopyMark(page, cc, font, boldFont) {
+    var lib = window.PDFLib;
+    var size = page.getSize();
+    var lines = getControlledCopyLines(cc).map(function(line){ return pdfSafeText(line).replace(/\\/g, ''); });
+    var amber = lib.rgb(0.82, 0.47, 0.03);
+    var bg = lib.rgb(1, 0.96, 0.86);
+    var text = lib.rgb(0.36, 0.23, 0.08);
+    var pos = cc.posicao || 'rodape';
+
+    function drawHorizontal(x, y, w, h) {
+        page.drawRectangle({ x: x, y: y, width: w, height: h, color: bg, opacity: 0.88, borderColor: amber, borderWidth: 1.2 });
+        lines.forEach(function(line, idx) {
+            page.drawText(line, {
+                x: x + 12 + (idx % 3) * Math.max(115, (w - 24) / 3),
+                y: y + h - 18 - Math.floor(idx / 3) * 14,
+                size: idx === 0 ? 9 : 7,
+                font: idx === 0 ? boldFont : font,
+                color: text
+            });
+        });
+    }
+
+    function drawVertical(x) {
+        var y = 38;
+        var h = Math.max(200, size.height - 76);
+        page.drawRectangle({ x: x, y: y, width: 28, height: h, color: bg, opacity: 0.88, borderColor: amber, borderWidth: 1.2 });
+        lines.forEach(function(line, idx) {
+            page.drawText(line, {
+                x: x + 19,
+                y: y + 18 + idx * Math.max(72, (h - 36) / lines.length),
+                size: idx === 0 ? 9 : 7,
+                font: idx === 0 ? boldFont : font,
+                color: text,
+                rotate: lib.degrees(90)
+            });
+        });
+    }
+
+    if (pos === 'cabecalho') {
+        drawHorizontal(36, Math.max(36, size.height - 58), size.width - 72, 42);
+    } else if (pos === 'lateral-direita') {
+        drawVertical(Math.max(12, size.width - 42));
+    } else if (pos === 'lateral-esquerda') {
+        drawVertical(14);
+    } else {
+        drawHorizontal(36, 18, size.width - 72, 42);
+    }
+}
+
+async function buildStampedSourcePdf(doc, cc) {
+    var sourceBytes = await getSourcePdfBytes(doc);
+    if (!sourceBytes) return null;
+    var lib = await ensurePdfLib();
+    var pdfDoc = await lib.PDFDocument.load(sourceBytes, { ignoreEncryption: true });
+    var font = await pdfDoc.embedFont(lib.StandardFonts.Helvetica);
+    var boldFont = await pdfDoc.embedFont(lib.StandardFonts.HelveticaBold);
+    pdfDoc.getPages().forEach(function(page) {
+        drawControlledCopyMark(page, cc, font, boldFont);
+    });
+    return await pdfDoc.save();
+}
+
+function buildControlledCopyPdf(doc, cc) {
+    var lines = getControlledCopyLines(cc);
+    var content = '';
+    content += '0.96 0.96 0.94 rg 0 0 595 842 re f\n';
+    content += '0.16 0.17 0.22 rg 58 82 479 678 re f\n';
+    content += '1 1 1 rg\n';
+    content += pdfLine(doc.title || 'Documento', 92, 690, 22, 'F2');
+    content += pdfLine('Codigo: ' + (doc.code || '-') + '   Versao: ' + (doc.version || '-'), 92, 662, 11, 'F1');
+    content += pdfLine('Copia controlada emitida para validacao do fluxo de documentos.', 92, 628, 11, 'F1');
+    content += '0.95 0.61 0.07 rg\n';
+    content += '1.5 w\n';
+
+    if (cc.posicao === 'cabecalho') {
+        content += '58 748 479 54 re S\n';
+        lines.forEach(function(line, idx){ content += pdfLine(line, 78 + (idx % 3) * 165, 780 - Math.floor(idx / 3) * 18, idx === 0 ? 12 : 8, idx === 0 ? 'F2' : 'F1'); });
+    } else if (cc.posicao === 'lateral-direita') {
+        content += '531 82 36 678 re S\n';
+        lines.forEach(function(line, idx){ content += pdfRotatedLine(line, 552, 130 + idx * 112, idx === 0 ? 12 : 8); });
+    } else if (cc.posicao === 'lateral-esquerda') {
+        content += '28 82 36 678 re S\n';
+        lines.forEach(function(line, idx){ content += pdfRotatedLine(line, 49, 130 + idx * 112, idx === 0 ? 12 : 8); });
+    } else {
+        content += '58 34 479 58 re S\n';
+        lines.forEach(function(line, idx){ content += pdfLine(line, 78 + (idx % 3) * 165, 69 - Math.floor(idx / 3) * 18, idx === 0 ? 12 : 8, idx === 0 ? 'F2' : 'F1'); });
+    }
+
+    var objects = [
+        '<< /Type /Catalog /Pages 2 0 R >>',
+        '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+        '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>',
+        '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+        '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>',
+        '<< /Length ' + content.length + ' >>\nstream\n' + content + 'endstream'
+    ];
+    var pdf = '%PDF-1.4\n';
+    var offsets = [0];
+    objects.forEach(function(obj, idx) {
+        offsets.push(pdf.length);
+        pdf += (idx + 1) + ' 0 obj\n' + obj + '\nendobj\n';
+    });
+    var xref = pdf.length;
+    pdf += 'xref\n0 ' + (objects.length + 1) + '\n0000000000 65535 f \n';
+    offsets.slice(1).forEach(function(offset) {
+        pdf += String(offset).padStart(10, '0') + ' 00000 n \n';
+    });
+    pdf += 'trailer\n<< /Size ' + (objects.length + 1) + ' /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF';
+    return pdf;
+}
+
+async function downloadControlledCopyPdf(doc, cc) {
+    var stampedBytes = null;
+    try { stampedBytes = await buildStampedSourcePdf(doc, cc); } catch(e) { stampedBytes = null; }
+    var blob = stampedBytes ? new Blob([stampedBytes], { type: 'application/pdf' }) : new Blob([buildControlledCopyPdf(doc, cc)], { type: 'application/pdf' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var base = String(doc.code || doc.title || 'documento').replace(/[^\w.-]+/g, '_');
+    a.href = url;
+    a.download = base + '_copia_controlada_' + cc.id + '.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 3000);
+}
+
+function openManageCopias() {
+    if (!currentViewerDoc) {
+        return;
+    }
+    var copias = currentViewerDoc.copias || [];
+    var list   = document.getElementById('manageCCList');
+    if (copias.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:30px 0;color:rgba(255,255,255,.25);font-size:.82rem">Nenhuma cópia emitida para este documento</div>';
+    } else {
+        list.innerHTML = copias.map(function(c, i){
+            var pos = c.posicao ? ' - Posi\u00e7\u00e3o: ' + c.posicao.replace('-', ' ') : '';
+            return '<div class="cc-copy-row"><div class="cc-copy-info"><div class="cc-copy-dest">' + sanitize(c.destinatario) + (c.ativa ? '' : ' <span style="font-size:.65rem;color:rgba(255,255,255,.2)">(inativa)</span>') + '</div><div class="cc-copy-meta">Emissor: ' + sanitize(c.emissor||'-') + ' - Emitida: ' + c.emissao + ' - Validade: ' + c.validade + sanitize(pos) + (c.obs ? '<br>' + sanitize(c.obs) : '') + '</div></div>' + (c.ativa ? '<button class="cc-deact-btn" onclick="deactivateCopy(' + i + ')"><i class="fas fa-ban"></i> Desativar</button>' : '<span style="font-size:.72rem;color:rgba(255,255,255,.2)">Inativa</span>') + '</div>';
+        }).join('');
+    }
+    const modal = bringModalAboveViewer('manageCCModal');
+    modal.classList.add('open');
+}
+
+function deactivateCopy(idx) {
+    if (!currentViewerDoc || !currentViewerDoc.copias) return;
+    if (!confirm('Desativar esta cópia controlada?')) return;
+    currentViewerDoc.copias[idx].ativa = false;
+    persistData();
+    showNotification('Cópia controlada desativada.');
+    openManageCopias();
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (document.getElementById('docViewerOverlay').classList.contains('open')) closeDocViewer();
+        document.getElementById('ccModal').classList.remove('open');
+        document.getElementById('manageCCModal').classList.remove('open');
+    }
+}, { passive: true });
+
+// ============================================================
+// INIT
+// ============================================================
+renderDocTree();
+</script>
+
+<!-- ================================================================
+     PDF / DOCUMENT VIEWER MODAL
+     ================================================================ -->
+<div class="doc-viewer-overlay" id="docViewerOverlay" style="display:none">
+    <div class="doc-viewer-bar">
+        <button class="dv-btn" onclick="closeDocViewer()" title="Fechar"><i class="fas fa-arrow-left"></i> Voltar</button>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding:0 4px">
+            <span class="dv-title" id="dv-title">Documento</span>
+            <span class="dv-meta" id="dv-meta"></span>
+        </div>
+        <button class="dv-btn" id="dv-review-btn" onclick="requestReview()" title="Solicitar revisão" style="display:none"><i class="fas fa-rotate"></i> Pedir Revisão</button>
+        <button class="dv-btn" id="dv-approve-btn" onclick="approveDocument()" title="Aprovar documento" style="display:none"><i class="fas fa-circle-check"></i> Aprovar</button>
+        <button class="dv-btn" onclick="openEditDocModal()" title="Editar documento"><i class="fas fa-pen"></i> Editar</button>
+        <button class="dv-btn primary" onclick="downloadCurrentDoc()" title="Baixar original"><i class="fas fa-download"></i> Baixar</button>
+        <button class="dv-btn" id="dv-cc-btn" onclick="openCopiaControlada()" title="Cópia controlada"><i class="fas fa-stamp"></i> Emitir Cópia Controlada</button>
+        <button class="dv-btn" onclick="openManageCopias()" title="Gerenciar cópias emitidas"><i class="fas fa-list-check"></i> Cópias</button>
+        <button class="dv-btn" onclick="dvFullscreen()" title="Tela cheia"><i class="fas fa-expand"></i></button>
+    </div>
+    <div class="doc-viewer-body" style="position:relative">
+        <div class="dv-fallback" id="dvFallback"></div>
+        <iframe class="doc-viewer-iframe" id="dvIframe" src="about:blank" title="Visualizador de documento"></iframe>
+        <div class="dv-cc-watermark" id="dvCCWatermark" style="display:none">CÓPIA CONTROLADA</div>
+        <div class="dv-cc-badge" id="dvCCBadge" style="display:none">
+            <i class="fas fa-stamp"></i>
+            <strong>CÓPIA CONTROLADA</strong>
+            <span id="dvCCBadgeInfo"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+function startModuleTour() {
+    alert('Tour deste módulo em breve! ');
+}
+</script></body>
+</html>

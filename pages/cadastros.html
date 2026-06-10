@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastros - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-database" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Cadastros</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Pedidos e Produtos</div>
+                <a href="#" class="nav-item active" id="nav-pedidos" onclick="switchView('pedidos');return false"><i class="fas fa-shopping-cart"></i> Pedidos</a>
+                <a href="#" class="nav-item" id="nav-produtos" onclick="switchView('produtos');return false"><i class="fas fa-box"></i> Produtos</a>
+                <a href="#" class="nav-item" id="nav-defeitos" onclick="switchView('defeitos');return false"><i class="fas fa-bug"></i> Tipos de Defeito</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Organização</div>
+                <a href="#" class="nav-item" id="nav-setores" onclick="switchView('setores');return false"><i class="fas fa-building"></i> Setores</a>
+                <a href="#" class="nav-item" id="nav-colaboradores" onclick="switchView('colaboradores');return false"><i class="fas fa-users"></i> Colaboradores</a>
+                <a href="#" class="nav-item" id="nav-fornecedores-cat" onclick="switchView('fornecedores-cat');return false"><i class="fas fa-truck"></i> Categorias de Fornecedores</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Documentos</div>
+                <a href="#" class="nav-item" id="nav-doc-tipos" onclick="switchView('doc-tipos');return false"><i class="fas fa-file-alt"></i> Tipos de Documento</a>
+            </div>
+        </nav>
+        </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" id="global-search" placeholder="Buscar em cadastros..." oninput="handleGlobalSearch()"></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JD</div>
+                        <span class="user-btn-name">Jo\u00e3o Demo</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JD</div>
+                            <div><div class="user-name">Jo\u00e3o Demo</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- VIEW: PEDIDOS -->
+            <div id="view-pedidos" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-box-archive" style="color:var(--primary);margin-right:10px"></i>Cadastros Gerais</h2>
+                        <p>Pedidos, produtos, defeitos, setores, colaboradores e fornecedores</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn primary" onclick="openModalFor('pedido')"><i class="fas fa-plus"></i> Novo Pedido</button>
+                        <label class="mod-btn ghost" style="cursor:pointer" title="Importar CSV">
+                            <i class="fas fa-file-csv"></i> Importar CSV
+                            <input type="file" accept=".csv" style="display:none" onchange="importCSV(this)">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mod-stats">
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)"><i class="fas fa-shopping-cart"></i></div></div><div class="stat-value" id="stat-pedidos">0</div><div class="stat-label">Pedidos</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-box"></i></div></div><div class="stat-value" id="stat-produtos">0</div><div class="stat-label">Produtos</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-building"></i></div></div><div class="stat-value" id="stat-setores">0</div><div class="stat-label">Setores</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(139,92,246,.1);color:var(--purple)"><i class="fas fa-users"></i></div></div><div class="stat-value" id="stat-colaboradores-cad">0</div><div class="stat-label">Colaboradores</div></div>
+                </div>
+
+                <div class="mod-filter-bar">
+                    <div class="mod-search"><i class="fas fa-search"></i><input type="text" id="searchPedido" placeholder="Buscar pedido, cliente..." oninput="renderPedidos()"></div>
+                    <select class="mod-select" id="filterStatus" onchange="renderPedidos()">
+                        <option value="">Todos os status</option>
+                        <option value="aberto">Aberto</option>
+                        <option value="producao">Em Produção</option>
+                        <option value="concluido">Concluído</option>
+                        <option value="entregue">Entregue</option>
+                    </select>
+                </div>
+
+                <div class="mod-table-wrap" id="pedidos-table-wrap">
+                    <table class="mod-table">
+                        <thead><tr><th>Pedido</th><th>Cliente</th><th>Produto</th><th>Qtde</th><th>Criado em</th><th>Prazo</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+                        <tbody id="tbody-pedidos"></tbody>
+                    </table>
+                </div>
+                <div class="mod-empty" id="empty-pedidos" style="display:none"><i class="fas fa-shopping-cart"></i><h3>Nenhum pedido cadastrado</h3></div>
+            </div>
+
+            <!-- VIEW: PRODUTOS -->
+            <div id="view-produtos" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Catélogo de Produtos</h2><p>Gerencie o catélogo de produtos e suas especificações</p></div>
+                    <div class="mod-actions">
+                        <button class="mod-btn primary" onclick="openModalFor('produto')"><i class="fas fa-plus"></i> Novo Produto</button>
+                        <label class="mod-btn ghost" style="cursor:pointer">
+                            <i class="fas fa-file-csv"></i> Importar CSV
+                            <input type="file" accept=".csv" style="display:none" onchange="importCSVProdutos(this)">
+                        </label>
+                    </div>
+                </div>
+                <div class="mod-filter-bar">
+                    <div class="mod-search"><i class="fas fa-search"></i><input type="text" id="searchProduto" placeholder="Buscar produto, código..." oninput="renderProdutos()"></div>
+                    <select class="mod-select" id="filterCategoria" onchange="renderProdutos()"><option value="">Todas categorias</option></select>
+                </div>
+                <div class="mod-table-wrap">
+                    <table class="mod-table">
+                        <thead><tr><th>Código</th><th>Produto</th><th>Categoria</th><th>Unidade</th><th>Especificações</th><th></th></tr></thead>
+                        <tbody id="tbody-produtos"></tbody>
+                    </table>
+                </div>
+                <div class="mod-empty" id="empty-produtos" style="display:none"><i class="fas fa-box"></i><h3>Nenhum produto cadastrado</h3><p>Clique em "Novo Produto" ou importe via CSV</p></div>
+
+                <!-- CSV Import Preview -->
+                <div id="csv-preview" style="display:none">
+                    <div class="mod-alert info"><i class="fas fa-info-circle"></i><div id="csv-preview-msg"></div></div>
+                    <div class="mod-table-wrap" id="csv-preview-wrap" style="max-height:200px;overflow-y:auto"></div>
+                    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
+                        <button class="mod-btn ghost" onclick="cancelCSV()">Cancelar</button>
+                        <button class="mod-btn primary" id="btn-confirm-csv" onclick="confirmCSV()">Confirmar Importação</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: DEFEITOS -->
+            <div id="view-defeitos" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Tipos de Defeito</h2><p>Classifique os tipos de defeito para uso em inspeções e NCs</p></div>
+                    <button class="mod-btn primary" onclick="openModalFor('defeito')"><i class="fas fa-plus"></i> Novo Tipo</button>
+                </div>
+                <div id="lista-defeitos"></div>
+                <div class="mod-empty" id="empty-defeitos" style="display:none"><i class="fas fa-bug"></i><h3>Nenhum tipo de defeito cadastrado</h3></div>
+            </div>
+
+            <!-- VIEW: SETORES -->
+            <div id="view-setores" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Setores / Unidades</h2><p>Organize a estrutura de setores da empresa</p></div>
+                    <button class="mod-btn primary" onclick="openModalFor('setor')"><i class="fas fa-plus"></i> Novo Setor</button>
+                </div>
+                <div id="lista-setores"></div>
+                <div class="mod-empty" id="empty-setores" style="display:none"><i class="fas fa-building"></i><h3>Nenhum setor cadastrado</h3></div>
+            </div>
+
+            <!-- VIEW: COLABORADORES (quick link) -->
+            <div id="view-colaboradores" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Colaboradores</h2><p>Gerencie colaboradores no módulo dedicado</p></div><a href="pessoas.html" class="mod-btn primary"><i class="fas fa-external-link-alt"></i> Abrir Módulo Pessoas</a></div>
+                <div class="mod-alert info"><i class="fas fa-info-circle"></i><div>O cadastro detalhado de colaboradores com linha do tempo e treinamentos está disponável no <a href="pessoas.html" style="color:#60a5fa;font-weight:600">Módulo Pessoas e Treinamentos</a>.</div></div>
+                <div id="colabs-resumo"></div>
+            </div>
+
+            <!-- VIEW: FORNECEDORES CATEGORIAS -->
+            <div id="view-fornecedores-cat" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Categorias de Fornecedores</h2><p>Classifique os tipos de fornecedor</p></div>
+                    <button class="mod-btn primary" onclick="openModalFor('cat-fornecedor')"><i class="fas fa-plus"></i> Nova Categoria</button>
+                </div>
+                <div id="lista-cat-forn"></div>
+                <div class="mod-empty" id="empty-cat-forn" style="display:none"><i class="fas fa-truck"></i><h3>Nenhuma categoria de fornecedor</h3></div>
+            </div>
+
+            <!-- VIEW: TIPOS DE DOCUMENTO -->
+            <div id="view-doc-tipos" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Tipos de Documento</h2><p>Categorias de documentos para o GED</p></div>
+                    <button class="mod-btn primary" onclick="openModalFor('tipo-doc')"><i class="fas fa-plus"></i> Novo Tipo</button>
+                </div>
+                <div id="lista-tipos-doc"></div>
+                <div class="mod-empty" id="empty-tipos-doc" style="display:none"><i class="fas fa-file-alt"></i><h3>Nenhum tipo de documento</h3></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- UNIVERSAL MODAL -->
+<div class="mod-modal-overlay" id="modalUniversal">
+    <div class="mod-modal sm" id="modalUniversalContent">
+        <div class="mod-modal-header">
+            <h3 id="modal-title">Novo Cadastro</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalUniversal')">&times;</button>
+        </div>
+        <div class="mod-modal-body" id="modal-body"></div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalUniversal')">Cancelar</button>
+            <button class="mod-btn primary" id="modal-save-btn">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: PEDIDO (maior) -->
+<div class="mod-modal-overlay" id="modalPedido">
+    <div class="mod-modal md">
+        <div class="mod-modal-header"><h3><i class="fas fa-shopping-cart" style="color:var(--primary)"></i> Novo Pedido</h3><button class="mod-modal-close" onclick="closeModal('modalPedido')">&times;</button></div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Número do Pedido <span>*</span></label><input class="mod-input" id="ped-num" placeholder="Ex: PED-2026-0200" readonly></div>
+                <div class="mod-form-group"><label>Cliente <span>*</span></label><input class="mod-input" id="ped-cliente" placeholder="Nome do cliente ou empresa"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Produto <span>*</span></label><select class="mod-select-inp" id="ped-produto"><option value="">Selecione...</option></select></div>
+                <div class="mod-form-group"><label>Quantidade <span>*</span></label><input class="mod-input" type="number" id="ped-qtde" min="1" placeholder="1"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Prazo de Entrega</label><input class="mod-input" type="date" id="ped-prazo"></div>
+                <div class="mod-form-group"><label>Valor Total (R$)</label><input class="mod-input" type="number" id="ped-valor" step="0.01" placeholder="0,00"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Status</label>
+                    <select class="mod-select-inp" id="ped-status"><option value="aberto">Aberto</option><option value="producao">Em Produção</option><option value="concluido">Concluído</option><option value="entregue">Entregue</option></select>
+                </div>
+                <div class="mod-form-group"><label>OC / Referência do Cliente</label><input class="mod-input" id="ped-oc" placeholder="Número do pedido do cliente"></div>
+            </div>
+            <div class="mod-form-group"><label>Observações</label><textarea class="mod-textarea" id="ped-obs" rows="2" placeholder="Instruções especiais, requisitos..."></textarea></div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalPedido')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarPedido()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: PRODUTO -->
+<div class="mod-modal-overlay" id="modalProduto">
+    <div class="mod-modal md">
+        <div class="mod-modal-header"><h3><i class="fas fa-box" style="color:var(--accent)"></i> Novo Produto</h3><button class="mod-modal-close" onclick="closeModal('modalProduto')">&times;</button></div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Código <span>*</span></label><input class="mod-input" id="prod-cod" placeholder="Ex: PROD-001"></div>
+                <div class="mod-form-group"><label>Nome do Produto <span>*</span></label><input class="mod-input" id="prod-nome" placeholder="Descrição do produto"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Categoria <span>*</span></label><input class="mod-input" id="prod-cat" placeholder="Ex: Componente, Produto Final..."></div>
+                <div class="mod-form-group"><label>Unidade de Medida</label><select class="mod-select-inp" id="prod-unidade"><option>pç</option><option>kg</option><option>m</option><option>m²</option><option>m³</option><option>L</option><option>cx</option><option>un</option></select></div>
+            </div>
+            <div class="mod-form-group" style="margin-bottom:14px"><label>Especificações Técnicas</label><textarea class="mod-textarea" id="prod-spec" rows="2" placeholder="Dimensés, tolerâncias, material..."></textarea></div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Peso (kg)</label><input class="mod-input" type="number" id="prod-peso" step="0.001" placeholder="0.000"></div>
+                <div class="mod-form-group"><label>Família / Linha</label><input class="mod-input" id="prod-familia" placeholder="Ex: Linha Premium"></div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalProduto')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarProduto()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const DB_KEY = 'sgq_cadastros';
+let csvData = null;
+
+function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"pedidos":[],"produtos":[],"defeitos":[],"setores":[],"catFornecedor":[],"tiposDoc":[]}'); }
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+function seedData() {
+    const db = getDB();
+    if (db.pedidos.length) return;
+    db.produtos = [
+        { id:1, cod:'PROD-001', nome:'Eixo Usinado 25mm', cat:'Componente Usinado', unidade:'pç', spec:'Ø25mm ±0,01 / Comprimento 200mm / Aço 1045', peso:1.2, familia:'Linha Standard' },
+        { id:2, cod:'PROD-002', nome:'Flange de Aço 6 Furos', cat:'Componente Estampado', unidade:'pç', spec:'Ø150mm / 6 furos M10 / Aço 1020', peso:0.85, familia:'Linha Premium' },
+        { id:3, cod:'PROD-003', nome:'Mancal de Rolamento', cat:'Produto Final', unidade:'un', spec:'Rolamento SKF 6205 / Carcaça fundida GG25', peso:2.4, familia:'Linha Standard' },
+    ];
+    db.pedidos = [
+        { id:1, num:'PED-2026-0150', cliente:'Metalúrgica Alpha Ltda', produto:'Eixo Usinado 25mm', qtde:500, prazo:'2026-06-20', valor:15000, status:'producao', oc:'OC-2026-0088', obs:'Entrega urgente - produção parada', criado:'2026-06-01' },
+        { id:2, num:'PED-2026-0151', cliente:'Construtora Beta S.A.', produto:'Flange de Aço 6 Furos', qtde:200, prazo:'2026-06-30', valor:8500, status:'aberto', oc:'', obs:'', criado:'2026-06-02' },
+        { id:3, num:'PED-2026-0152', cliente:'Ind?stria Gama Eireli', produto:'Mancal de Rolamento', qtde:50, prazo:'2026-07-15', valor:22000, status:'entregue', oc:'OC-GAMA-0021', obs:'Enviar laudo de qualidade', criado:'2026-05-20' },
+    ];
+    db.defeitos = [
+        { id:1, nome:'Dimensional fora de tolerância', categoria:'Dimensional', severidade:'alta', desc:'Medida fora dos limites especificados no desenho' },
+        { id:2, nome:'Rugosidade superficial inadequada', categoria:'Superfície', severidade:'media', desc:'Acabamento superficial não conforme com Ra especificado' },
+        { id:3, nome:'Trinca / Fissura', categoria:'Estrutural', severidade:'critica', desc:'Presença de trinca ou fissura no material' },
+        { id:4, nome:'Contaminação / Sujidade', categoria:'Limpeza', severidade:'baixa', desc:'Presença de contaminante no produto' },
+    ];
+    db.setores = [
+        { id:1, nome:'Qualidade', responsavel:'João Teste', email:'qualidade@empresa.com', descricao:'Gestão da qualidade e conformidade ISO 9001' },
+        { id:2, nome:'Produção', responsavel:'Carlos Ferreira', email:'producao@empresa.com', descricao:'Operações e manufatura' },
+        { id:3, nome:'Manutenção', responsavel:'Pedro Mech', email:'manutencao@empresa.com', descricao:'Manutenção preventiva e corretiva de equipamentos' },
+        { id:4, nome:'Compras', responsavel:'Maria Silva', email:'compras@empresa.com', descricao:'Gestão de fornecedores e suprimentos' },
+    ];
+    db.catFornecedor = [
+        { id:1, nome:'Matéria-Prima', desc:'Fornecedores de mat?rias-primas', critico:true },
+        { id:2, nome:'Serviços de Usinagem', desc:'Terceirização de usinagem e caldeiraria', critico:true },
+        { id:3, nome:'Insumos Gerais', desc:'Material de escrit?rio, limpeza, etc.', critico:false },
+        { id:4, nome:'Transportadoras', desc:'Empresas de frete e logàstica', critico:false },
+    ];
+    db.tiposDoc = [
+        { id:1, nome:'Procedimento Operacional Padrão', sigla:'POP', descricao:'Instrução de trabalho detalhada para atividades repetitivas' },
+        { id:2, nome:'Instrução de Trabalho', sigla:'IT', descricao:'Guia passo-a-passo para operações específicas' },
+        { id:3, nome:'Manual da Qualidade', sigla:'MQ', descricao:'Documento de alto n?vel descrevendo o SGQ' },
+        { id:4, nome:'Formulário', sigla:'FORM', descricao:'Formulários de registro e coleta de dados' },
+        { id:5, nome:'Norma Técnica', sigla:'NT', descricao:'Normas ABNT, ISO e outras aplic?veis' },
+    ];
+    saveDB(db);
+}
+
+function switchView(v) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display='none');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-'+v).style.display='block';
+    const nav = document.getElementById('nav-'+v);
+    if (nav) nav.classList.add('active');
+    updateStats();
+    if (v==='pedidos') renderPedidos();
+    if (v==='produtos') renderProdutos();
+    if (v==='defeitos') renderDefeitos();
+    if (v==='setores') renderSetores();
+    if (v==='colaboradores') renderColabsResumo();
+    if (v==='fornecedores-cat') renderCatForn();
+    if (v==='doc-tipos') renderTiposDoc();
+}
+
+function updateStats() {
+    const db = getDB();
+    document.getElementById('stat-pedidos').textContent = db.pedidos.length;
+    document.getElementById('stat-produtos').textContent = db.produtos.length;
+    document.getElementById('stat-setores').textContent = db.setores.length;
+    document.getElementById('stat-colaboradores-cad').textContent = JSON.parse(localStorage.getItem('sgq_pessoas')||'{"colaboradores":[]}').colaboradores.filter(c=>c.ativo).length;
+}
+
+function renderPedidos() {
+    const db = getDB();
+    const search = (document.getElementById('searchPedido')?.value||'').toLowerCase();
+    const sf = document.getElementById('filterStatus')?.value||'';
+    const items = db.pedidos.filter(p => {
+        if (search && !p.num.toLowerCase().includes(search) && !p.cliente.toLowerCase().includes(search) && !p.produto.toLowerCase().includes(search)) return false;
+        if (sf && p.status !== sf) return false;
+        return true;
+    }).reverse();
+    const tbody = document.getElementById('tbody-pedidos');
+    const emptyEl = document.getElementById('empty-pedidos');
+    const wrap = document.getElementById('pedidos-table-wrap');
+    if (!items.length) { tbody.innerHTML=''; emptyEl.style.display='flex'; wrap.style.display='none'; return; }
+    emptyEl.style.display='none'; wrap.style.display='block';
+    const statusBadge = { aberto:'pendente', producao:'andamento', concluido:'concluida', entregue:'vigente' };
+    const statusLabel = { aberto:'Aberto', producao:'Em Produção', concluido:'Concluído', entregue:'Entregue' };
+    tbody.innerHTML = items.map(p => `<tr>
+        <td><span style="font-weight:700;color:var(--primary-light)">${p.num}</span></td>
+        <td style="font-weight:600;color:#fff">${p.cliente}</td>
+        <td style="font-size:.82rem">${p.produto}</td>
+        <td style="text-align:center">${p.qtde.toLocaleString('pt-BR')}</td>
+        <td style="font-size:.8rem;color:rgba(255,255,255,.45)">${formatDate(p.criado)}</td>
+        <td style="font-size:.8rem;color:${isOverdue(p.prazo)&&p.status!=='entregue'?'var(--danger)':'rgba(255,255,255,.55)'}">${formatDate(p.prazo)}</td>
+        <td style="font-weight:700;color:var(--accent)">R$ ${p.valor.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+        <td><span class="sbadge ${statusBadge[p.status]}">${statusLabel[p.status]}</span></td>
+        <td class="col-actions">
+            <button class="tbl-btn accent" onclick="changeStatus(${p.id})"><i class="fas fa-edit"></i></button>
+            <button class="tbl-btn danger" onclick="deletePedido(${p.id})"><i class="fas fa-trash"></i></button>
+        </td>
+    </tr>`).join('');
+}
+
+function isOverdue(prazo) { return prazo && new Date(prazo+'T00:00') < new Date(); }
+
+function renderProdutos() {
+    const db = getDB();
+    const search = (document.getElementById('searchProduto')?.value||'').toLowerCase();
+    const cat = document.getElementById('filterCategoria')?.value||'';
+    const cats = [...new Set(db.produtos.map(p=>p.cat))];
+    const sel = document.getElementById('filterCategoria');
+    if (sel.options.length <= 1) { cats.forEach(c => { const o = new Option(c,c); sel.add(o); }); }
+
+    const items = db.produtos.filter(p => {
+        if (search && !p.cod.toLowerCase().includes(search) && !p.nome.toLowerCase().includes(search)) return false;
+        if (cat && p.cat !== cat) return false;
+        return true;
+    });
+    const tbody = document.getElementById('tbody-produtos');
+    const emptyEl = document.getElementById('empty-produtos');
+    if (!items.length) { tbody.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    tbody.innerHTML = items.map(p => `<tr>
+        <td><span style="font-family:monospace;font-size:.82rem;color:var(--primary-light)">${p.cod}</span></td>
+        <td style="font-weight:600;color:#fff">${p.nome}</td>
+        <td><span style="font-size:.78rem;background:rgba(255,255,255,.06);padding:2px 7px;border-radius:4px;color:rgba(255,255,255,.6)">${p.cat}</span></td>
+        <td style="text-align:center">${p.unidade}</td>
+        <td style="font-size:.78rem;color:rgba(255,255,255,.4);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.spec||'-'}</td>
+        <td class="col-actions">
+            <button class="tbl-btn danger" onclick="deleteProduto(${p.id})"><i class="fas fa-trash"></i></button>
+        </td>
+    </tr>`).join('');
+}
+
+function renderDefeitos() {
+    const db = getDB();
+    const listEl = document.getElementById('lista-defeitos');
+    const emptyEl = document.getElementById('empty-defeitos');
+    if (!db.defeitos.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    listEl.innerHTML = db.defeitos.map(d => `
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
+            <div style="width:40px;height:40px;border-radius:9px;background:rgba(249,115,22,.1);display:flex;align-items:center;justify-content:center;color:var(--orange);flex-shrink:0"><i class="fas fa-bug"></i></div>
+            <div style="flex:1"><div style="font-weight:700;color:#fff;margin-bottom:3px">${d.nome}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${d.categoria} � ${d.desc}</div></div>
+            <span class="pri ${d.severidade}" style="flex-shrink:0">${d.severidade.charAt(0).toUpperCase()+d.severidade.slice(1)}</span>
+            <button class="mod-btn danger" style="padding:6px 10px;font-size:.78rem" onclick="deleteItem('defeitos',${d.id})"><i class="fas fa-trash"></i></button>
+        </div>
+    `).join('');
+}
+
+function renderSetores() {
+    const db = getDB();
+    const listEl = document.getElementById('lista-setores');
+    const emptyEl = document.getElementById('empty-setores');
+    if (!db.setores.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    listEl.innerHTML = db.setores.map(s => `
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
+            <div style="width:40px;height:40px;border-radius:9px;background:rgba(15,117,189,.1);display:flex;align-items:center;justify-content:center;color:var(--primary-light);flex-shrink:0"><i class="fas fa-building"></i></div>
+            <div style="flex:1">
+                <div style="font-weight:700;color:#fff;margin-bottom:3px">${s.nome}</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.4)">Resp: ${s.responsavel} � ${s.email} � ${s.descricao}</div>
+            </div>
+            <button class="mod-btn danger" style="padding:6px 10px;font-size:.78rem" onclick="deleteItem('setores',${s.id})"><i class="fas fa-trash"></i></button>
+        </div>
+    `).join('');
+}
+
+function renderColabsResumo() {
+    const pDB = JSON.parse(localStorage.getItem('sgq_pessoas')||'{"colaboradores":[]}');
+    const cont = document.getElementById('colabs-resumo');
+    const colabs = pDB.colaboradores.filter(c=>c.ativo);
+    cont.innerHTML = `<div class="mod-table-wrap"><table class="mod-table"><thead><tr><th>Nome</th><th>Função</th><th>Setor</th><th>Admissão</th></tr></thead>
+    <tbody>${colabs.map(c=>`<tr><td style="font-weight:600;color:#fff">${c.nome}</td><td>${c.funcao}</td><td>${c.setor}</td><td>${formatDate(c.admissao)}</td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:rgba(255,255,255,.25)">Nenhum colaborador no módulo Pessoas</td></tr>'}</tbody>
+    </table></div>`;
+}
+
+function renderCatForn() {
+    const db = getDB();
+    const listEl = document.getElementById('lista-cat-forn');
+    const emptyEl = document.getElementById('empty-cat-forn');
+    if (!db.catFornecedor.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    listEl.innerHTML = db.catFornecedor.map(c => `
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
+            <div style="flex:1"><div style="font-weight:700;color:#fff;margin-bottom:3px">${c.nome} ${c.critico?'<span style="font-size:.72rem;background:rgba(239,68,68,.12);color:#f87171;padding:2px 7px;border-radius:4px;margin-left:6px">Crítico</span>':''}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${c.desc}</div></div>
+            <button class="mod-btn danger" style="padding:6px 10px;font-size:.78rem" onclick="deleteItem('catFornecedor',${c.id})"><i class="fas fa-trash"></i></button>
+        </div>
+    `).join('');
+}
+
+function renderTiposDoc() {
+    const db = getDB();
+    const listEl = document.getElementById('lista-tipos-doc');
+    const emptyEl = document.getElementById('empty-tipos-doc');
+    if (!db.tiposDoc.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    listEl.innerHTML = db.tiposDoc.map(t => `
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
+            <div style="width:44px;height:44px;border-radius:9px;background:rgba(15,117,189,.1);display:flex;align-items:center;justify-content:center;color:var(--primary-light);font-size:.75rem;font-weight:800;flex-shrink:0">${t.sigla}</div>
+            <div style="flex:1"><div style="font-weight:700;color:#fff;margin-bottom:3px">${t.nome}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${t.descricao}</div></div>
+            <button class="mod-btn danger" style="padding:6px 10px;font-size:.78rem" onclick="deleteItem('tiposDoc',${t.id})"><i class="fas fa-trash"></i></button>
+        </div>
+    `).join('');
+}
+
+// Generic modal opener
+function openModalFor(type) {
+    if (type === 'pedido') { populateProdutosSelect(); gerarNumeroPedido(); openModal('modalPedido'); return; }
+    if (type === 'produto') { openModal('modalProduto'); return; }
+
+    const configs = {
+        'defeito': {
+            title: '<i class="fas fa-bug" style="color:var(--orange)"></i> Novo Tipo de Defeito',
+            body: `<div class="mod-form-group" style="margin-bottom:14px"><label>Nome do Defeito <span>*</span></label><input class="mod-input" id="gen-nome" placeholder="Ex: Dimensional fora de tolerância"></div>
+                   <div class="mod-form-row"><div class="mod-form-group"><label>Categoria</label><input class="mod-input" id="gen-cat" placeholder="Ex: Dimensional, Superfície..."></div>
+                   <div class="mod-form-group"><label>Severidade</label><select class="mod-select-inp" id="gen-sev"><option value="baixa">Baixa</option><option value="media">Média</option><option value="alta">Alta</option><option value="critica">Crítica</option></select></div></div>
+                   <div class="mod-form-group"><label>Descrição</label><textarea class="mod-textarea" id="gen-desc" rows="2"></textarea></div>`,
+            save: () => {
+                const nome = document.getElementById('gen-nome').value.trim();
+                if (!nome) return alert('Informe o nome.');
+                const db = getDB(); const newId = db.defeitos.length ? Math.max(...db.defeitos.map(d=>d.id))+1 : 1;
+                db.defeitos.push({ id:newId, nome, categoria:document.getElementById('gen-cat').value, severidade:document.getElementById('gen-sev').value, desc:document.getElementById('gen-desc').value });
+                saveDB(db); closeModal('modalUniversal'); renderDefeitos(); showToast('Tipo de defeito adicionado!','success');
+            }
+        },
+        'setor': {
+            title: '<i class="fas fa-building" style="color:var(--primary)"></i> Novo Setor',
+            body: `<div class="mod-form-group" style="margin-bottom:14px"><label>Nome do Setor <span>*</span></label><input class="mod-input" id="gen-nome" placeholder="Ex: Qualidade"></div>
+                   <div class="mod-form-group" style="margin-bottom:14px"><label>Responsável</label><input class="mod-input" id="gen-resp" placeholder="Nome do responsável"></div>
+                   <div class="mod-form-group" style="margin-bottom:14px"><label>E-mail</label><input class="mod-input" type="email" id="gen-email" placeholder="setor@empresa.com"></div>
+                   <div class="mod-form-group"><label>Descrição</label><textarea class="mod-textarea" id="gen-desc" rows="2"></textarea></div>`,
+            save: () => {
+                const nome = document.getElementById('gen-nome').value.trim();
+                if (!nome) return alert('Informe o nome.');
+                const db = getDB(); const newId = db.setores.length ? Math.max(...db.setores.map(s=>s.id))+1 : 1;
+                db.setores.push({ id:newId, nome, responsavel:document.getElementById('gen-resp').value, email:document.getElementById('gen-email').value, descricao:document.getElementById('gen-desc').value });
+                saveDB(db); closeModal('modalUniversal'); renderSetores(); showToast('Setor adicionado!','success');
+            }
+        },
+        'cat-fornecedor': {
+            title: '<i class="fas fa-truck" style="color:var(--warning)"></i> Nova Categoria de Fornecedor',
+            body: `<div class="mod-form-group" style="margin-bottom:14px"><label>Nome da Categoria <span>*</span></label><input class="mod-input" id="gen-nome" placeholder="Ex: Matéria-Prima"></div>
+                   <div class="mod-form-group" style="margin-bottom:14px"><label>Descrição</label><textarea class="mod-textarea" id="gen-desc" rows="2"></textarea></div>
+                   <div class="mod-toggle-row"><label class="mod-toggle"><input type="checkbox" id="gen-critico"><span class="mod-toggle-slider"></span></label><span class="mod-toggle-label">Fornecedor Crítico</span></div>`,
+            save: () => {
+                const nome = document.getElementById('gen-nome').value.trim();
+                if (!nome) return alert('Informe o nome.');
+                const db = getDB(); const newId = db.catFornecedor.length ? Math.max(...db.catFornecedor.map(c=>c.id))+1 : 1;
+                db.catFornecedor.push({ id:newId, nome, desc:document.getElementById('gen-desc').value, critico:document.getElementById('gen-critico').checked });
+                saveDB(db); closeModal('modalUniversal'); renderCatForn(); showToast('Categoria adicionada!','success');
+            }
+        },
+        'tipo-doc': {
+            title: '<i class="fas fa-file-alt" style="color:var(--primary)"></i> Novo Tipo de Documento',
+            body: `<div class="mod-form-row"><div class="mod-form-group"><label>Nome <span>*</span></label><input class="mod-input" id="gen-nome" placeholder="Ex: Procedimento..."></div>
+                   <div class="mod-form-group"><label>Sigla</label><input class="mod-input" id="gen-sigla" placeholder="Ex: POP" style="max-width:80px"></div></div>
+                   <div class="mod-form-group"><label>Descrição</label><textarea class="mod-textarea" id="gen-desc" rows="2"></textarea></div>`,
+            save: () => {
+                const nome = document.getElementById('gen-nome').value.trim();
+                if (!nome) return alert('Informe o nome.');
+                const db = getDB(); const newId = db.tiposDoc.length ? Math.max(...db.tiposDoc.map(t=>t.id))+1 : 1;
+                db.tiposDoc.push({ id:newId, nome, sigla:document.getElementById('gen-sigla').value, descricao:document.getElementById('gen-desc').value });
+                saveDB(db); closeModal('modalUniversal'); renderTiposDoc(); showToast('Tipo de documento adicionado!','success');
+            }
+        }
+    };
+    const cfg = configs[type];
+    if (!cfg) return;
+    document.getElementById('modal-title').innerHTML = cfg.title;
+    document.getElementById('modal-body').innerHTML = cfg.body;
+    document.getElementById('modal-save-btn').onclick = cfg.save;
+    openModal('modalUniversal');
+}
+
+function populateProdutosSelect() {
+    const db = getDB();
+    const sel = document.getElementById('ped-produto');
+    sel.innerHTML = '<option value="">Selecione...</option>' + db.produtos.map(p=>`<option>${p.nome}</option>`).join('');
+}
+
+function gerarNumeroPedido() {
+    const db = getDB();
+    const n = db.pedidos.length + 1;
+    const num = 'PED-' + new Date().getFullYear() + '-' + String(n+150).padStart(4,'0');
+    document.getElementById('ped-num').value = num;
+    const hoje = new Date(); hoje.setDate(hoje.getDate()+30);
+    document.getElementById('ped-prazo').value = hoje.toISOString().slice(0,10);
+}
+
+function salvarPedido() {
+    const num = document.getElementById('ped-num').value;
+    const cliente = document.getElementById('ped-cliente').value.trim();
+    const produto = document.getElementById('ped-produto').value;
+    const qtde = parseInt(document.getElementById('ped-qtde').value);
+    if (!cliente || !produto || !qtde) return alert('Preencha cliente, produto e quantidade.');
+    const db = getDB();
+    const newId = db.pedidos.length ? Math.max(...db.pedidos.map(p=>p.id))+1 : 1;
+    db.pedidos.push({ id:newId, num, cliente, produto, qtde, prazo:document.getElementById('ped-prazo').value, valor:parseFloat(document.getElementById('ped-valor').value)||0, status:document.getElementById('ped-status').value, oc:document.getElementById('ped-oc').value, obs:document.getElementById('ped-obs').value, criado:new Date().toISOString().slice(0,10) });
+    saveDB(db);
+    closeModal('modalPedido');
+    renderPedidos();
+    updateStats();
+    showToast('Pedido criado!','success');
+}
+
+function salvarProduto() {
+    const cod = document.getElementById('prod-cod').value.trim();
+    const nome = document.getElementById('prod-nome').value.trim();
+    const cat = document.getElementById('prod-cat').value.trim();
+    if (!cod || !nome || !cat) return alert('Preencha c?digo, nome e categoria.');
+    const db = getDB();
+    const newId = db.produtos.length ? Math.max(...db.produtos.map(p=>p.id))+1 : 1;
+    db.produtos.push({ id:newId, cod, nome, cat, unidade:document.getElementById('prod-unidade').value, spec:document.getElementById('prod-spec').value, peso:parseFloat(document.getElementById('prod-peso').value)||0, familia:document.getElementById('prod-familia').value });
+    saveDB(db);
+    closeModal('modalProduto');
+    renderProdutos();
+    updateStats();
+    showToast('Produto cadastrado!','success');
+}
+
+function changeStatus(id) {
+    const db = getDB();
+    const ped = db.pedidos.find(p=>p.id===id);
+    if (!ped) return;
+    const statuses = ['aberto','producao','concluido','entregue'];
+    const labels = ['Aberto','Em Produção','Concluído','Entregue'];
+    const cur = statuses.indexOf(ped.status);
+    const choice = prompt(`Status atual: ${labels[cur]}\n\nNovo status (1-4):\n1 - Aberto\n2 - Em Produção\n3 - Concluído\n4 - Entregue`);
+    const n = parseInt(choice);
+    if (n >= 1 && n <= 4) { ped.status = statuses[n-1]; saveDB(db); renderPedidos(); showToast('Status atualizado!','success'); }
+}
+
+function deletePedido(id) {
+    if (!confirm('Excluir este pedido?')) return;
+    const db = getDB(); db.pedidos = db.pedidos.filter(p=>p.id!==id); saveDB(db); renderPedidos(); updateStats();
+}
+
+function deleteProduto(id) {
+    if (!confirm('Excluir este produto?')) return;
+    const db = getDB(); db.produtos = db.produtos.filter(p=>p.id!==id); saveDB(db); renderProdutos(); updateStats();
+}
+
+function deleteItem(arr, id) {
+    if (!confirm('Excluir este item?')) return;
+    const db = getDB(); db[arr] = db[arr].filter(x=>x.id!==id); saveDB(db);
+    if (arr==='defeitos') renderDefeitos();
+    if (arr==='setores') renderSetores();
+    if (arr==='catFornecedor') renderCatForn();
+    if (arr==='tiposDoc') renderTiposDoc();
+    showToast('Item removido.','success');
+}
+
+// CSV Import for Produtos
+function importCSVProdutos(input) {
+    if (!input.files.length) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const lines = e.target.result.split('\n').map(l=>l.trim()).filter(Boolean);
+        if (!lines.length) return;
+        const headers = lines[0].split(';').map(h=>h.trim().toLowerCase());
+        const rows = lines.slice(1).map(l => {
+            const cols = l.split(';');
+            return { cod: cols[headers.indexOf('codigo')]||cols[0]||'', nome: cols[headers.indexOf('nome')]||cols[1]||'', cat: cols[headers.indexOf('categoria')]||cols[2]||'Importado', unidade: cols[headers.indexOf('unidade')]||'pç', spec: cols[headers.indexOf('especificacao')]||'' };
+        }).filter(r=>r.cod&&r.nome);
+
+        csvData = rows;
+        document.getElementById('csv-preview-msg').innerHTML = `<strong>${rows.length} produto(s)</strong> identificados no arquivo. Revise abaixo e confirme a importação.`;
+        const previewHtml = `<table class="mod-table"><thead><tr><th>Código</th><th>Nome</th><th>Categoria</th><th>Unidade</th></tr></thead>
+            <tbody>${rows.slice(0,20).map(r=>`<tr><td style="font-family:monospace;font-size:.8rem">${r.cod}</td><td>${r.nome}</td><td>${r.cat}</td><td>${r.unidade}</td></tr>`).join('')}${rows.length>20?`<tr><td colspan="4" style="text-align:center;color:rgba(255,255,255,.35)">... mais ${rows.length-20} item(s)</td></tr>`:''}</tbody></table>`;
+        document.getElementById('csv-preview-wrap').innerHTML = previewHtml;
+        document.getElementById('csv-preview').style.display = 'block';
+    };
+    reader.readAsText(file, 'UTF-8');
+    input.value = '';
+}
+
+function confirmCSV() {
+    if (!csvData) return;
+    const db = getDB();
+    let nextId = db.produtos.length ? Math.max(...db.produtos.map(p=>p.id)) : 0;
+    csvData.forEach(r => { nextId++; db.produtos.push({ id:nextId, cod:r.cod, nome:r.nome, cat:r.cat, unidade:r.unidade, spec:r.spec, peso:0, familia:'' }); });
+    saveDB(db); csvData=null;
+    document.getElementById('csv-preview').style.display='none';
+    renderProdutos(); updateStats();
+    showToast('Importação conclu?da!','success');
+}
+
+function cancelCSV() { csvData=null; document.getElementById('csv-preview').style.display='none'; }
+
+function handleGlobalSearch() {
+    const v = document.querySelector('.mod-view:not([style*="display: none"])');
+    if (!v) return;
+    const id = v.id.replace('view-','');
+    if (id==='pedidos') { document.getElementById('searchPedido').value = document.getElementById('global-search').value; renderPedidos(); }
+    if (id==='produtos') { document.getElementById('searchProduto').value = document.getElementById('global-search').value; renderProdutos(); }
+}
+
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function formatDate(str) { if(!str) return '-'; const d=new Date(str+(str.length===10?'T00:00':'')); return d.toLocaleDateString('pt-BR'); }
+function showToast(msg, type) {
+    const t=document.createElement('div'); t.style.cssText=`position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;z-index:9999;background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent=msg; document.body.appendChild(t); setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},3000);
+}
+document.querySelectorAll('.mod-modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active');}));
+seedData();
+updateStats();
+renderPedidos();
+</script>
+<script>
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');});
+</script><script>
+function startModuleTour() {
+    alert('Tour deste módulo em breve! ');
+}
+</script></body>
+</html>
+

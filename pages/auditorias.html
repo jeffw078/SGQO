@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditorias Internas - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-clipboard-list" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Auditorias Internas</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Auditorias</div>
+                <a href="#" class="nav-item active" id="nav-cronograma" onclick="switchView('cronograma');return false"><i class="fas fa-calendar-alt"></i> Cronograma</a>
+                <a href="#" class="nav-item" id="nav-checklists" onclick="switchView('checklists');return false"><i class="fas fa-list-check"></i> Checklists</a>
+                <a href="#" class="nav-item" id="nav-resultados" onclick="switchView('resultados');return false"><i class="fas fa-chart-bar"></i> Resultados</a>
+                <a href="#" class="nav-item" id="nav-planos" onclick="switchView('planos');return false"><i class="fas fa-tasks"></i> Planos de Ação</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Configurações</div>
+                <a href="#" class="nav-item" id="nav-config" onclick="switchView('config');return false"><i class="fas fa-gear"></i> Configurações</a>
+            </div>
+        </nav>
+        </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar auditoria, cláusula..."></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JD</div>
+                        <span class="user-btn-name">Jo\u00e3o Demo</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JD</div>
+                            <div><div class="user-name">Jo\u00e3o Demo</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <!-- VIEW: CRONOGRAMA -->
+            <div id="view-cronograma" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-magnifying-glass-chart" style="color:var(--danger);margin-right:10px"></i>Auditorias Internas</h2>
+                        <p>Planejamento, execução e acompanhamento - requisito 9.2</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn primary" onclick="openNovaAuditoriaModal()"><i class="fas fa-plus"></i> Planejar Auditoria</button>
+                    </div>
+                </div>
+
+                <div class="mod-stats">
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(139,92,246,.1);color:var(--purple)"><i class="fas fa-calendar-check"></i></div></div><div class="stat-value" id="stat-agendadas">0</div><div class="stat-label">Agendadas</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-spinner"></i></div></div><div class="stat-value" id="stat-andamento-aud">0</div><div class="stat-label">Em Andamento</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-check-double"></i></div></div><div class="stat-value" id="stat-concluidas-aud">0</div><div class="stat-label">Concluídas (ano)</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fas fa-exclamation-circle"></i></div></div><div class="stat-value" id="stat-ncs-aud">0</div><div class="stat-label">NCs Identificadas</div></div>
+                </div>
+
+                <div id="cronograma-list"></div>
+                <div class="mod-empty" id="empty-cronograma" style="display:none"><i class="fas fa-calendar-alt"></i><h3>Nenhuma auditoria planejada</h3><p>Planeje a primeira auditoria interna clicando no botão acima</p></div>
+            </div>
+
+            <!-- VIEW: CHECKLISTS -->
+            <div id="view-checklists" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Checklists de Auditoria</h2><p>Crie e gerencie checklists por cláusula ISO 9001</p></div>
+                    <button class="mod-btn primary" onclick="openNovoChecklistModal()"><i class="fas fa-plus"></i> Novo Checklist</button>
+                </div>
+                <div id="lista-checklists"></div>
+                <div class="mod-empty" id="empty-checklists" style="display:none"><i class="fas fa-list-check"></i><h3>Nenhum checklist cadastrado</h3></div>
+            </div>
+
+            <!-- VIEW: RESULTADOS -->
+            <div id="view-resultados" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Resultados de Auditorias</h2><p>Histórico de resultados, conformidades e NCs</p></div></div>
+                <div class="mod-table-wrap">
+                    <table class="mod-table">
+                        <thead><tr><th>#</th><th>Auditoria</th><th>Data</th><th>Auditor</th><th>Escopo</th><th>Conformidades</th><th>NCs</th><th>Resultado</th><th></th></tr></thead>
+                        <tbody id="tbody-resultados"></tbody>
+                    </table>
+                </div>
+                <div class="mod-empty" id="empty-resultados" style="display:none"><i class="fas fa-chart-bar"></i><h3>Nenhum resultado disponável</h3></div>
+            </div>
+
+            <!-- VIEW: PLANOS -->
+            <div id="view-planos" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Planos de Ação de Auditoria</h2><p>Ações resultantes de NCs identificadas em auditorias</p></div></div>
+                <div id="lista-planos-aud"></div>
+                <div class="mod-empty" id="empty-planos-aud" style="display:none"><i class="fas fa-check-circle" style="color:var(--accent)"></i><h3>Nenhum plano de ação pendente</h3></div>
+            </div>
+
+            <!-- VIEW: CONFIGURAÇÕES -->
+            <div id="view-config" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2><i class="fas fa-gear" style="color:var(--primary);margin-right:8px"></i>Configurações de Auditorias</h2><p>Programa anual, responsabilidades e parâmetros do módulo</p></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px">
+
+                    <!-- Responsáveis -->
+                    <div class="mod-card" style="grid-column:1/-1">
+                        <div class="mod-card-header"><h4><i class="fas fa-user-shield" style="color:var(--primary);margin-right:8px"></i>Responsáveis pelas Auditorias</h4></div>
+                        <div class="mod-card-body">
+                            <div class="mod-form-group">
+                                <label class="mod-label">Auditor Líder padrão</label>
+                                <input class="mod-input" id="cfg-auditor-lider" value="Ana Paula Oliveira" placeholder="Nome do auditor líder">
+                            </div>
+                            <div class="mod-form-group">
+                                <label class="mod-label">Setor responsável</label>
+                                <input class="mod-input" id="cfg-setor-auditoria" value="Qualidade" placeholder="Setor responsável">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Programa Anual -->
+                    <div class="mod-card">
+                        <div class="mod-card-header"><h4><i class="fas fa-calendar-check" style="color:var(--accent);margin-right:8px"></i>Programa Anual de Auditoria</h4></div>
+                        <div class="mod-card-body">
+                            <div class="mod-form-group">
+                                <label class="mod-label">Frequência mínima de auditorias</label>
+                                <select class="mod-select" id="cfg-freq-auditoria">
+                                    <option value="mensal">Mensal</option>
+                                    <option value="bimestral">Bimestral</option>
+                                    <option value="trimestral" selected>Trimestral</option>
+                                    <option value="semestral">Semestral</option>
+                                    <option value="anual">Anual</option>
+                                </select>
+                            </div>
+                            <div class="mod-form-group">
+                                <label class="mod-label">Cláusulas obrigatérias por ciclo</label>
+                                <input class="mod-input" id="cfg-clausulas-obrig" value="4.1, 4.2, 5.1, 6.1, 9.1, 9.2, 10.2" placeholder="Ex: 4.1, 9.1, 10.2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notificações -->
+                    <div class="mod-card">
+                        <div class="mod-card-header"><h4><i class="fas fa-bell" style="color:var(--warning);margin-right:8px"></i>Notificações</h4></div>
+                        <div class="mod-card-body">
+                            <div class="mod-form-group">
+                                <label class="mod-label">Avisar antecipadamente (dias)</label>
+                                <input class="mod-input" type="number" id="cfg-aviso-dias" value="7" min="1" max="30">
+                            </div>
+                            <div class="mod-form-group" style="display:flex;align-items:center;gap:10px;margin-top:8px">
+                                <input type="checkbox" id="cfg-notif-email" checked style="width:16px;height:16px;cursor:pointer">
+                                <label for="cfg-notif-email" style="font-size:.85rem;color:rgba(255,255,255,.7);cursor:pointer">Notificar por e-mail</label>
+                            </div>
+                            <div class="mod-form-group" style="display:flex;align-items:center;gap:10px">
+                                <input type="checkbox" id="cfg-notif-sistema" checked style="width:16px;height:16px;cursor:pointer">
+                                <label for="cfg-notif-sistema" style="font-size:.85rem;color:rgba(255,255,255,.7);cursor:pointer">Notificar no sistema</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Padrés de NC em Auditoria -->
+                    <div class="mod-card" style="grid-column:1/-1">
+                        <div class="mod-card-header" style="display:flex;justify-content:space-between;align-items:center">
+                            <h4><i class="fas fa-triangle-exclamation" style="color:var(--danger);margin-right:8px"></i>Tipos de Não Conformidade</h4>
+                            <button class="mod-btn primary" onclick="addTipoNC()"><i class="fas fa-plus"></i> Adicionar</button>
+                        </div>
+                        <div class="mod-card-body">
+                            <div id="lista-tipos-nc">
+                                <div class="mod-table-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="font-size:.85rem;color:rgba(255,255,255,.8)">Não Conformidade</span><button class="mod-btn" style="font-size:.72rem;padding:3px 8px"><i class="fas fa-trash"></i></button></div>
+                                <div class="mod-table-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="font-size:.85rem;color:rgba(255,255,255,.8)">Observação</span><button class="mod-btn" style="font-size:.72rem;padding:3px 8px"><i class="fas fa-trash"></i></button></div>
+                                <div class="mod-table-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0"><span style="font-size:.85rem;color:rgba(255,255,255,.8)">Oportunidade de Melhoria</span><button class="mod-btn" style="font-size:.72rem;padding:3px 8px"><i class="fas fa-trash"></i></button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botão salvar -->
+                    <div style="grid-column:1/-1;text-align:right">
+                        <button class="mod-btn primary" onclick="saveConfigAuditorias()"><i class="fas fa-save"></i> Salvar Configurações</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVA AUDITORIA -->
+<div class="mod-modal-overlay" id="modalNovaAuditoria">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-plus-circle" style="color:var(--danger)"></i> Planejar Auditoria Interna</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNovaAuditoria')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Título da Auditoria <span>*</span></label><input class="mod-input" id="na-titulo" placeholder="Ex: Auditoria Interna ISO 9001 - Q2 2026"></div>
+                <div class="mod-form-group"><label>Auditor Líder <span>*</span></label>
+                    <select class="mod-select-inp" id="na-auditor"><option>João Teste</option><option>Ana Carvalho</option><option>Auditor Externo</option></select>
+                </div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Data Prevista <span>*</span></label><input class="mod-input" type="date" id="na-data"></div>
+                <div class="mod-form-group"><label>Duração Estimada</label><select class="mod-select-inp" id="na-duracao"><option>Meio dia (4h)</option><option>Um dia (8h)</option><option>Dois dias</option><option>Três dias ou mais</option></select></div>
+            </div>
+            <div class="mod-form-row full">
+                <div class="mod-form-group"><label>Escopo / Setores Auditados <span>*</span></label>
+                    <input class="mod-input" id="na-escopo" placeholder="Ex: Qualidade, Produção, Compras">
+                </div>
+            </div>
+            <div class="mod-form-section-title" style="margin-top:16px">Cláusulas ISO 9001 a Auditar</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px" id="clausulas-grid">
+                ${['4.1 Contexto','4.2 Partes Interessadas','4.3 Escopo','4.4 SGQ/Processos','5.1 Liderança','5.2 Polática','5.3 Funções','6.1 Riscos','6.2 Objetivos','7.1 Recursos','7.2 Competência','7.3 Conscientização','7.4 Comunicação','7.5 Documentos','8.1 Planejamento','8.4 Fornecedores','8.5 Produção','8.6 Liberação','8.7 Saídas NC','9.1 Monitoramento','9.2 Auditoria','9.3 Análise Crática','10.2 NC/AC','10.3 Melhoria'].map(c=>`
+                    <label style="display:flex;align-items:center;gap:8px;padding:8px;background:rgba(255,255,255,.04);border-radius:6px;cursor:pointer;font-size:.82rem;color:rgba(255,255,255,.65)">
+                        <input type="checkbox" class="clausula-check" value="${c}" style="accent-color:var(--primary)"> ${c}
+                    </label>
+                `).join('')}
+            </div>
+            <div class="mod-form-row full" style="margin-top:16px">
+                <div class="mod-form-group"><label>Objetivos da Auditoria</label><textarea class="mod-textarea" id="na-objetivos" rows="2" placeholder="Descreva os objetivos desta auditoria..."></textarea></div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovaAuditoria')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarAuditoria()"><i class="fas fa-save"></i> Planejar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: CONDUZIR AUDITORIA -->
+<div class="mod-modal-overlay" id="modalConduzir">
+    <div class="mod-modal xl">
+        <div class="mod-modal-header">
+            <h3 id="cond-title"><i class="fas fa-clipboard-list" style="color:var(--primary)"></i> Conduzindo Auditoria</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalConduzir')">&times;</button>
+        </div>
+        <div class="mod-modal-body" id="cond-body"></div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalConduzir')">Salvar Rascunho</button>
+            <button class="mod-btn primary" id="btn-finalizar-aud" onclick="finalizarAuditoria()"><i class="fas fa-check"></i> Finalizar Auditoria</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVO CHECKLIST -->
+<div class="mod-modal-overlay" id="modalNovoChecklist">
+    <div class="mod-modal md">
+        <div class="mod-modal-header"><h3><i class="fas fa-list-check" style="color:var(--primary)"></i> Novo Checklist</h3><button class="mod-modal-close" onclick="closeModal('modalNovoChecklist')">&times;</button></div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row"><div class="mod-form-group"><label>Nome do Checklist <span>*</span></label><input class="mod-input" id="nck-nome" placeholder="Ex: Checklist ISO 9001 - Requisito 7.5"></div>
+                <div class="mod-form-group"><label>Cláusula ISO</label><input class="mod-input" id="nck-clausula" placeholder="Ex: 7.5"></div>
+            </div>
+            <div class="mod-form-section-title">Perguntas / Critários</div>
+            <div id="perguntas-list" style="display:flex;flex-direction:column;gap:8px"></div>
+            <button class="mod-btn ghost" style="margin-top:8px;font-size:.82rem" onclick="addPergunta()"><i class="fas fa-plus"></i> Adicionar Pergunta</button>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovoChecklist')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarChecklist()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const DB_KEY = 'sgq_auditorias';
+let currentAudId = null;
+
+function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"auditorias":[],"checklists":[]}'); }
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+function seedData() {
+    const db = getDB();
+    if (db.auditorias.length) return;
+    const addDays = (n) => { const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+    db.auditorias = [
+        { id:1, titulo:'Auditoria Interna ISO 9001 - Q2 2026', auditor:'João Teste', data:addDays(14), escopo:'Qualidade, Produção', clausulas:['7.5 Documentos','8.5 Produção','8.6 Liberação','10.2 NC/AC'], objetivos:'Verificar conformidade com requisitos ISO 9001', status:'agendada', ncs:0, conformidades:0 },
+        { id:2, titulo:'Auditoria de Processo - Linha de Solda', auditor:'Ana Carvalho', data:addDays(2), escopo:'Produção', clausulas:['4.4 SGQ/Processos','8.1 Planejamento','8.5 Produção'], objetivos:'Auditar processo de solda para ISO 9001', status:'andamento', ncs:2, conformidades:8 },
+        { id:3, titulo:'Auditoria Interna - Controle de Documentos', auditor:'João Teste', data:addDays(-60), escopo:'Qualidade', clausulas:['7.5 Documentos','4.2 Partes Interessadas'], objetivos:'Verificar conformidade do GED', status:'concluida', ncs:1, conformidades:12 },
+    ];
+    db.checklists = [
+        { id:1, nome:'Checklist ISO 9001 - Controle de Documentos', clausula:'7.5', perguntas:['Os documentos possuem identificação única?','Existe processo de aprovação antes da emissão?','Documentos obsoletos são retirados de circulação?','O controle de vers?es está implementado?','Existe lista mestra de documentos?'] },
+        { id:2, nome:'Checklist ISO 9001 - Não Conformidades', clausula:'10.2', perguntas:['As NCs são registradas tempestivamente?','Existe análise de causa raiz?','Ações corretivas são verificadas quanto � eficácia?'] },
+    ];
+    saveDB(db);
+}
+
+function switchView(v) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display='none');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-'+v).style.display='block';
+    const nav = document.getElementById('nav-'+v);
+    if (nav) nav.classList.add('active');
+    if (v==='cronograma') renderCronograma();
+    if (v==='checklists') renderChecklists();
+    if (v==='resultados') renderResultados();
+    if (v==='planos') renderPlanosAud();
+}
+
+function renderCronograma() {
+    const db = getDB();
+    const agendadas = db.auditorias.filter(a=>a.status==='agendada').length;
+    const andamento = db.auditorias.filter(a=>a.status==='andamento').length;
+    const concluidas = db.auditorias.filter(a=>a.status==='concluida').length;
+    const ncs = db.auditorias.reduce((s,a)=>s+(a.ncs||0),0);
+    document.getElementById('stat-agendadas').textContent = agendadas;
+    document.getElementById('stat-andamento-aud').textContent = andamento;
+    document.getElementById('stat-concluidas-aud').textContent = concluidas;
+    document.getElementById('stat-ncs-aud').textContent = ncs;
+
+    const listEl = document.getElementById('cronograma-list');
+    const emptyEl = document.getElementById('empty-cronograma');
+    if (!db.auditorias.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+
+    const today = new Date();
+    const months = {};
+    [...db.auditorias].sort((a,b)=>new Date(a.data)-new Date(b.data)).forEach(a => {
+        const d = new Date(a.data+'T00:00');
+        const key = d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+        if (!months[key]) months[key] = [];
+        months[key].push(a);
+    });
+
+    listEl.innerHTML = Object.entries(months).map(([month, items]) => `
+        <div class="audit-month-group">
+            <div class="audit-month-label">${month.charAt(0).toUpperCase()+month.slice(1)}</div>
+            ${items.map(a => {
+                const d = new Date(a.data+'T00:00');
+                const statusColors = {agendada:'rgba(139,92,246,.3)',andamento:'rgba(245,158,11,.3)',concluida:'rgba(16,185,129,.3)'};
+                return `<div class="audit-item" style="border-color:${statusColors[a.status]}" onclick="openConduzirModal(${a.id})">
+                    <div class="audit-date-box">
+                        <div class="day">${d.getDate()}</div>
+                        <div class="mon">${d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')}</div>
+                    </div>
+                    <div class="audit-info">
+                        <h4>${a.titulo}</h4>
+                        <p>${a.objetivos}</p>
+                        <div class="audit-meta">
+                            <span class="meta-tag"><i class="fas fa-user"></i>${a.auditor}</span>
+                            <span class="meta-tag"><i class="fas fa-building"></i>${a.escopo}</span>
+                            <span class="meta-tag"><i class="fas fa-list"></i>${a.clausulas.length} cl?usulas</span>
+                            ${a.ncs ? `<span class="meta-tag" style="color:#f87171"><i class="fas fa-exclamation-circle"></i>${a.ncs} NCs</span>` : ''}
+                        </div>
+                    </div>
+                    <span class="sbadge ${a.status==='agendada'?'agendada':a.status==='andamento'?'andamento':'concluida'}">${{agendada:'Agendada',andamento:'Em Andamento',concluida:'Concluída'}[a.status]}</span>
+                </div>`;
+            }).join('')}
+        </div>
+    `).join('');
+}
+
+function openConduzirModal(id) {
+    const db = getDB();
+    const aud = db.auditorias.find(a=>a.id===id);
+    if (!aud) return;
+    currentAudId = id;
+    document.getElementById('cond-title').innerHTML = `<i class="fas fa-clipboard-list" style="color:var(--primary)"></i> ${aud.titulo}`;
+    document.getElementById('btn-finalizar-aud').style.display = aud.status === 'concluida' ? 'none' : 'inline-flex';
+
+    const checklistsHtml = aud.clausulas.map(c => {
+        const cl = db.checklists.find(x => x.clausula === c.split(' ')[0]);
+        const pergs = cl ? cl.perguntas : ['Verificar conformidade geral com este requisito','Evid?ncias documentadas adequadas?','Responsáveis definidos?'];
+        return `<div class="detail-panel"><div class="detail-panel-header" onclick="togglePanel(this)"><h4><i class="fas fa-check-circle" style="color:var(--primary)"></i>${c}</h4><i class="fas fa-chevron-down toggle-icon"></i></div>
+            <div class="detail-panel-body">
+                ${pergs.map((p,i) => `
+                    <div class="chk-item" id="chk-${id}-${c.replace(/\s/g,'')}-${i}">
+                        <input type="checkbox" onchange="updatePerguntaStatus(this)">
+                        <span class="chk-label">${p}</span>
+                        <select style="margin-left:auto;padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#fff;font-size:.78rem" onchange="this.parentElement.classList.toggle('reprovado',this.value==='nc')">
+                            <option value="conf">Conforme</option>
+                            <option value="nc">Não Conforme</option>
+                            <option value="obs">Observação</option>
+                            <option value="na">N/A</option>
+                        </select>
+                    </div>
+                `).join('')}
+                <div style="margin-top:10px"><textarea class="mod-textarea" rows="2" placeholder="Evid?ncias e observações para esta cl?usula..."></textarea></div>
+            </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('cond-body').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">AUDITOR</div><div style="font-weight:600;color:#fff">${aud.auditor}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">DATA</div><div style="font-weight:600;color:#fff">${formatDate(aud.data)}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">ESCOPO</div><div style="font-weight:600;color:#fff">${aud.escopo}</div></div>
+        </div>
+        <div class="mod-form-section-title">Checklist de Auditoria</div>
+        ${checklistsHtml}
+        <hr class="mod-divider">
+        <div class="mod-form-row">
+            <div class="mod-form-group"><label>Total de Conformidades</label><input class="mod-input" type="number" id="cond-conf" value="${aud.conformidades||0}"></div>
+            <div class="mod-form-group"><label>Total de Não Conformidades</label><input class="mod-input" type="number" id="cond-ncs" value="${aud.ncs||0}"></div>
+        </div>
+        <div class="mod-form-group" style="margin-top:10px"><label>Conclusão da Auditoria</label><textarea class="mod-textarea" id="cond-conclusao" rows="3" placeholder="Descreva as conclusões, pontos fortes e oportunidades de melhoria identificadas..."></textarea></div>
+    `;
+    openModal('modalConduzir');
+}
+
+function togglePanel(header) {
+    header.classList.toggle('open');
+    const body = header.nextElementSibling;
+    body.classList.toggle('open');
+}
+
+function finalizarAuditoria() {
+    const db = getDB();
+    const aud = db.auditorias.find(a=>a.id===currentAudId);
+    if (!aud) return;
+    aud.status = 'concluida';
+    aud.conformidades = parseInt(document.getElementById('cond-conf').value)||0;
+    aud.ncs = parseInt(document.getElementById('cond-ncs').value)||0;
+    aud.conclusao = document.getElementById('cond-conclusao').value;
+    saveDB(db);
+    closeModal('modalConduzir');
+    renderCronograma();
+    showToast('Auditoria finalizada!', 'success');
+}
+
+function renderChecklists() {
+    const db = getDB();
+    const cont = document.getElementById('lista-checklists');
+    const emptyEl = document.getElementById('empty-checklists');
+    if (!db.checklists.length) { cont.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    cont.innerHTML = db.checklists.map(cl => `
+        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px 20px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <span style="font-size:.75rem;font-weight:700;background:rgba(239,68,68,.15);color:var(--danger);padding:2px 8px;border-radius:4px">ISO ${cl.clausula}</span>
+                <span style="font-weight:700;color:#fff">${cl.nome}</span>
+                <span style="margin-left:auto;font-size:.78rem;color:rgba(255,255,255,.35)">${cl.perguntas.length} perguntas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">${cl.perguntas.map((p,i)=>`<div style="font-size:.8rem;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:6px"><span style="width:18px;height:18px;border-radius:50%;background:rgba(15,117,189,.2);color:var(--primary-light);display:inline-flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0">${i+1}</span>${p}</div>`).join('')}</div>
+        </div>
+    `).join('');
+}
+
+function renderResultados() {
+    const db = getDB();
+    const concluidas = db.auditorias.filter(a=>a.status==='concluida');
+    const tbody = document.getElementById('tbody-resultados');
+    const emptyEl = document.getElementById('empty-resultados');
+    if (!concluidas.length) { tbody.innerHTML=''; emptyEl.style.display='flex'; document.querySelector('.mod-table-wrap').style.display='none'; return; }
+    emptyEl.style.display='none';
+    document.querySelector('.mod-table-wrap').style.display='block';
+    tbody.innerHTML = concluidas.map(a => `<tr onclick="openConduzirModal(${a.id})">
+        <td><span style="font-weight:700;color:rgba(255,255,255,.4)">#${a.id}</span></td>
+        <td><span style="font-weight:600;color:#fff">${a.titulo}</span></td>
+        <td>${formatDate(a.data)}</td>
+        <td>${a.auditor}</td>
+        <td style="font-size:.78rem">${a.escopo}</td>
+        <td style="color:var(--accent);font-weight:700">${a.conformidades}</td>
+        <td style="color:${a.ncs>0?'var(--danger)':'var(--accent)'};font-weight:700">${a.ncs}</td>
+        <td><span class="sbadge ${a.ncs>3?'aberta':a.ncs>0?'andamento':'concluida'}">${a.ncs===0?'Sem NCs':a.ncs+' NC(s)'}</span></td>
+        <td><button class="tbl-btn primary" onclick="event.stopPropagation();openConduzirModal(${a.id})">Ver</button></td>
+    </tr>`).join('');
+}
+
+function renderPlanosAud() {
+    const db = getDB();
+    const comNCs = db.auditorias.filter(a=>a.ncs>0);
+    const listEl = document.getElementById('lista-planos-aud');
+    const emptyEl = document.getElementById('empty-planos-aud');
+    if (!comNCs.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    listEl.innerHTML = comNCs.map(a => `<div style="background:rgba(255,255,255,.03);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:16px 20px;margin-bottom:10px">
+        <div style="font-weight:700;color:#fff;margin-bottom:6px">${a.titulo}</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.4);margin-bottom:10px">${a.ncs} NC(s) identificada(s) na auditoria de ${formatDate(a.data)}</div>
+        <a href="nao-conformidades.html" class="mod-btn warning" style="font-size:.82rem"><i class="fas fa-external-link-alt"></i> Criar Plano de Ação no módulo NC</a>
+    </div>`).join('');
+}
+
+function salvarAuditoria() {
+    const titulo = document.getElementById('na-titulo').value.trim();
+    const auditor = document.getElementById('na-auditor').value;
+    const data = document.getElementById('na-data').value;
+    const escopo = document.getElementById('na-escopo').value.trim();
+    if (!titulo || !data || !escopo) return alert('Preencha os campos obrigatórios.');
+    const clausulas = [...document.querySelectorAll('.clausula-check:checked')].map(c=>c.value);
+    if (!clausulas.length) return alert('Selecione pelo menos uma cl?usula.');
+    const db = getDB();
+    const newId = db.auditorias.length ? Math.max(...db.auditorias.map(a=>a.id))+1 : 1;
+    db.auditorias.push({ id:newId, titulo, auditor, data, escopo, clausulas, objetivos:document.getElementById('na-objetivos').value, status:'agendada', ncs:0, conformidades:0 });
+    saveDB(db);
+    closeModal('modalNovaAuditoria');
+    renderCronograma();
+    showToast('Auditoria planejada com sucesso!', 'success');
+}
+
+function openNovoChecklistModal() {
+    document.getElementById('perguntas-list').innerHTML = '';
+    addPergunta(); addPergunta(); addPergunta();
+    openModal('modalNovoChecklist');
+}
+
+function addPergunta() {
+    const list = document.getElementById('perguntas-list');
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;gap:8px;align-items:center';
+    div.innerHTML = `<input class="mod-input pergunta-input" placeholder="Pergunta / critério de auditoria..." style="flex:1"><button class="mod-btn danger" style="padding:7px 10px" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>`;
+    list.appendChild(div);
+}
+
+function salvarChecklist() {
+    const nome = document.getElementById('nck-nome').value.trim();
+    if (!nome) return alert('Informe o nome do checklist.');
+    const perguntas = [...document.querySelectorAll('.pergunta-input')].map(i=>i.value.trim()).filter(Boolean);
+    if (!perguntas.length) return alert('Adicione pelo menos uma pergunta.');
+    const db = getDB();
+    const newId = db.checklists.length ? Math.max(...db.checklists.map(c=>c.id))+1 : 1;
+    db.checklists.push({ id:newId, nome, clausula:document.getElementById('nck-clausula').value, perguntas });
+    saveDB(db);
+    closeModal('modalNovoChecklist');
+    renderChecklists();
+    showToast('Checklist criado!', 'success');
+}
+
+function openNovaAuditoriaModal() { openModal('modalNovaAuditoria'); }
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function formatDate(str) { if(!str) return '-'; const d=new Date(str+(str.length===10?'T00:00':'')); return d.toLocaleDateString('pt-BR'); }
+function showToast(msg, type) {
+    const t=document.createElement('div'); t.style.cssText=`position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;z-index:9999;background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent=msg; document.body.appendChild(t); setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},3000);
+}
+document.querySelectorAll('.mod-modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active');}));
+seedData();
+renderCronograma();
+</script>
+<script>
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');});
+function addTipoNC(){const name=prompt('Nome do tipo de NC:');if(name){const li=document.createElement('div');li.className='mod-table-row';li.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)';li.innerHTML='<span style="font-size:.85rem;color:rgba(255,255,255,.8)">'+name+'</span><button class="mod-btn" style="font-size:.72rem;padding:3px 8px" onclick="this.closest(\'.mod-table-row\').remove()"><i class="fas fa-trash"></i></button>';document.getElementById('lista-tipos-nc').appendChild(li);}}
+function saveConfigAuditorias(){showToast('Configurações salvas com sucesso!','success');}
+</script><script>
+function startModuleTour() {
+    alert('Tour deste módulo em breve! ');
+}
+</script></body>
+</html>

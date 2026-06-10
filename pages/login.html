@@ -115,19 +115,19 @@
                 <form id="loginForm" onsubmit="handleLogin(event)">
                     <div class="form-group">
                         <label for="email">E-mail</label>
-                        <input type="email" id="email" placeholder="seu@email.com.br" required autocomplete="username">
+                        <input type="email" id="email" placeholder="seu@email.com.br" value="jefferson@databooster.com.br" required autocomplete="username">
                     </div>
 
                     <div class="form-group">
                         <label for="password">Senha</label>
-                        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                        <input type="password" id="password" placeholder="********" value="databooster123" required autocomplete="current-password">
                     </div>
 
                     <div class="form-row">
                         <label>
-                            <input type="checkbox" style="accent-color:var(--primary)"> Lembrar de mim
+                            <input type="checkbox" id="remember" style="accent-color:var(--primary)" checked> Lembrar de mim
                         </label>
-                        <a href="#">Esqueci minha senha</a>
+                        <a href="mailto:contato@sgqonline.com.br?subject=Recuperar%20senha">Esqueci minha senha</a>
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-login">
@@ -163,7 +163,7 @@
                 name: "Bill Gates", role: "Empreendedor e filantropo", color: "#8b5cf6", initials: "BG"
             },
             {
-                text: "Não conformidades são presentes disfarçados — elas mostram exatamente onde seu processo precisa melhorar.",
+                text: "Não conformidades são presentes disfarçados – elas mostram exatamente onde seu processo precisa melhorar.",
                 name: "Princípio ISO 9001", role: "Melhoria contínua (cláusula 10.2)", color: "#f97316", initials: "IS"
             },
             {
@@ -175,8 +175,8 @@
                 name: "W. Edwards Deming", role: "Pai da Gestão da Qualidade", color: "#0f75bd", initials: "WD"
             },
             {
-                text: "Documentos são evidências. Sem registros, seu SGQ não existe para um auditor — por melhor que seja seu processo.",
-                name: "ISO 9001:2015", role: "Requisito 7.5 — Informação documentada", color: "#f59e0b", initials: "IS"
+                text: "Documentos são evidências. Sem registros, seu SGQ não existe para um auditor – por melhor que seja seu processo.",
+                name: "ISO 9001:2015", role: "Requisito 7.5 – Informação documentada", color: "#f59e0b", initials: "IS"
             }
         ];
 

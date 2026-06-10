@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pessoas e Treinamentos - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-users" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Pessoas e Treinamentos</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Pessoas</div>
+                <a href="#" class="nav-item active" id="nav-colaboradores" onclick="switchView('colaboradores');return false"><i class="fas fa-users"></i> Colaboradores</a>
+                <a href="#" class="nav-item" id="nav-funcoes" onclick="switchView('funcoes');return false"><i class="fas fa-sitemap"></i> Funções / Cargos</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Treinamentos</div>
+                <a href="#" class="nav-item" id="nav-treinamentos" onclick="switchView('treinamentos');return false"><i class="fas fa-chalkboard-teacher"></i> Gestão de Treinamentos</a>
+                <a href="#" class="nav-item" id="nav-matriz" onclick="switchView('matriz');return false"><i class="fas fa-table-cells"></i> Matriz de Competências</a>
+                <a href="#" class="nav-item" id="nav-relatorio" onclick="switchView('relatorio');return false"><i class="fas fa-file-alt"></i> Relatério do Colaborador</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Configurações</div>
+                <a href="#" class="nav-item" id="nav-config" onclick="switchView('config');return false"><i class="fas fa-gear"></i> Configurações</a>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar">JD</div>
+                <div class="user-info"><div class="user-name">João Teste</div><div class="user-role">RH / Qualidade</div></div>
+                <a href="login.html" title="Sair"><i class="fas fa-arrow-right-from-bracket"></i></a>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar colaborador, treinamento..."></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <button class="topbar-icon"><i class="fas fa-gear"></i></button>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- VIEW: COLABORADORES -->
+            <div id="view-colaboradores" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-user-graduate" style="color:var(--accent);margin-right:10px"></i>Gestão de Pessoas e Treinamentos</h2>
+                        <p>Matriz de competências, treinamentos e linha do tempo - requisitos 7.2, 7.3</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn primary" onclick="openNovoColaboradorModal()"><i class="fas fa-user-plus"></i> Novo Colaborador</button>
+                    </div>
+                </div>
+
+                <div class="mod-stats">
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-users"></i></div></div><div class="stat-value" id="stat-total-colab">0</div><div class="stat-label">Colaboradores Ativos</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fas fa-exclamation-circle"></i></div></div><div class="stat-value" id="stat-pendentes">0</div><div class="stat-label">Treinamentos Vencidos/Pendentes</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-calendar-check"></i></div></div><div class="stat-value" id="stat-agendados">0</div><div class="stat-label">Treinamentos Agendados</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)"><i class="fas fa-award"></i></div></div><div class="stat-value" id="stat-concluidos">0</div><div class="stat-label">Concluídos (30d)</div></div>
+                </div>
+
+                <div class="mod-filter-bar">
+                    <div class="mod-search"><i class="fas fa-search"></i><input type="text" id="searchColab" placeholder="Buscar colaborador..." oninput="renderColaboradores()"></div>
+                    <select class="mod-select" id="filterSetor" onchange="renderColaboradores()">
+                        <option value="">Todos os setores</option>
+                        <option>Qualidade</option>
+                        <option>Produção</option>
+                        <option>RH</option>
+                        <option>Compras</option>
+                        <option>Logística</option>
+                        <option>Manutenção</option>
+                    </select>
+                    <select class="mod-select" id="filterStatusColab" onchange="renderColaboradores()">
+                        <option value="">Todos</option>
+                        <option value="ok">Treinamentos em dia</option>
+                        <option value="pendente">Com pendências</option>
+                    </select>
+                </div>
+
+                <div id="lista-colaboradores"></div>
+                <div class="mod-empty" id="empty-colaboradores" style="display:none">
+                    <i class="fas fa-users"></i>
+                    <h3>Nenhum colaborador cadastrado</h3>
+                </div>
+            </div>
+
+            <!-- VIEW: FUNÇÕES -->
+            <div id="view-funcoes" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Funções e Descrição de Cargos</h2><p>Defina as funções, requisitos e competências necessárias</p></div>
+                    <button class="mod-btn primary" onclick="openNovaFuncaoModal()"><i class="fas fa-plus"></i> Nova Função</button>
+                </div>
+                <div id="lista-funcoes"></div>
+                <div class="mod-empty" id="empty-funcoes" style="display:none"><i class="fas fa-sitemap"></i><h3>Nenhuma função cadastrada</h3></div>
+            </div>
+
+            <!-- VIEW: TREINAMENTOS -->
+            <div id="view-treinamentos" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Gestão de Treinamentos</h2><p>Planeje, registre e acompanhe treinamentos</p></div>
+                    <button class="mod-btn primary" onclick="openNovoTreinamentoModal()"><i class="fas fa-plus"></i> Novo Treinamento</button>
+                </div>
+                <div class="mod-tabs">
+                    <button class="mod-tab active" onclick="switchTreinTab(this,'agendados')">Agendados</button>
+                    <button class="mod-tab" onclick="switchTreinTab(this,'concluidos')">Concluídos</button>
+                    <button class="mod-tab" onclick="switchTreinTab(this,'vencidos')">Vencidos / Pendentes</button>
+                </div>
+                <div id="tab-agendados" class="mod-tab-content active" id="tab-agendados">
+                    <div id="lista-agendados"></div>
+                    <div class="mod-empty" id="empty-agendados" style="display:none"><i class="fas fa-calendar"></i><h3>Nenhum treinamento agendado</h3></div>
+                </div>
+                <div id="tab-concluidos" class="mod-tab-content">
+                    <div id="lista-concluidos"></div>
+                </div>
+                <div id="tab-vencidos" class="mod-tab-content">
+                    <div class="mod-alert warn" style="margin-bottom:16px"><i class="fas fa-exclamation-triangle"></i><div>Colaboradores com treinamentos vencidos ou pendentes precisam ser notificados e reagendados.</div></div>
+                    <div id="lista-vencidos"></div>
+                </div>
+            </div>
+
+            <!-- VIEW: MATRIZ -->
+            <div id="view-matriz" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Matriz de Competências</h2><p>Visão cruzada de colaboradores e competências requeridas</p></div></div>
+                <div id="matriz-content" style="overflow-x:auto"></div>
+            </div>
+
+            <!-- VIEW: RELATÓRIO -->
+            <div id="view-relatorio" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Relatério do Colaborador</h2><p>Linha do tempo completa para auditorias</p></div></div>
+                <div class="card" style="margin-bottom:20px">
+                    <div class="card-body">
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Selecione o Colaborador</label>
+                                <select class="mod-select-inp" id="rel-colaborador" onchange="renderRelatorio()">
+                                    <option value="">Selecione...</option>
+                                </select>
+                            </div>
+                            <div class="mod-form-group" style="display:flex;align-items:flex-end">
+                                <button class="mod-btn primary"><i class="fas fa-print"></i> Imprimir Relatério</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="relatorio-content"></div>
+            </div>
+
+            <!-- VIEW: CONFIGURAÇÕES -->
+            <div id="view-config" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2><i class="fas fa-gear" style="color:var(--primary);margin-right:8px"></i>Configurações de Pessoas e Treinamentos</h2><p>Parâmetros gerais, alertas e responsabilidades</p></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px">
+
+                    <!-- Responsáveis -->
+                    <div class="mod-card">
+                        <div class="mod-card-header"><h4><i class="fas fa-user-shield" style="color:var(--primary);margin-right:8px"></i>Responsáveis</h4></div>
+                        <div class="mod-card-body">
+                            <div class="mod-form-group">
+                                <label class="mod-label">Responsável por treinamentos</label>
+                                <input class="mod-input" value="Ana Paula Oliveira" placeholder="Nome ou setor">
+                            </div>
+                            <div class="mod-form-group">
+                                <label class="mod-label">Setor de RH</label>
+                                <input class="mod-input" value="Recursos Humanos" placeholder="Setor responsável">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas de vencimento -->
+                    <div class="mod-card">
+                        <div class="mod-card-header"><h4><i class="fas fa-bell" style="color:var(--warning);margin-right:8px"></i>Alertas de Vencimento</h4></div>
+                        <div class="mod-card-body">
+                            <div class="mod-form-group">
+                                <label class="mod-label">Alertar vencimento de treinamento (dias antes)</label>
+                                <input class="mod-input" type="number" value="30" min="1" max="90">
+                            </div>
+                            <div class="mod-form-group" style="display:flex;align-items:center;gap:10px;margin-top:8px">
+                                <input type="checkbox" id="cfg-notif-trein-email" checked style="width:16px;height:16px;cursor:pointer">
+                                <label for="cfg-notif-trein-email" style="font-size:.85rem;color:rgba(255,255,255,.7);cursor:pointer">Notificar responsável por e-mail</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campos da função / cargo -->
+                    <div class="mod-card" style="grid-column:1/-1">
+                        <div class="mod-card-header" style="display:flex;justify-content:space-between;align-items:center">
+                            <h4><i class="fas fa-sitemap" style="color:var(--accent);margin-right:8px"></i>Descrições de Cargos</h4>
+                            <button class="mod-btn primary" onclick="switchView('funcoes')"><i class="fas fa-arrow-right"></i> Gerenciar Funções</button>
+                        </div>
+                        <div class="mod-card-body">
+                            <p style="font-size:.85rem;color:rgba(255,255,255,.5)">Acesse a aba <strong style="color:rgba(255,255,255,.8)">Funções / Cargos</strong> para cadastrar e editar as descrições de cargo, competências exigidas e treinamentos obrigatérios por função.</p>
+                        </div>
+                    </div>
+
+                    <!-- Formulário de admissão -->
+                    <div class="mod-card" style="grid-column:1/-1">
+                        <div class="mod-card-header"><h4><i class="fas fa-file-contract" style="color:var(--purple);margin-right:8px"></i>Formulário de Admissão</h4></div>
+                        <div class="mod-card-body">
+                            <p style="font-size:.85rem;color:rgba(255,255,255,.5)">O formulário padrão de admissão de colaboradores é gerenciado no módulo <strong style="color:rgba(255,255,255,.8)">BPM / Formulários</strong>. O processo "Admissão de Colaborador" já está pré-configurado.</p>
+                            <a href="bpm.html" class="mod-btn primary" style="margin-top:10px;display:inline-flex"><i class="fas fa-diagram-project"></i> Ir para BPM</a>
+                        </div>
+                    </div>
+
+                    <div style="grid-column:1/-1;text-align:right">
+                        <button class="mod-btn primary" onclick="showToast('Configurações salvas!','success')"><i class="fas fa-save"></i> Salvar Configurações</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVO COLABORADOR -->
+<div class="mod-modal-overlay" id="modalNovoColab">
+    <div class="mod-modal md">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-user-plus" style="color:var(--accent)"></i> Novo Colaborador</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNovoColab')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Nome Completo <span>*</span></label><input class="mod-input" id="nc-nome" placeholder="Nome do colaborador"></div>
+                <div class="mod-form-group"><label>CPF / Matrícula</label><input class="mod-input" id="nc-cpf" placeholder="000.000.000-00"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Função / Cargo <span>*</span></label>
+                    <select class="mod-select-inp" id="nc-funcao"><option value="">Selecione...</option><option>Operador de Produção</option><option>Inspetor de Qualidade</option><option>Técnico de Manutenção</option><option>Analista de Qualidade</option><option>Gerente de Produção</option></select>
+                </div>
+                <div class="mod-form-group"><label>Setor <span>*</span></label>
+                    <select class="mod-select-inp" id="nc-setor"><option value="">Selecione...</option><option>Qualidade</option><option>Produção</option><option>RH</option><option>Compras</option><option>Logística</option><option>Manutenção</option></select>
+                </div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Data de Admissão <span>*</span></label><input class="mod-input" type="date" id="nc-admissao"></div>
+                <div class="mod-form-group"><label>E-mail Corporativo</label><input class="mod-input" type="email" id="nc-email" placeholder="colaborador@empresa.com"></div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovoColab')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarColaborador()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: PERFIL COLABORADOR / TIMELINE -->
+<div class="mod-modal-overlay" id="modalPerfil">
+    <div class="mod-modal xl">
+        <div class="mod-modal-header">
+            <h3 id="perfil-title"><i class="fas fa-user" style="color:var(--accent)"></i> Perfil</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalPerfil')">&times;</button>
+        </div>
+        <div class="mod-modal-body" id="perfil-body"></div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalPerfil')">Fechar</button>
+            <button class="mod-btn primary" onclick="openNovoTreinamentoModal()"><i class="fas fa-plus"></i> Agendar Treinamento</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVO TREINAMENTO -->
+<div class="mod-modal-overlay" id="modalNovoTrein">
+    <div class="mod-modal md">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-chalkboard-teacher" style="color:var(--primary)"></i> Agendar Treinamento</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNovoTrein')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Treinamento <span>*</span></label><input class="mod-input" id="nt-nome" placeholder="Nome do treinamento"></div>
+                <div class="mod-form-group"><label>Colaboradores <span>*</span></label>
+                    <select class="mod-select-inp" id="nt-colaborador" multiple style="height:80px"><option>Ana Carvalho</option><option>Carlos Ferreira</option><option>Maria Silva</option><option>João Teste</option></select>
+                </div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Data do Treinamento <span>*</span></label><input class="mod-input" type="date" id="nt-data"></div>
+                <div class="mod-form-group"><label>Validade (meses)</label><input class="mod-input" type="number" id="nt-validade" placeholder="Ex: 12 (0 = sem validade)"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Instrutor / Empresa</label><input class="mod-input" id="nt-instrutor" placeholder="Nome do instrutor ou empresa"></div>
+                <div class="mod-form-group"><label>Carga Horária</label><input class="mod-input" id="nt-carga" placeholder="Ex: 8h"></div>
+            </div>
+            <div class="mod-form-group">
+                <label>Descrição / Conteúdo</label>
+                <textarea class="mod-textarea" id="nt-descricao" rows="2" placeholder="Descreva os tópicos abordados..."></textarea>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovoTrein')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarTreinamento()"><i class="fas fa-save"></i> Agendar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVA FUNÇÃO -->
+<div class="mod-modal-overlay" id="modalNovaFuncao">
+    <div class="mod-modal md">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-sitemap" style="color:var(--primary)"></i> Nova Função / Cargo</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNovaFuncao')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Nome da Função <span>*</span></label><input class="mod-input" id="nf-nome-fn" placeholder="Ex: Inspetor de Qualidade"></div>
+                <div class="mod-form-group"><label>Setor</label><select class="mod-select-inp" id="nf-setor-fn"><option>Qualidade</option><option>Produção</option><option>Manutenção</option></select></div>
+            </div>
+            <div class="mod-form-group" style="margin-bottom:14px">
+                <label>Descrição do Cargo</label>
+                <textarea class="mod-textarea" id="nf-desc-fn" rows="3" placeholder="Responsabilidades e atribuições..."></textarea>
+            </div>
+            <div class="mod-form-group">
+                <label>Treinamentos Obrigatérios (um por linha)</label>
+                <textarea class="mod-textarea" id="nf-trein-fn" rows="3" placeholder="NR-12 Segurança em Máquinas&#10;ISO 9001 Fundamentos&#10;Ferramentas da Qualidade"></textarea>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovaFuncao')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarFuncao()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const DB_KEY = 'sgq_pessoas';
+let currentColabId = null;
+
+function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"colaboradores":[],"funcoes":[],"treinamentos":[]}'); }
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+function seedData() {
+    const db = getDB();
+    if (db.colaboradores.length) return;
+    const addDays = (n) => { const d = new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+    db.colaboradores = [
+        { id:1, nome:'Ana Carvalho', cpf:'111.222.333-44', funcao:'Inspetor de Qualidade', setor:'Qualidade', admissao:'2022-03-15', email:'ana@empresa.com', ativo:true },
+        { id:2, nome:'Carlos Ferreira', cpf:'222.333.444-55', funcao:'Operador de Produção', setor:'Produção', admissao:'2020-07-01', email:'carlos@empresa.com', ativo:true },
+        { id:3, nome:'Maria Silva', cpf:'333.444.555-66', funcao:'Analista de Qualidade', setor:'Qualidade', admissao:'2023-01-10', email:'maria@empresa.com', ativo:true },
+        { id:4, nome:'João Teste', cpf:'444.555.666-77', funcao:'Gerente de Produção', setor:'Produção', admissao:'2019-05-20', email:'joao@empresa.com', ativo:true },
+    ];
+    db.funcoes = [
+        { id:1, nome:'Inspetor de Qualidade', setor:'Qualidade', descricao:'Responsável por inspeções de produto e controle de qualidade', treinamentos:['ISO 9001 Fundamentos','Ferramentas da Qualidade','NR-12'] },
+        { id:2, nome:'Operador de Produção', setor:'Produção', descricao:'Opera máquinas e equipamentos da linha de produção', treinamentos:['NR-12','Procedimento Operacional Padrão','Boas Práticas de Fabricação'] },
+    ];
+    db.treinamentos = [
+        { id:1, nome:'ISO 9001 Fundamentos', colaboradores:['Ana Carvalho','Maria Silva'], data:'2026-06-15', validade:24, instrutor:'João Teste', carga:'8h', status:'agendado', concluido:false },
+        { id:2, nome:'NR-12 Segurança em M?quinas', colaboradores:['Carlos Ferreira'], data:'2026-01-20', validade:12, instrutor:'Empresa Externa', carga:'16h', status:'concluido', concluido:true, avaliacao:'Aprovado' },
+        { id:3, nome:'Ferramentas da Qualidade', colaboradores:['Ana Carvalho'], data:addDays(-400), validade:24, instrutor:'Consultoria ABC', carga:'24h', status:'vencido', concluido:true },
+    ];
+    saveDB(db);
+}
+
+function switchView(v) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display='none');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-'+v).style.display='block';
+    const nav = document.getElementById('nav-'+v);
+    if (nav) nav.classList.add('active');
+    if (v==='colaboradores') renderColaboradores();
+    if (v==='funcoes') renderFuncoes();
+    if (v==='treinamentos') renderTreinamentos();
+    if (v==='matriz') renderMatriz();
+    if (v==='relatorio') populateRelatorioSelect();
+}
+
+function switchTreinTab(btn, tabId) {
+    document.querySelectorAll('.mod-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.mod-tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+tabId).classList.add('active');
+}
+
+function renderColaboradores() {
+    const db = getDB();
+    const search = (document.getElementById('searchColab')?.value||'').toLowerCase();
+    const setor = document.getElementById('filterSetor')?.value||'';
+    let items = db.colaboradores.filter(c => {
+        if (!c.ativo) return false;
+        if (search && !c.nome.toLowerCase().includes(search)) return false;
+        if (setor && c.setor !== setor) return false;
+        return true;
+    });
+
+    document.getElementById('stat-total-colab').textContent = db.colaboradores.filter(c=>c.ativo).length;
+    document.getElementById('stat-pendentes').textContent = db.treinamentos.filter(t=>t.status==='vencido').length;
+    document.getElementById('stat-agendados').textContent = db.treinamentos.filter(t=>t.status==='agendado').length;
+    document.getElementById('stat-concluidos').textContent = db.treinamentos.filter(t=>t.status==='concluido').length;
+
+    const listEl = document.getElementById('lista-colaboradores');
+    const emptyEl = document.getElementById('empty-colaboradores');
+    if (!items.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+
+    listEl.innerHTML = items.map(c => {
+        const treinVencidos = db.treinamentos.filter(t => t.status==='vencido' && t.colaboradores.includes(c.nome)).length;
+        const treinAgend = db.treinamentos.filter(t => t.status==='agendado' && t.colaboradores.includes(c.nome)).length;
+        const initials = c.nome.split(' ').map(n=>n[0]).slice(0,2).join('');
+        return `<div style="display:flex;align-items:center;gap:16px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid ${treinVencidos?'rgba(239,68,68,.2)':'rgba(255,255,255,.06)'};border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all .2s" onmouseenter="this.style.background='rgba(255,255,255,.06)'" onmouseleave="this.style.background='rgba(255,255,255,.03)'" onclick="openPerfil(${c.id})">
+            <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.95rem;flex-shrink:0">${initials}</div>
+            <div style="flex:1">
+                <div style="font-size:.95rem;font-weight:700;color:#fff;margin-bottom:3px">${c.nome}</div>
+                <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:rgba(255,255,255,.4)">
+                    <span><i class="fas fa-briefcase" style="margin-right:3px"></i>${c.funcao}</span>
+                    <span><i class="fas fa-building" style="margin-right:3px"></i>${c.setor}</span>
+                    <span><i class="fas fa-calendar" style="margin-right:3px"></i>Admitido em ${formatDate(c.admissao)}</span>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+                ${treinVencidos ? `<span class="sbadge vencido"><i class="fas fa-exclamation-triangle" style="margin-right:3px"></i>${treinVencidos} vencido(s)</span>` : ''}
+                ${treinAgend ? `<span class="sbadge agendada">${treinAgend} agendado(s)</span>` : ''}
+                ${!treinVencidos && !treinAgend ? `<span class="sbadge concluida"><i class="fas fa-check" style="margin-right:3px"></i>Em dia</span>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function openPerfil(id) {
+    const db = getDB();
+    const c = db.colaboradores.find(x=>x.id===id);
+    if (!c) return;
+    currentColabId = id;
+    document.getElementById('perfil-title').innerHTML = `<i class="fas fa-user" style="color:var(--accent)"></i> ${c.nome}`;
+    const treinamentos = db.treinamentos.filter(t => t.colaboradores.includes(c.nome));
+    const tlItems = [
+        { type:'blue', icon:'fa-door-open', title:'Admissão', date:c.admissao, desc:`Admitido como ${c.funcao} no setor de ${c.setor}` },
+        ...treinamentos.map(t => ({ type:t.status==='vencido'?'red':t.status==='concluido'?'green':'yellow', icon:t.status==='vencido'?'fa-exclamation':'fa-chalkboard-teacher', title:t.nome, date:t.data, desc:`${t.carga} � ${t.instrutor} � ${t.status==='concluido'?'Concluído':t.status==='agendado'?'Agendado':'Vencido'}` }))
+    ].sort((a,b) => new Date(a.date) - new Date(b.date));
+
+    const tlHtml = tlItems.map(i => `
+        <div class="tl-item">
+            <div class="tl-dot ${i.type}"><i class="fas ${i.icon}"></i></div>
+            <div class="tl-card">
+                <div class="tl-card-title">${i.title}</div>
+                <div class="tl-card-date">${formatDate(i.date)}</div>
+                <div class="tl-card-body">${i.desc}</div>
+            </div>
+        </div>
+    `).join('');
+
+    document.getElementById('perfil-body').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px">
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">FUNÇÃO</div><div style="font-weight:600;color:#fff">${c.funcao}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">SETOR</div><div style="font-weight:600;color:#fff">${c.setor}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">ADMISSÃO</div><div style="font-weight:600;color:#fff">${formatDate(c.admissao)}</div></div>
+        </div>
+        <div class="mod-form-section-title">Linha do Tempo</div>
+        <div class="timeline">${tlHtml}</div>
+    `;
+    openModal('modalPerfil');
+}
+
+function renderFuncoes() {
+    const db = getDB();
+    const cont = document.getElementById('lista-funcoes');
+    const emptyEl = document.getElementById('empty-funcoes');
+    if (!db.funcoes.length) { cont.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+    cont.innerHTML = db.funcoes.map(f => `
+        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px 20px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <div><span style="font-size:.95rem;font-weight:700;color:#fff">${f.nome}</span><span style="margin-left:10px;font-size:.75rem;background:rgba(15,117,189,.15);color:var(--primary-light);padding:2px 8px;border-radius:4px">${f.setor}</span></div>
+            </div>
+            <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:10px">${f.descricao}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+                ${f.treinamentos.map(t => `<span style="background:rgba(16,185,129,.1);color:#34d399;padding:3px 9px;border-radius:5px;font-size:.75rem"><i class="fas fa-check" style="margin-right:3px"></i>${t}</span>`).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderTreinamentos() {
+    const db = getDB();
+    const agend = db.treinamentos.filter(t=>t.status==='agendado');
+    const conc = db.treinamentos.filter(t=>t.status==='concluido');
+    const venc = db.treinamentos.filter(t=>t.status==='vencido');
+    const renderItem = (t) => `<div style="display:flex;align-items:center;gap:14px;padding:14px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
+        <div style="width:40px;height:40px;border-radius:9px;background:rgba(15,117,189,.12);display:flex;align-items:center;justify-content:center;color:var(--primary-light);flex-shrink:0"><i class="fas fa-chalkboard-teacher"></i></div>
+        <div style="flex:1">
+            <div style="font-weight:600;color:#fff;margin-bottom:3px">${t.nome}</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.4)">${t.colaboradores.join(', ')} � ${t.instrutor} � ${t.carga} � ${formatDate(t.data)}</div>
+        </div>
+        <span class="sbadge ${t.status==='agendado'?'agendada':t.status==='concluido'?'concluida':'vencido'}">${{agendado:'Agendado',concluido:'Concluído',vencido:'Vencido'}[t.status]}</span>
+    </div>`;
+
+    document.getElementById('lista-agendados').innerHTML = agend.map(renderItem).join('') || '';
+    document.getElementById('empty-agendados').style.display = agend.length ? 'none' : 'flex';
+    document.getElementById('lista-concluidos').innerHTML = conc.map(renderItem).join('') || '<div class="mod-empty"><i class="fas fa-check-circle"></i><h3>Nenhum conclu?do</h3></div>';
+    document.getElementById('lista-vencidos').innerHTML = venc.map(renderItem).join('') || '<div class="mod-empty"><i class="fas fa-check-circle" style="color:var(--accent)"></i><h3>Nenhum vencido</h3></div>';
+}
+
+function renderMatriz() {
+    const db = getDB();
+    const competencias = [...new Set(db.funcoes.flatMap(f => f.treinamentos))];
+    const cont = document.getElementById('matriz-content');
+    if (!competencias.length || !db.colaboradores.length) { cont.innerHTML = '<div class="mod-empty"><i class="fas fa-table-cells"></i><h3>Cadastre funções com treinamentos para ver a matriz</h3></div>'; return; }
+    const header = `<tr><th style="padding:10px 14px;background:rgba(255,255,255,.05);font-size:.72rem;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase;min-width:140px">Colaborador</th>${competencias.map(c=>`<th style="padding:10px 12px;background:rgba(255,255,255,.05);font-size:.7rem;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase;min-width:120px;max-width:120px;white-space:normal;word-break:break-word">${c}</th>`).join('')}</tr>`;
+    const rows = db.colaboradores.filter(c=>c.ativo).map(c => {
+        const cells = competencias.map(comp => {
+            const trein = db.treinamentos.find(t => t.nome===comp && t.colaboradores.includes(c.nome));
+            if (!trein) return `<td style="text-align:center;padding:10px"><i class="fas fa-minus" style="color:rgba(255,255,255,.15)"></i></td>`;
+            const icon = trein.status==='concluido' ? '?' : trein.status==='agendado' ? '' : '?';
+            return `<td style="text-align:center;padding:10px">${icon}</td>`;
+        }).join('');
+        return `<tr><td style="padding:10px 14px;font-weight:600;color:#fff;white-space:nowrap">${c.nome}</td>${cells}</tr>`;
+    }).join('');
+    cont.innerHTML = `<table class="mod-table" style="min-width:600px"><thead>${header}</thead><tbody>${rows}</tbody></table>`;
+}
+
+function populateRelatorioSelect() {
+    const db = getDB();
+    const sel = document.getElementById('rel-colaborador');
+    sel.innerHTML = '<option value="">Selecione...</option>' + db.colaboradores.filter(c=>c.ativo).map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+}
+
+function renderRelatorio() {
+    const id = parseInt(document.getElementById('rel-colaborador').value);
+    if (!id) return;
+    openPerfil(id);
+    closeModal('modalPerfil');
+    const db = getDB();
+    const c = db.colaboradores.find(x=>x.id===id);
+    if (!c) return;
+    const treinamentos = db.treinamentos.filter(t => t.colaboradores.includes(c.nome));
+    const cont = document.getElementById('relatorio-content');
+    cont.innerHTML = `<div class="card"><div class="card-header"><h4><i class="fas fa-user" style="color:var(--accent);margin-right:8px"></i>${c.nome}</h4></div><div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">FUNÇÃO</div><div style="font-weight:600;color:#fff">${c.funcao}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">SETOR</div><div style="font-weight:600;color:#fff">${c.setor}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">ADMISSÃO</div><div style="font-weight:600;color:#fff">${formatDate(c.admissao)}</div></div>
+        </div>
+        <div class="mod-form-section-title">Treinamentos</div>
+        <table class="mod-table"><thead><tr><th>Treinamento</th><th>Data</th><th>Instrutor</th><th>Carga</th><th>Status</th></tr></thead>
+        <tbody>${treinamentos.map(t=>`<tr><td style="font-weight:600;color:#fff">${t.nome}</td><td>${formatDate(t.data)}</td><td>${t.instrutor}</td><td>${t.carga}</td><td><span class="sbadge ${t.status==='concluido'?'concluida':t.status==='agendado'?'agendada':'vencido'}">${{agendado:'Agendado',concluido:'Concluído',vencido:'Vencido'}[t.status]}</span></td></tr>`).join('')}</tbody>
+        </table>
+    </div></div>`;
+}
+
+function salvarColaborador() {
+    const nome = document.getElementById('nc-nome').value.trim();
+    const funcao = document.getElementById('nc-funcao').value;
+    const setor = document.getElementById('nc-setor').value;
+    const admissao = document.getElementById('nc-admissao').value;
+    if (!nome || !funcao || !setor || !admissao) return alert('Preencha todos os campos obrigatórios.');
+    const db = getDB();
+    const newId = db.colaboradores.length ? Math.max(...db.colaboradores.map(c=>c.id))+1 : 1;
+    db.colaboradores.push({ id:newId, nome, cpf:document.getElementById('nc-cpf').value, funcao, setor, admissao, email:document.getElementById('nc-email').value, ativo:true });
+    saveDB(db);
+    closeModal('modalNovoColab');
+    renderColaboradores();
+    showToast('Colaborador cadastrado!', 'success');
+}
+
+function salvarTreinamento() {
+    const nome = document.getElementById('nt-nome').value.trim();
+    const data = document.getElementById('nt-data').value;
+    if (!nome || !data) return alert('Preencha nome e data.');
+    const sel = document.getElementById('nt-colaborador');
+    const colabs = [...sel.selectedOptions].map(o => o.value);
+    if (!colabs.length) return alert('Selecione ao menos um colaborador.');
+    const db = getDB();
+    const newId = db.treinamentos.length ? Math.max(...db.treinamentos.map(t=>t.id))+1 : 1;
+    const hoje = new Date();
+    const dataTrein = new Date(data);
+    db.treinamentos.push({ id:newId, nome, colaboradores:colabs, data, validade:parseInt(document.getElementById('nt-validade').value)||0, instrutor:document.getElementById('nt-instrutor').value, carga:document.getElementById('nt-carga').value, descricao:document.getElementById('nt-descricao').value, status: dataTrein > hoje ? 'agendado' : 'concluido', concluido: dataTrein <= hoje });
+    saveDB(db);
+    closeModal('modalNovoTrein');
+    renderTreinamentos();
+    showToast('Treinamento agendado!', 'success');
+}
+
+function salvarFuncao() {
+    const nome = document.getElementById('nf-nome-fn').value.trim();
+    if (!nome) return alert('Informe o nome da função.');
+    const db = getDB();
+    const newId = db.funcoes.length ? Math.max(...db.funcoes.map(f=>f.id))+1 : 1;
+    const treinamentos = document.getElementById('nf-trein-fn').value.split('\n').map(t=>t.trim()).filter(Boolean);
+    db.funcoes.push({ id:newId, nome, setor:document.getElementById('nf-setor-fn').value, descricao:document.getElementById('nf-desc-fn').value, treinamentos });
+    saveDB(db);
+    closeModal('modalNovaFuncao');
+    renderFuncoes();
+    showToast('Função cadastrada!', 'success');
+}
+
+function openNovoColaboradorModal() { openModal('modalNovoColab'); }
+function openNovoTreinamentoModal() { openModal('modalNovoTrein'); }
+function openNovaFuncaoModal() { openModal('modalNovaFuncao'); }
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function formatDate(str) { if(!str) return '-'; const d = new Date(str+(str.length===10?'T00:00':'')); return d.toLocaleDateString('pt-BR'); }
+function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;z-index:9999;background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent = msg; document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+document.querySelectorAll('.mod-modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('active'); }));
+seedData();
+renderColaboradores();
+</script>
+<script>
+function startModuleTour() {
+    alert('Tour deste módulo em breve! ');
+}
+</script></body>
+</html>

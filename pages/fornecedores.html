@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliação de Fornecedores - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-truck" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Avaliação de Fornecedores</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Fornecedores</div>
+                <a href="#" class="nav-item active" id="nav-lista" onclick="switchView('lista');return false"><i class="fas fa-list"></i> Todos os Fornecedores</a>
+                <a href="#" class="nav-item" id="nav-avaliar" onclick="switchView('avaliar');return false"><i class="fas fa-star"></i> Avaliar Fornecedor</a>
+                <a href="#" class="nav-item" id="nav-novo" onclick="openNovoModal();return false"><i class="fas fa-plus-circle"></i> Cadastrar Fornecedor</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Configurações</div>
+                <a href="#" class="nav-item" id="nav-config" onclick="switchView('config');return false"><i class="fas fa-gear"></i> Formulários e Fluxos</a>
+            </div>
+        </nav>
+        </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar fornecedor..."></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JD</div>
+                        <span class="user-btn-name">Jo\u00e3o Demo</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JD</div>
+                            <div><div class="user-name">Jo\u00e3o Demo</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- VIEW: LISTA -->
+            <div id="view-lista" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-handshake" style="color:var(--purple);margin-right:10px"></i>Avaliação de Fornecedores</h2>
+                        <p>Gestão e qualificação de fornecedores - requisito 8.4</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn purple" onclick="openNovoModal()"><i class="fas fa-plus"></i> Cadastrar Fornecedor</button>
+                        <button class="mod-btn primary" onclick="switchView('avaliar')"><i class="fas fa-star"></i> Avaliar</button>
+                    </div>
+                </div>
+
+                <div class="mod-stats">
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-award"></i></div></div>
+                        <div class="stat-value" id="stat-a">0</div><div class="stat-label">Classificação A</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)"><i class="fas fa-thumbs-up"></i></div></div>
+                        <div class="stat-value" id="stat-b">0</div><div class="stat-label">Classificação B</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-exclamation"></i></div></div>
+                        <div class="stat-value" id="stat-c">0</div><div class="stat-label">Classificação C</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fas fa-ban"></i></div></div>
+                        <div class="stat-value" id="stat-d">0</div><div class="stat-label">Bloqueados / D</div>
+                    </div>
+                </div>
+
+                <div class="mod-filter-bar">
+                    <div class="mod-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchForn" placeholder="Buscar por nome, CNPJ ou categoria..." oninput="renderFornecedores()">
+                    </div>
+                    <select class="mod-select" id="filterClassif" onchange="renderFornecedores()">
+                        <option value="">Todas as classificações</option>
+                        <option value="A">A - Excelente</option>
+                        <option value="B">B - Bom</option>
+                        <option value="C">C - Regular</option>
+                        <option value="D">D - Bloqueado</option>
+                    </select>
+                    <select class="mod-select" id="filterCategForn" onchange="renderFornecedores()">
+                        <option value="">Todas as categorias</option>
+                        <option>Matéria-Prima</option>
+                        <option>Serviços</option>
+                        <option>Componentes</option>
+                        <option>Ferramentas</option>
+                        <option>Logística</option>
+                    </select>
+                </div>
+
+                <div id="lista-fornecedores"></div>
+                <div class="mod-empty" id="empty-fornecedores" style="display:none">
+                    <i class="fas fa-handshake"></i>
+                    <h3>Nenhum fornecedor cadastrado</h3>
+                    <p>Cadastre seus fornecedores para iniciar avaliações</p>
+                </div>
+            </div>
+
+            <!-- VIEW: AVALIAR -->
+            <div id="view-avaliar" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Avaliar Fornecedor</h2><p>Registre a avaliação periódica de desempenho</p></div>
+                    <button class="mod-btn ghost" onclick="switchView('lista')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h4><i class="fas fa-star" style="color:var(--warning);margin-right:8px"></i> Formulário de Avaliação</h4></div>
+                    <div class="card-body">
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Fornecedor <span>*</span></label>
+                                <select class="mod-select-inp" id="aval-fornecedor">
+                                    <option value="">Selecione...</option>
+                                </select>
+                            </div>
+                            <div class="mod-form-group">
+                                <label>Perãodo de Referência</label>
+                                <select class="mod-select-inp" id="aval-periodo">
+                                    <option>1º Trimestre 2026</option>
+                                    <option>2º Trimestre 2026</option>
+                                    <option selected>Semestral - 1º Sem 2026</option>
+                                    <option>Anual 2026</option>
+                                </select>
+                            </div>
+                        </div>
+                        <hr class="mod-divider">
+                        <div class="mod-form-section-title">Critários de Avaliação</div>
+
+                        <div id="criterios-list">
+                            <div class="criterio-item" style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                                    <div style="font-size:.9rem;font-weight:600;color:#fff">Qualidade dos Produtos / Serviços</div>
+                                    <span style="font-size:.75rem;color:rgba(255,255,255,.35)">Peso: 30%</span>
+                                </div>
+                                <div style="display:flex;gap:8px">
+                                    ${[1,2,3,4,5].map(n=>`<button class="nota-btn" data-criterio="qualidade" data-nota="${n}" onclick="selecionarNota('qualidade',${n},this)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-weight:700">${n}</button>`).join('')}
+                                </div>
+                                <div style="display:flex;justify-content:space-between;font-size:.72rem;color:rgba(255,255,255,.25);margin-top:4px"><span>Péssimo</span><span>Excelente</span></div>
+                            </div>
+                            <div class="criterio-item" style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                                    <div style="font-size:.9rem;font-weight:600;color:#fff">Prazo de Entrega</div>
+                                    <span style="font-size:.75rem;color:rgba(255,255,255,.35)">Peso: 25%</span>
+                                </div>
+                                <div style="display:flex;gap:8px">
+                                    ${[1,2,3,4,5].map(n=>`<button class="nota-btn" data-criterio="prazo" data-nota="${n}" onclick="selecionarNota('prazo',${n},this)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-weight:700">${n}</button>`).join('')}
+                                </div>
+                            </div>
+                            <div class="criterio-item" style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                                    <div style="font-size:.9rem;font-weight:600;color:#fff">Atendimento e Suporte</div>
+                                    <span style="font-size:.75rem;color:rgba(255,255,255,.35)">Peso: 20%</span>
+                                </div>
+                                <div style="display:flex;gap:8px">
+                                    ${[1,2,3,4,5].map(n=>`<button class="nota-btn" data-criterio="atendimento" data-nota="${n}" onclick="selecionarNota('atendimento',${n},this)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-weight:700">${n}</button>`).join('')}
+                                </div>
+                            </div>
+                            <div class="criterio-item" style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                                    <div style="font-size:.9rem;font-weight:600;color:#fff">Preão / Competitividade</div>
+                                    <span style="font-size:.75rem;color:rgba(255,255,255,.35)">Peso: 15%</span>
+                                </div>
+                                <div style="display:flex;gap:8px">
+                                    ${[1,2,3,4,5].map(n=>`<button class="nota-btn" data-criterio="preco" data-nota="${n}" onclick="selecionarNota('preco',${n},this)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-weight:700">${n}</button>`).join('')}
+                                </div>
+                            </div>
+                            <div class="criterio-item" style="padding:14px 0">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                                    <div style="font-size:.9rem;font-weight:600;color:#fff">Documentação e Conformidade</div>
+                                    <span style="font-size:.75rem;color:rgba(255,255,255,.35)">Peso: 10%</span>
+                                </div>
+                                <div style="display:flex;gap:8px">
+                                    ${[1,2,3,4,5].map(n=>`<button class="nota-btn" data-criterio="doc" data-nota="${n}" onclick="selecionarNota('doc',${n},this)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-weight:700">${n}</button>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;margin-top:16px;display:flex;align-items:center;gap:16px">
+                            <div style="text-align:center">
+                                <div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:4px">NOTA FINAL</div>
+                                <div id="nota-final" style="font-size:2.4rem;font-weight:800;color:#fff">-</div>
+                            </div>
+                            <div style="flex:1">
+                                <div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:4px">CLASSIFICAÇÃO</div>
+                                <div id="classif-result" style="font-size:1.4rem;font-weight:800;color:var(--accent)">-</div>
+                            </div>
+                        </div>
+                        <div class="mod-form-group" style="margin-top:14px">
+                            <label>Observações e Evidências</label>
+                            <textarea class="mod-textarea" id="aval-obs" rows="3" placeholder="Documente ocorrências, elogios ou pontos de melhoria identificados..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+                    <button class="mod-btn ghost" onclick="switchView('lista')">Cancelar</button>
+                    <button class="mod-btn primary" onclick="salvarAvaliacao()"><i class="fas fa-save"></i> Registrar Avaliação</button>
+                </div>
+            </div>
+
+            <!-- VIEW: CONFIG -->
+            <div id="view-config" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Configurações de Fornecedores</h2></div></div>
+                <div class="card">
+                    <div class="card-header"><h4>Critários e Pesos de Avaliação</h4></div>
+                    <div class="card-body">
+                        <p style="font-size:.85rem;color:rgba(255,255,255,.45);margin-bottom:16px">Configure os critários e seus respectivos pesos para a avaliação de fornecedores. Total deve ser 100%.</p>
+                        <div style="display:flex;flex-direction:column;gap:8px">
+                            <div style="display:flex;gap:10px;align-items:center"><input class="mod-input" value="Qualidade dos Produtos / Serviços" style="flex:1"><input class="mod-input" type="number" value="30" style="width:80px"> <span style="color:rgba(255,255,255,.4);font-size:.85rem">%</span></div>
+                            <div style="display:flex;gap:10px;align-items:center"><input class="mod-input" value="Prazo de Entrega" style="flex:1"><input class="mod-input" type="number" value="25" style="width:80px"> <span style="color:rgba(255,255,255,.4);font-size:.85rem">%</span></div>
+                            <div style="display:flex;gap:10px;align-items:center"><input class="mod-input" value="Atendimento e Suporte" style="flex:1"><input class="mod-input" type="number" value="20" style="width:80px"> <span style="color:rgba(255,255,255,.4);font-size:.85rem">%</span></div>
+                            <div style="display:flex;gap:10px;align-items:center"><input class="mod-input" value="Preão / Competitividade" style="flex:1"><input class="mod-input" type="number" value="15" style="width:80px"> <span style="color:rgba(255,255,255,.4);font-size:.85rem">%</span></div>
+                            <div style="display:flex;gap:10px;align-items:center"><input class="mod-input" value="Documentação e Conformidade" style="flex:1"><input class="mod-input" type="number" value="10" style="width:80px"> <span style="color:rgba(255,255,255,.4);font-size:.85rem">%</span></div>
+                        </div>
+                        <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                            <button class="mod-btn primary"><i class="fas fa-save"></i> Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVO FORNECEDOR -->
+<div class="mod-modal-overlay" id="modalNovo">
+    <div class="mod-modal md">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-plus-circle" style="color:var(--purple)"></i> Cadastrar Fornecedor</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNovo')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Razão Social <span>*</span></label><input class="mod-input" id="nf-razao" placeholder="Nome da empresa"></div>
+                <div class="mod-form-group"><label>CNPJ / CPF</label><input class="mod-input" id="nf-cnpj" placeholder="00.000.000/0001-00"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Categoria <span>*</span></label>
+                    <select class="mod-select-inp" id="nf-categoria">
+                        <option value="">Selecione...</option>
+                        <option>Matéria-Prima</option>
+                        <option>Serviços</option>
+                        <option>Componentes</option>
+                        <option>Ferramentas</option>
+                        <option>Logística</option>
+                    </select>
+                </div>
+                <div class="mod-form-group"><label>Contato Principal</label><input class="mod-input" id="nf-contato" placeholder="Nome do contato"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>E-mail</label><input class="mod-input" type="email" id="nf-email" placeholder="contato@fornecedor.com"></div>
+                <div class="mod-form-group"><label>Telefone / WhatsApp</label><input class="mod-input" id="nf-tel" placeholder="(11) 99999-9999"></div>
+            </div>
+            <div class="mod-form-row full">
+                <div class="mod-form-group"><label>Produtos / Serviços Fornecidos</label><textarea class="mod-textarea" id="nf-produtos" rows="2" placeholder="Descreva o que este fornecedor fornece..."></textarea></div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovo')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarFornecedor()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: DETALHE FORNECEDOR -->
+<div class="mod-modal-overlay" id="modalDetalhe">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3 id="detalhe-forn-title"><i class="fas fa-handshake" style="color:var(--purple)"></i> Fornecedor</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalDetalhe')">&times;</button>
+        </div>
+        <div class="mod-modal-body" id="detalhe-forn-body"></div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalDetalhe')">Fechar</button>
+            <button class="mod-btn primary" onclick="irAvaliar()"><i class="fas fa-star"></i> Avaliar Agora</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const DB_KEY = 'sgq_fornecedores';
+let currentFornId = null;
+const notas = {};
+
+function sanitize(str) {
+    return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function fixText(str) {
+    return String(str || '')
+        .replaceAll('Aços', 'Aços')
+        .replaceAll('Aço', 'Aço')
+        .replaceAll('Matéria', 'Matéria')
+        .replaceAll('Logàstica', 'Logística')
+        .replaceAll('Manutenção', 'Manutenção')
+        .replaceAll('Serviços', 'Serviços')
+        .replaceAll('Ind?stria', 'Indústria')
+        .replaceAll('avaliação', 'avaliação')
+        .replaceAll('Avaliação', 'Avaliação')
+        .replaceAll('CLASSIFICAÇÃO', 'CLASSIFICAÇÃO')
+        .replaceAll('Histórico', 'Histórico')
+        .replaceAll('médio', 'médio')
+        .replaceAll('critérios', 'critérios');
+}
+
+function normalizeFornecedor(f) {
+    ['razao','categoria','contato','email','tel','produtos'].forEach(k => f[k] = fixText(f[k]));
+    if (Array.isArray(f.avaliacoes)) f.avaliacoes.forEach(a => { a.periodo = fixText(a.periodo); a.obs = fixText(a.obs); });
+    return f;
+}
+
+function getDB() {
+    const db = JSON.parse(localStorage.getItem(DB_KEY) || '{"fornecedores":[]}');
+    db.fornecedores = (db.fornecedores || []).map(normalizeFornecedor);
+    return db;
+}
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+function seedData() {
+    const db = getDB();
+    if (db.fornecedores.length) return;
+    db.fornecedores = [
+        { id:1, razao:'Aços Brasil Ltda', cnpj:'12.345.678/0001-90', categoria:'Matéria-Prima', contato:'Paulo Souza', email:'paulo@acosbrasil.com', tel:'(11) 98765-4321', produtos:'Aço inox, chapa galvanizada', score:4.2, classif:'A', avaliacoes:[{periodo:'Semestral 2025', nota:4.2, obs:'Excelente qualidade'}] },
+        { id:2, razao:'LogiTrans Express', cnpj:'98.765.432/0001-10', categoria:'Logàstica', contato:'Joana Lima', email:'jlima@logitrans.com', tel:'(11) 3333-4444', produtos:'Transporte e entrega', score:3.5, classif:'B', avaliacoes:[] },
+        { id:3, razao:'TecService Manutenção', cnpj:'55.444.333/0001-22', categoria:'Serviços', contato:'Ricardo Gomes', email:'rg@tecservice.com', tel:'(11) 91234-5678', produtos:'Manutenção preventiva e corretiva', score:2.8, classif:'C', avaliacoes:[] },
+        { id:4, razao:'Parafusos ABC Ind?stria', cnpj:'44.333.222/0001-55', categoria:'Componentes', contato:'Sandra Nunes', email:'sandra@parafusosabc.com', tel:'(11) 2222-3333', produtos:'Parafusos, porcas, arruelas', score:1.6, classif:'D', avaliacoes:[] },
+    ];
+    saveDB(db);
+}
+
+function switchView(v) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display='none');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-'+v).style.display='block';
+    const nav = document.getElementById('nav-'+v);
+    if (nav) nav.classList.add('active');
+    if (v==='lista') renderFornecedores();
+    if (v==='avaliar') populateFornecedorSelect();
+}
+
+function populateFornecedorSelect() {
+    const db = getDB();
+    const sel = document.getElementById('aval-fornecedor');
+    sel.innerHTML = '<option value="">Selecione...</option>' + db.fornecedores.map(f => `<option value="${f.id}">${f.razao}</option>`).join('');
+}
+
+function renderFornecedores() {
+    const db = getDB();
+    const search = (document.getElementById('searchForn')?.value||'').toLowerCase();
+    const cf = document.getElementById('filterClassif')?.value||'';
+    const catf = document.getElementById('filterCategForn')?.value||'';
+    const items = db.fornecedores.filter(f => {
+        if (search && !f.razao.toLowerCase().includes(search)) return false;
+        if (cf && f.classif !== cf) return false;
+        if (catf && f.categoria !== catf) return false;
+        return true;
+    });
+
+    document.getElementById('stat-a').textContent = db.fornecedores.filter(f=>f.classif==='A').length;
+    document.getElementById('stat-b').textContent = db.fornecedores.filter(f=>f.classif==='B').length;
+    document.getElementById('stat-c').textContent = db.fornecedores.filter(f=>f.classif==='C').length;
+    document.getElementById('stat-d').textContent = db.fornecedores.filter(f=>f.classif==='D').length;
+
+    const listEl = document.getElementById('lista-fornecedores');
+    const emptyEl = document.getElementById('empty-fornecedores');
+    if (!items.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+
+    const classifColors = {A:'a',B:'b',C:'c',D:'d'};
+    listEl.innerHTML = items.map(f => `
+        <div style="display:flex;align-items:center;gap:16px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all .2s" onmouseenter="this.style.background='rgba(255,255,255,.06)'" onmouseleave="this.style.background='rgba(255,255,255,.03)'" onclick="openDetalhe(${f.id})">
+            <div class="score-circle ${classifColors[f.classif]||'b'}">${sanitize(f.classif)}</div>
+            <div style="flex:1">
+                <div style="font-size:.95rem;font-weight:700;color:#fff;margin-bottom:3px">${sanitize(f.razao)}</div>
+                <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:rgba(255,255,255,.4)">
+                    <span><i class="fas fa-tag" style="margin-right:3px"></i>${sanitize(f.categoria)}</span>
+                    <span><i class="fas fa-user" style="margin-right:3px"></i>${sanitize(f.contato)}</span>
+                    <span><i class="fas fa-envelope" style="margin-right:3px"></i>${sanitize(f.email)}</span>
+                </div>
+            </div>
+            <div style="text-align:right">
+                <div style="font-size:1.5rem;font-weight:800;color:#fff">${f.score?f.score.toFixed(1):'-'}</div>
+                <div style="font-size:.72rem;color:rgba(255,255,255,.35)">Score médio</div>
+                <div class="score-bar" style="width:80px;margin-top:4px"><div class="score-fill ${f.score>=4?'':f.score>=3?'warn':'danger'}" style="width:${(f.score||0)*20}%"></div></div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openDetalhe(id) {
+    const db = getDB();
+    const f = db.fornecedores.find(x=>x.id===id);
+    if (!f) return;
+    currentFornId = id;
+    document.getElementById('detalhe-forn-title').innerHTML = `<i class="fas fa-handshake" style="color:var(--purple)"></i> ${sanitize(f.razao)}`;
+    const classifColors = {A:'a',B:'b',C:'c',D:'d'};
+    const avalHtml = f.avaliacoes && f.avaliacoes.length ? f.avaliacoes.map(a => `
+        <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);align-items:center">
+            <div style="font-size:.85rem;color:rgba(255,255,255,.6);flex:1">${sanitize(a.periodo)}</div>
+            <div style="font-size:1.2rem;font-weight:800;color:#fff">${a.nota.toFixed(1)}</div>
+            <span class="score-circle ${f.score>=4?'a':f.score>=3?'b':f.score>=2?'c':'d'}" style="width:32px;height:32px;font-size:.85rem">${sanitize(f.classif)}</span>
+        </div>
+    `).join('') : '<div style="color:rgba(255,255,255,.3);font-size:.85rem">Nenhuma avaliação registrada</div>';
+
+    document.getElementById('detalhe-forn-body').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">CNPJ</div><div style="font-weight:600;color:#fff">${sanitize(f.cnpj||'-')}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">CATEGORIA</div><div style="font-weight:600;color:#fff">${sanitize(f.categoria)}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">CLASSIFICAÇÃO</div><div class="score-circle ${classifColors[f.classif]||'b'}" style="display:inline-flex;width:36px;height:36px;font-size:1rem">${sanitize(f.classif)}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">CONTATO</div><div style="font-weight:600;color:#fff">${sanitize(f.contato)}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">E-MAIL</div><div style="font-weight:600;color:#fff">${sanitize(f.email)}</div></div>
+        </div>
+        <div class="mod-form-section-title">Histórico de Avaliações</div>
+        ${avalHtml}
+    `;
+    openModal('modalDetalhe');
+}
+
+function irAvaliar() {
+    closeModal('modalDetalhe');
+    switchView('avaliar');
+    setTimeout(() => {
+        const sel = document.getElementById('aval-fornecedor');
+        if (currentFornId) sel.value = currentFornId;
+    }, 100);
+}
+
+const pesos = { qualidade:0.3, prazo:0.25, atendimento:0.2, preco:0.15, doc:0.1 };
+
+function selecionarNota(criterio, nota, btn) {
+    notas[criterio] = nota;
+    document.querySelectorAll(`.nota-btn[data-criterio="${criterio}"]`).forEach(b => {
+        b.style.background = 'rgba(255,255,255,.04)';
+        b.style.color = 'rgba(255,255,255,.5)';
+        b.style.borderColor = 'rgba(255,255,255,.1)';
+    });
+    btn.style.background = 'rgba(15,117,189,.3)';
+    btn.style.color = '#fff';
+    btn.style.borderColor = 'var(--primary)';
+    calcNotaFinal();
+}
+
+function calcNotaFinal() {
+    let total = 0, pesoTotal = 0;
+    for (const [k, peso] of Object.entries(pesos)) {
+        if (notas[k]) { total += notas[k] * peso; pesoTotal += peso; }
+    }
+    if (!pesoTotal) return;
+    const nota = (total / pesoTotal).toFixed(1);
+    const classif = nota >= 4.5 ? 'A' : nota >= 3.5 ? 'B' : nota >= 2.5 ? 'C' : 'D';
+    const colors = {A:'#34d399',B:'#3b9fe2',C:'#fbbf24',D:'#f87171'};
+    document.getElementById('nota-final').textContent = nota;
+    document.getElementById('classif-result').innerHTML = `<span style="color:${colors[classif]}">${classif} - ${classif==='A'?'Excelente':classif==='B'?'Bom':classif==='C'?'Regular':'Bloqueado'}</span>`;
+}
+
+function salvarAvaliacao() {
+    const fornId = parseInt(document.getElementById('aval-fornecedor').value);
+    const periodo = document.getElementById('aval-periodo').value;
+    if (!fornId) return alert('Selecione o fornecedor.');
+    if (Object.keys(notas).length < 3) return alert('Avalie pelo menos 3 crit?rios.');
+
+    let total = 0, pesoTotal = 0;
+    for (const [k, peso] of Object.entries(pesos)) {
+        if (notas[k]) { total += notas[k] * peso; pesoTotal += peso; }
+    }
+    const nota = parseFloat((total/pesoTotal).toFixed(1));
+    const classif = nota >= 4.5 ? 'A' : nota >= 3.5 ? 'B' : nota >= 2.5 ? 'C' : 'D';
+
+    const db = getDB();
+    const forn = db.fornecedores.find(f=>f.id===fornId);
+    if (!forn) return;
+    if (!forn.avaliacoes) forn.avaliacoes = [];
+    forn.avaliacoes.push({ periodo, nota, obs:document.getElementById('aval-obs').value, data:new Date().toISOString() });
+    forn.score = nota;
+    forn.classif = classif;
+    saveDB(db);
+    switchView('lista');
+    showToast('Avaliao registrada com sucesso!', 'success');
+    Object.keys(notas).forEach(k => delete notas[k]);
+}
+
+function salvarFornecedor() {
+    const razao = document.getElementById('nf-razao').value.trim();
+    const categoria = document.getElementById('nf-categoria').value;
+    if (!razao || !categoria) return alert('Preencha razão social e categoria.');
+    const db = getDB();
+    const newId = db.fornecedores.length ? Math.max(...db.fornecedores.map(f=>f.id))+1 : 1;
+    db.fornecedores.push({ id:newId, razao, cnpj:document.getElementById('nf-cnpj').value, categoria, contato:document.getElementById('nf-contato').value, email:document.getElementById('nf-email').value, tel:document.getElementById('nf-tel').value, produtos:document.getElementById('nf-produtos').value, score:null, classif:'B', avaliacoes:[] });
+    saveDB(db);
+    closeModal('modalNovo');
+    renderFornecedores();
+    showToast('Fornecedor cadastrado!', 'success');
+}
+
+function openNovoModal() { openModal('modalNovo'); }
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;z-index:9999;background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+document.querySelectorAll('.mod-modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('active'); }));
+seedData();
+renderFornecedores();
+</script>
+<script>
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');});
+</script><script>
+function startModuleTour() {
+    alert('Tour deste módulo em breve! ');
+}
+</script></body>
+</html>

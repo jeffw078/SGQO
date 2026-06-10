@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processo Produtivo - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* =========== TABLET APONTAMENTO SCREEN =========== */
+        .tab-fullscreen { background: #080d1a; min-height: 100vh; padding: 24px; }
+        .tab-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:14px; }
+        .tab-machines-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:20px; }
+        .tab-machine-card { border-radius:16px; padding:28px; border:2px solid; transition:all .3s; }
+        .tab-machine-card.status-running  { background:rgba(16,185,129,.07); border-color:#10b981; box-shadow:0 0 30px rgba(16,185,129,.12); }
+        .tab-machine-card.status-stopped  { background:rgba(239,68,68,.07);  border-color:#ef4444; box-shadow:0 0 30px rgba(239,68,68,.12); }
+        .tab-machine-card.status-idle     { background:rgba(255,255,255,.03); border-color:rgba(255,255,255,.1); }
+        .tab-machine-name { font-size:1.35rem; font-weight:700; color:#fff; margin-bottom:4px; }
+        .tab-machine-code { font-size:.78rem; color:rgba(255,255,255,.3); margin-bottom:12px; }
+        .tab-machine-status { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:.82rem; font-weight:700; margin-bottom:14px; }
+        .tab-machine-status.running { background:rgba(16,185,129,.2);  color:#34d399; }
+        .tab-machine-status.stopped { background:rgba(239,68,68,.2);   color:#f87171; }
+        .tab-machine-status.idle    { background:rgba(255,255,255,.08); color:rgba(255,255,255,.45); }
+        .tab-timer { font-size:2.6rem; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.04em; margin:10px 0; }
+        .tab-timer.running { color:#34d399; }
+        .tab-timer.stopped { color:#f87171; }
+        .tab-timer.idle    { color:rgba(255,255,255,.25); }
+        .tab-motivo-bar { font-size:.8rem; color:#f87171; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+        .tab-btn-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:4px; }
+        .tab-btn { flex:1; min-width:110px; padding:13px 18px; border-radius:12px; font-size:.88rem; font-weight:700; border:none; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; touch-action:manipulation; }
+        .tab-btn.green { background:#10b981; color:#fff; } .tab-btn.green:hover { background:#059669; }
+        .tab-btn.red   { background:#ef4444; color:#fff; } .tab-btn.red:hover   { background:#dc2626; }
+        .tab-btn.blue  { background:#0f75bd; color:#fff; } .tab-btn.blue:hover  { background:#0d64a3; }
+        .tab-btn.gray  { background:rgba(255,255,255,.1); color:rgba(255,255,255,.6); } .tab-btn.gray:hover { background:rgba(255,255,255,.18); }
+        .tab-btn:disabled { opacity:.35; cursor:not-allowed; pointer-events:none; }
+
+        /* =========== OEE GAUGES =========== */
+        .oee-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px,1fr)); gap:16px; margin-bottom:28px; }
+        .oee-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:14px; padding:24px 18px; text-align:center; }
+        .oee-gauge { position:relative; width:110px; height:110px; margin:0 auto 14px; }
+        .oee-gauge svg { transform:rotate(-90deg); }
+        .oee-gauge-value { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.35rem; font-weight:800; color:#fff; }
+        .oee-label { font-size:.82rem; font-weight:700; color:rgba(255,255,255,.6); text-transform:uppercase; letter-spacing:.5px; }
+        .oee-sublabel { font-size:.72rem; color:rgba(255,255,255,.28); margin-top:4px; }
+
+        /* =========== STOP REASON MODAL =========== */
+        .stop-reasons-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:10px; max-height:320px; overflow-y:auto; padding:2px; }
+        .stop-reason-btn { padding:14px; border-radius:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); cursor:pointer; text-align:center; transition:all .2s; color:rgba(255,255,255,.7); font-size:.84rem; font-weight:600; }
+        .stop-reason-btn:hover, .stop-reason-btn.selected { background:rgba(239,68,68,.14); border-color:#ef4444; color:#f87171; }
+        .stop-reason-btn .sr-cat { font-size:.7rem; color:rgba(255,255,255,.3); margin-top:4px; font-weight:400; }
+
+        /* =========== CONFIG SUB-TABS =========== */
+        .config-tabs { display:flex; gap:4px; margin-bottom:24px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:5px; flex-wrap:wrap; }
+        .config-tab { flex:1; min-width:120px; padding:9px 12px; border-radius:7px; border:none; background:none; color:rgba(255,255,255,.4); font-size:.8rem; font-weight:600; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:6px; }
+        .config-tab.active { background:var(--primary); color:#fff; }
+        .config-panel { display:none; }
+        .config-panel.active { display:block; }
+
+        /* =========== STATUS BADGES =========== */
+        .op-status { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700; }
+        .op-status.pendente    { background:rgba(245,158,11,.15);  color:#fbbf24; }
+        .op-status.em_andamento{ background:rgba(15,117,189,.15);  color:#60a5fa; }
+        .op-status.pausada     { background:rgba(239,68,68,.15);   color:#f87171; }
+        .op-status.concluida   { background:rgba(16,185,129,.15);  color:#34d399; }
+        .op-status.cancelada   { background:rgba(255,255,255,.08); color:rgba(255,255,255,.35); }
+
+        /* =========== FORM CARDS =========== */
+        .form-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:24px 28px; margin-bottom:20px; }
+        .form-card h3 { font-size:.93rem; font-weight:700; color:rgba(255,255,255,.65); margin-bottom:18px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,.06); display:flex; align-items:center; gap:8px; }
+        .form-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(210px,1fr)); gap:16px; margin-bottom:16px; }
+        .form-group label { display:block; font-size:.77rem; font-weight:600; color:rgba(255,255,255,.4); text-transform:uppercase; letter-spacing:.4px; margin-bottom:7px; }
+        .form-group input,
+        .form-group select,
+        .form-group textarea,
+        #modal-body .form-group input,
+        #modal-body .form-group select,
+        #modal-body .form-group textarea {
+            width:100%; padding:9px 14px;
+            background:rgba(255,255,255,.08) !important;
+            border:1px solid rgba(255,255,255,.14) !important;
+            border-radius:8px;
+            color:#fff !important;
+            font-family:inherit; font-size:.85rem; outline:none;
+            transition:border-color .2s; box-sizing:border-box;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus,
+        #modal-body .form-group input:focus,
+        #modal-body .form-group select:focus,
+        #modal-body .form-group textarea:focus { border-color:var(--primary) !important; background:rgba(255,255,255,.12) !important; box-shadow:none !important; }
+        .form-group select option, #modal-body select option { background:#1a1a2e; color:#fff; }
+        .form-group textarea { resize:vertical; min-height:70px; }
+        #modal-body .form-group label { color:rgba(255,255,255,.4); font-size:.77rem; font-weight:600; text-transform:uppercase; letter-spacing:.4px; }
+
+        /* =========== MODE TOGGLE =========== */
+        .mode-toggle { display:flex; gap:12px; margin-bottom:22px; flex-wrap:wrap; }
+        .mode-card { flex:1; min-width:200px; padding:22px 18px; border-radius:12px; border:2px solid rgba(255,255,255,.08); cursor:pointer; transition:all .2s; text-align:center; }
+        .mode-card.active { border-color:var(--primary); background:rgba(15,117,189,.09); }
+        .mode-card i { font-size:1.8rem; margin-bottom:10px; color:rgba(255,255,255,.28); display:block; }
+        .mode-card.active i { color:var(--primary); }
+        .mode-card h4 { font-size:.9rem; font-weight:700; color:rgba(255,255,255,.65); margin-bottom:6px; }
+        .mode-card.active h4 { color:#fff; }
+        .mode-card p { font-size:.76rem; color:rgba(255,255,255,.28); line-height:1.5; }
+
+        /* =========== SMALL TAGS =========== */
+        .tag { display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border-radius:5px; font-size:.72rem; font-weight:600; }
+        .tag.green  { background:rgba(16,185,129,.15);  color:#34d399; }
+        .tag.red    { background:rgba(239,68,68,.15);   color:#f87171; }
+        .tag.yellow { background:rgba(245,158,11,.15);  color:#fbbf24; }
+        .tag.blue   { background:rgba(15,117,189,.15);  color:#60a5fa; }
+        .tag.gray   { background:rgba(255,255,255,.08); color:rgba(255,255,255,.4); }
+        .tag.purple { background:rgba(139,92,246,.15);  color:#a78bfa; }
+
+        /* =========== TIMELINE =========== */
+        .timeline { padding-left:20px; border-left:2px solid rgba(255,255,255,.08); }
+        .tl-item { position:relative; padding:0 0 20px 22px; }
+        .tl-item::before { content:''; position:absolute; left:-9px; top:4px; width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,.15); border:2px solid rgba(255,255,255,.25); }
+        .tl-item.running::before { background:#10b981; border-color:#34d399; }
+        .tl-item.stopped::before { background:#ef4444; border-color:#f87171; }
+        .tl-item.done::before { background:#8b5cf6; border-color:#a78bfa; }
+        .tl-time { font-size:.74rem; color:rgba(255,255,255,.28); margin-bottom:3px; }
+        .tl-text { font-size:.85rem; color:rgba(255,255,255,.7); }
+
+        /* =========== PROGRESS BAR =========== */
+        .prog-bar-wrap { height:7px; background:rgba(255,255,255,.07); border-radius:4px; overflow:hidden; margin-top:8px; }
+        .prog-bar { height:100%; border-radius:4px; transition:width .5s; }
+
+        /* =========== TURNO CHIP =========== */
+        .turno-chip { display:inline-flex; align-items:center; padding:4px 10px; border-radius:20px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.09); font-size:.78rem; color:rgba(255,255,255,.55); margin:2px; }
+
+        /* =========== PENALIZA OEE =========== */
+        .pen-toggle { display:inline-flex; align-items:flex-start; gap:10px; cursor:pointer; }
+        .pen-toggle input[type=checkbox] { width:16px; height:16px; accent-color:#ef4444; flex-shrink:0; margin-top:2px; }
+
+        /* =========== INFO ALERT =========== */
+        .info-alert { padding:14px 18px; background:rgba(15,117,189,.1); border:1px solid rgba(15,117,189,.25); border-radius:10px; display:flex; align-items:flex-start; gap:12px; margin-bottom:18px; font-size:.83rem; color:rgba(255,255,255,.6); }
+        .info-alert i { color:#60a5fa; flex-shrink:0; margin-top:2px; }
+
+        @media (max-width:640px) {
+            .tab-machines-grid { grid-template-columns:1fr; }
+            .tab-timer { font-size:1.9rem; }
+            .tab-btn { font-size:.8rem; padding:11px 12px; }
+            .config-tab { min-width:90px; font-size:.73rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-industry" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Processo Produtivo</span>
+                    <button onclick="startModuleTour()" title="Ajuda" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Visão Geral</div>
+                <a href="#" class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard');return false"><i class="fas fa-chart-pie"></i> Dashboard / OEE</a>
+            </div>
+            <div class="nav-section" id="nav-section-op">
+                <div class="nav-section-title">Ordens de Produção</div>
+                <a href="#" class="nav-item" id="nav-ordens" onclick="switchView('ordens');return false"><i class="fas fa-list-check"></i> Lista de Ordens</a>
+                <a href="#" class="nav-item" id="nav-nova-op" onclick="openNovaOP(null);return false"><i class="fas fa-plus-circle"></i> Nova Ordem</a>
+            </div>
+            <div class="nav-section" id="nav-section-apontamento">
+                <div class="nav-section-title">Apontamento</div>
+                <a href="#" class="nav-item" id="nav-apontamento" onclick="switchView('apontamento');return false"><i class="fas fa-tablet-screen-button"></i> Painel Produtivo</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Configurações</div>
+                <a href="#" class="nav-item" id="nav-config" onclick="switchView('config');return false"><i class="fas fa-gear"></i> Configurações</a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Buscar ordens, máquinas...">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JW</div>
+                        <span class="user-btn-name">Jefferson Willian</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JW</div>
+                            <div><div class="user-name">Jefferson Willian</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- ===================================================== -->
+            <!-- VIEW: DASHBOARD                                        -->
+            <!-- ===================================================== -->
+            <div id="view-dashboard" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-industry" style="color:var(--primary);margin-right:10px"></i>Processo Produtivo</h2>
+                        <p id="dash-mode-label">Carregando...</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn accent" onclick="switchView('apontamento')"><i class="fas fa-tablet-screen-button"></i> Painel Tablet</button>
+                        <button class="mod-btn primary" onclick="openNovaOP(null)"><i class="fas fa-plus"></i> Nova OP</button>
+                    </div>
+                </div>
+
+                <!-- OEE Gauges -->
+                <div class="oee-grid" id="oee-gauges"></div>
+
+                <!-- Stats -->
+                <div class="mod-stats" id="dash-stats"></div>
+
+                <!-- Active OPs -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;margin-top:4px">
+                    <h3 style="font-size:.98rem;font-weight:700;color:rgba(255,255,255,.7)"><i class="fas fa-bolt" style="color:#fbbf24;margin-right:6px"></i>Ordens em Andamento / Pausadas</h3>
+                    <a href="#" onclick="switchView('ordens');return false" style="font-size:.8rem;color:var(--primary)">Ver todas <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="mod-table-wrap">
+                    <table class="mod-table">
+                        <thead><tr><th>OP</th><th>Produto / Pedido</th><th>Máquina</th><th>Turno</th><th>Progresso</th><th>Status</th><th></th></tr></thead>
+                        <tbody id="tbody-active-ops"></tbody>
+                    </table>
+                </div>
+                <div class="mod-empty" id="empty-active-ops" style="display:none;margin-top:16px">
+                    <i class="fas fa-industry"></i>
+                    <h3>Nenhuma ordem em andamento</h3>
+                    <p>Crie uma Ordem de Produção para começar</p>
+                    <button class="mod-btn primary" style="margin-top:14px" onclick="openNovaOP(null)"><i class="fas fa-plus"></i> Nova Ordem</button>
+                </div>
+
+                <!-- Recent apontamentos -->
+                <div style="margin-top:32px">
+                    <h3 style="font-size:.98rem;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:14px"><i class="fas fa-clock-rotate-left" style="color:var(--primary);margin-right:6px"></i>?lttimos Apontamentos</h3>
+                    <div id="recent-apontamentos" class="timeline"></div>
+                    <div class="mod-empty" id="empty-apontamentos" style="display:none;padding:16px 0"><i class="fas fa-list-check"></i><h3>Sem apontamentos registrados</h3></div>
+                </div>
+            </div>
+
+            <!-- ===================================================== -->
+            <!-- VIEW: ORDENS DE PRODUÇÃO                              -->
+            <!-- ===================================================== -->
+            <div id="view-ordens" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div>
+                        <h2>Ordens de Produção</h2>
+                        <p>Gerencie e acompanhe as ordens vinculadas aos pedidos</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn primary" onclick="openNovaOP(null)"><i class="fas fa-plus"></i> Nova Ordem</button>
+                        <button class="mod-btn ghost" onclick="exportOPs()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                    </div>
+                </div>
+
+                <div class="mod-filter-bar">
+                    <div class="mod-search"><i class="fas fa-search"></i><input type="text" id="searchOP" placeholder="Buscar OP, produto, pedido..." oninput="renderOrdens()"></div>
+                    <select class="mod-select" id="filterOPStatus" onchange="renderOrdens()">
+                        <option value="">Todos os status</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="em_andamento">Em Andamento</option>
+                        <option value="pausada">Pausada</option>
+                        <option value="concluida">Concluída</option>
+                        <option value="cancelada">Cancelada</option>
+                    </select>
+                    <select class="mod-select" id="filterOPMaquina" onchange="renderOrdens()">
+                        <option value="">Todas as máquinas</option>
+                    </select>
+                </div>
+
+                <div class="mod-table-wrap" id="wrap-table-ordens">
+                    <table class="mod-table">
+                        <thead><tr><th>OP</th><th>Pedido</th><th>Produto</th><th>Qtde</th><th>Máquina</th><th>Turno</th><th>Início</th><th>Prazo</th><th>Status</th><th></th></tr></thead>
+                        <tbody id="tbody-ordens"></tbody>
+                    </table>
+                </div>
+                <div class="mod-empty" id="empty-ordens" style="display:none">
+                    <i class="fas fa-list-check"></i>
+                    <h3>Nenhuma ordem cadastrada</h3>
+                    <p>Clique em "Nova Ordem" para criar a primeira</p>
+                </div>
+            </div>
+
+            <!-- ===================================================== -->
+            <!-- VIEW: NOVA / EDITAR OP                                -->
+            <!-- ===================================================== -->
+            <div id="view-nova-op" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div>
+                        <h2 id="nova-op-title"><i class="fas fa-plus-circle" style="color:var(--accent);margin-right:10px"></i>Nova Ordem de Produção</h2>
+                        <p>Preencha os dados e vincule ao pedido correspondente</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn ghost" onclick="switchView('ordens')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                    </div>
+                </div>
+
+                <form id="op-form" onsubmit="saveOP(event)">
+                    <input type="hidden" id="op-edit-id">
+
+                    <div class="form-card">
+                        <h3><i class="fas fa-barcode"></i> Identificação</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nº da Ordem (OP) *</label>
+                                <input type="text" id="op-numero" placeholder="OP-0001" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Pedido Vinculado</label>
+                                <select id="op-pedido" onchange="onPedidoChange()">
+                                    <option value="">— Sem pedido vinculado —</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Produto *</label>
+                                <select id="op-produto" required>
+                                    <option value="">— Selecionar produto —</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Quantidade a Produzir *</label>
+                                <input type="number" id="op-quantidade" min="1" placeholder="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Unidade</label>
+                                <input type="text" id="op-unidade" placeholder="un, kg, m..." value="un">
+                            </div>
+                            <div class="form-group">
+                                <label>Responsável</label>
+                                <input type="text" id="op-responsavel" placeholder="Operador ou supervisor">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <h3><i class="fas fa-calendar-days"></i> Programação</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Data de Início Prevista *</label>
+                                <input type="date" id="op-data-inicio" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Data de Entrega (Prazo)</label>
+                                <input type="date" id="op-data-prazo">
+                            </div>
+                            <div class="form-group">
+                                <label>Turno</label>
+                                <select id="op-turno">
+                                    <option value="">— Sem turno definido —</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Máquina / Centro de Trabalho</label>
+                                <select id="op-maquina">
+                                    <option value="">— Sem máquina —</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tempo de Ciclo Ideal (min/peça)</label>
+                                <input type="number" id="op-ciclo" min="0" step="0.01" placeholder="0.50">
+                            </div>
+                            <div class="form-group">
+                                <label>Status Inicial</label>
+                                <select id="op-status">
+                                    <option value="pendente">Pendente</option>
+                                    <option value="em_andamento">Em Andamento</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <h3><i class="fas fa-chart-bar"></i> Qualidade (Apontamento Real)</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Quantidade Produzida (real)</label>
+                                <input type="number" id="op-qtde-real" min="0" placeholder="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Quantidade com Defeito</label>
+                                <input type="number" id="op-qtde-defeito" min="0" placeholder="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <h3><i class="fas fa-comment-dots"></i> Observações</h3>
+                        <div class="form-group">
+                            <textarea id="op-obs" placeholder="Instruções especiais, alertas, notas para o operador..."></textarea>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:10px;justify-content:flex-end">
+                        <button type="button" class="mod-btn ghost" onclick="switchView('ordens')"><i class="fas fa-times"></i> Cancelar</button>
+                        <button type="submit" class="mod-btn primary"><i class="fas fa-save"></i> Salvar Ordem</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ===================================================== -->
+            <!-- VIEW: PAINEL PRODUTIVO (Tablet)                       -->
+            <!-- ===================================================== -->
+            <div id="view-apontamento" class="mod-view" style="display:none;padding:0">
+                <div class="tab-fullscreen" id="tab-painel">
+                    <div class="tab-header">
+                        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                            <div style="font-size:1.3rem;font-weight:800;color:#fff">
+                                <i class="fas fa-industry" style="color:var(--primary);margin-right:8px"></i>Painel Produtivo
+                            </div>
+                            <div id="tab-turno-ativo" style="padding:4px 14px;border-radius:20px;background:rgba(16,185,129,.15);color:#34d399;font-size:.8rem;font-weight:600;display:none">
+                                <i class="fas fa-sun" style="margin-right:5px"></i><span></span>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <div id="tab-clock" style="font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.55)"></div>
+                            <button class="mod-btn ghost" onclick="switchView('dashboard')" style="font-size:.8rem"><i class="fas fa-arrow-left"></i> Dashboard</button>
+                        </div>
+                    </div>
+
+                    <div id="tab-machines-grid" class="tab-machines-grid"></div>
+
+                    <div class="mod-empty" id="empty-machines" style="display:none">
+                        <i class="fas fa-cog"></i>
+                        <h3 style="color:#fff">Nenhuma máquina ativa</h3>
+                        <p style="color:rgba(255,255,255,.4)">Cadastre e ative máquinas nas configurações</p>
+                        <button class="mod-btn primary" style="margin-top:14px" onclick="switchView('config')"><i class="fas fa-gear"></i> Ir para Configurações</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================================================== -->
+            <!-- VIEW: CONFIGURAÇÕES                                   -->
+            <!-- ===================================================== -->
+            <div id="view-config" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-gear" style="color:var(--primary);margin-right:10px"></i>Configurações</h2>
+                        <p>Tipo de processo, turnos, máquinas e motivos de parada</p>
+                    </div>
+                </div>
+
+                <div class="config-tabs">
+                    <button class="config-tab active" id="ctab-modo"     onclick="switchConfigTab('modo')"    ><i class="fas fa-sliders"></i> Processo</button>
+                    <button class="config-tab"        id="ctab-turnos"   onclick="switchConfigTab('turnos')"  ><i class="fas fa-clock"></i> Turnos</button>
+                    <button class="config-tab"        id="ctab-maquinas" onclick="switchConfigTab('maquinas')"><i class="fas fa-cog"></i> Máquinas</button>
+                    <button class="config-tab"        id="ctab-paradas"  onclick="switchConfigTab('paradas')" ><i class="fas fa-hand"></i> Motivos de Parada</button>
+                </div>
+
+                <!-- ---- Panel: Tipo de Processo ---- -->
+                <div class="config-panel active" id="cpanel-modo">
+                    <div class="form-card">
+                        <h3><i class="fas fa-route"></i> Tipo de Apontamento Produtivo</h3>
+                        <p style="font-size:.85rem;color:rgba(255,255,255,.4);margin-bottom:22px">Define como o processo produtivo será acompanhado no sistema</p>
+                        <div class="mode-toggle">
+                            <div class="mode-card" id="mode-card-op" onclick="setModo('op')">
+                                <i class="fas fa-list-check"></i>
+                                <h4>Por Ordem de Produção</h4>
+                                <p>Crie OPs vinculadas a pedidos e acompanhe quantidade, qualidade e status por ordem</p>
+                            </div>
+                            <div class="mode-card" id="mode-card-processo" onclick="setModo('processo')">
+                                <i class="fas fa-tablet-screen-button"></i>
+                                <h4>Por Ponto Produtivo</h4>
+                                <p>Painel de tablet para cada máquina — registra início, parada, retomada e fim em tempo real</p>
+                            </div>
+                            <div class="mode-card" id="mode-card-ambos" onclick="setModo('ambos')">
+                                <i class="fas fa-layer-group"></i>
+                                <h4>Ambos (Modo Completo)</h4>
+                                <p>OPs vinculadas a pedidos + painel de ponto produtivo simultaneamente</p>
+                            </div>
+                        </div>
+                        <button class="mod-btn primary" onclick="saveModo()"><i class="fas fa-save"></i> Salvar Configuração</button>
+                    </div>
+                </div>
+
+                <!-- ---- Panel: Turnos ---- -->
+                <div class="config-panel" id="cpanel-turnos">
+                    <div class="mod-header" style="margin-bottom:16px">
+                        <div>
+                            <h3 style="font-size:1.05rem;font-weight:700;color:#fff">Turnos de Trabalho</h3>
+                            <p style="font-size:.82rem;color:rgba(255,255,255,.4)">Defina os turnos e horários para calcular horas disponáveis e OEE</p>
+                        </div>
+                        <button class="mod-btn primary" onclick="openTurnoModal(null)"><i class="fas fa-plus"></i> Novo Turno</button>
+                    </div>
+                    <div id="lista-turnos"></div>
+                    <div class="mod-empty" id="empty-turnos" style="display:none"><i class="fas fa-clock"></i><h3>Nenhum turno cadastrado</h3></div>
+                </div>
+
+                <!-- ---- Panel: Máquinas ---- -->
+                <div class="config-panel" id="cpanel-maquinas">
+                    <div class="mod-header" style="margin-bottom:16px">
+                        <div>
+                            <h3 style="font-size:1.05rem;font-weight:700;color:#fff">Máquinas / Centros de Trabalho</h3>
+                            <p style="font-size:.82rem;color:rgba(255,255,255,.4)">Cadastre máquinas para vincular a pedidos e ordens de produção</p>
+                        </div>
+                        <button class="mod-btn primary" onclick="openMaquinaModal(null)"><i class="fas fa-plus"></i> Nova Máquina</button>
+                    </div>
+                    <div class="mod-table-wrap" id="lista-maquinas" style="display:none">
+                        <table class="mod-table">
+                            <thead><tr><th>Código</th><th>Nome</th><th>Setor</th><th>Status</th><th>Meta OEE</th><th></th></tr></thead>
+                            <tbody id="tbody-maquinas"></tbody>
+                        </table>
+                    </div>
+                    <div class="mod-empty" id="empty-maquinas" style="display:none"><i class="fas fa-cog"></i><h3>Nenhuma máquina cadastrada</h3></div>
+                </div>
+
+                <!-- ---- Panel: Motivos de Parada ---- -->
+                <div class="config-panel" id="cpanel-paradas">
+                    <div class="mod-header" style="margin-bottom:16px">
+                        <div>
+                            <h3 style="font-size:1.05rem;font-weight:700;color:#fff">Motivos de Parada</h3>
+                            <p style="font-size:.82rem;color:rgba(255,255,255,.4)">Configure os motivos e defina se penalizam os indicadores de OEE</p>
+                        </div>
+                        <button class="mod-btn primary" onclick="openParadaModal(null)"><i class="fas fa-plus"></i> Novo Motivo</button>
+                    </div>
+                    <div class="info-alert">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong style="color:#fff">Penaliza OEE:</strong> quando marcado, as horas dessa parada são deduzidas das horas disponáveis do turno para cálculo de disponibilidade e OEE.
+                            <br><span style="color:rgba(255,255,255,.3);margin-top:4px;display:block">Ex.: Refeição e manutenção preventiva podem <em>não</em> penalizar. Quebra de máquina e falta de material <em>devem</em> penalizar.</span>
+                        </div>
+                    </div>
+                    <div class="mod-table-wrap" id="lista-paradas" style="display:none">
+                        <table class="mod-table">
+                            <thead><tr><th>Motivo</th><th>Categoria</th><th>Cor</th><th>Penaliza OEE</th><th></th></tr></thead>
+                            <tbody id="tbody-paradas"></tbody>
+                        </table>
+                    </div>
+                    <div class="mod-empty" id="empty-paradas" style="display:none"><i class="fas fa-hand"></i><h3>Nenhum motivo de parada cadastrado</h3></div>
+                </div>
+            </div>
+
+        </div><!-- /page-content -->
+    </div><!-- /main-content -->
+</div><!-- /dashboard-layout -->
+
+<!-- ===== MODAL GEN—RICO ===== -->
+<div id="modal-overlay" class="modal-overlay" onclick="closeModalBG(event)">
+    <div class="modal-box" id="modal-box" style="max-width:520px;background:#111827;color:#fff" onclick="event.stopPropagation()">
+        <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:20px;padding-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+            <h3 id="modal-title" style="font-size:1.05rem;font-weight:700;color:#fff;margin:0"></h3>
+            <button class="modal-close" onclick="closeAllModals()" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+    </div>
+</div>
+
+<!-- ===== MODAL PARADA (tablet) ===== -->
+<div id="modal-parada-overlay" class="modal-overlay" style="z-index:9999" onclick="closeParadaBG(event)">
+    <div class="modal-box" style="max-width:580px;background:#111827;color:#fff" onclick="event.stopPropagation()">
+        <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:20px;padding-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+            <h3 style="font-size:1.05rem;font-weight:700;color:#fff;margin:0"><i class="fas fa-hand" style="color:#f87171;margin-right:8px"></i>Registrar Parada</h3>
+            <button class="modal-close" onclick="closeParadaModal()" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:.85rem;color:rgba(255,255,255,.45);margin-bottom:16px">Selecione o motivo da parada:</p>
+            <div class="stop-reasons-grid" id="stop-reasons-list"></div>
+            <div class="form-group" style="margin-top:16px">
+                <label>Observação (opcional)</label>
+                <textarea id="parada-obs" placeholder="Detalhes adicionais..." rows="2"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+                <button class="mod-btn ghost" onclick="closeParadaModal()">Cancelar</button>
+                <button class="mod-btn danger" onclick="confirmarParada()"><i class="fas fa-hand"></i> Confirmar Parada</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// DATA LAYER
+// ============================================================
+const PROD_KEY = 'sgq_producao';
+const CAD_KEY  = 'sgq_cadastros';
+
+function defaultDB() {
+    return {
+        config: {
+            modo: 'ambos',
+            turnos: [
+                { id: uid(), nome: 'Turno A', inicio: '06:00', fim: '14:00', diasSemana: [1,2,3,4,5], ativo: true },
+                { id: uid(), nome: 'Turno B', inicio: '14:00', fim: '22:00', diasSemana: [1,2,3,4,5], ativo: true }
+            ],
+            maquinas: [],
+            motivosParada: [
+                { id: uid(), nome: 'Setup / Troca de ferramenta',  categoria: 'Setup',          penalizaOEE: true,  cor: '#f59e0b' },
+                { id: uid(), nome: 'Manutenção corretiva',         categoria: 'Manutenção',      penalizaOEE: true,  cor: '#ef4444' },
+                { id: uid(), nome: 'Manutenção preventiva',        categoria: 'Manutenção',      penalizaOEE: false, cor: '#0f75bd' },
+                { id: uid(), nome: 'Falta de material',            categoria: 'Logística',       penalizaOEE: true,  cor: '#f97316' },
+                { id: uid(), nome: 'Refei—o / Pausa programada',  categoria: 'Programada',      penalizaOEE: false, cor: '#8b5cf6' },
+                { id: uid(), nome: 'Aguardando liberação de OP',   categoria: 'Programada',      penalizaOEE: false, cor: '#6b7280' },
+                { id: uid(), nome: 'Problema de qualidade',        categoria: 'Qualidade',       penalizaOEE: true,  cor: '#dc2626' },
+                { id: uid(), nome: 'Falta de energia / infraest.', categoria: 'Infraestrutura',  penalizaOEE: true,  cor: '#7c3aed' }
+            ]
+        },
+        ordens: [],
+        apontamentos: []
+    };
+}
+
+function getDB() {
+    try {
+        return JSON.parse(localStorage.getItem(PROD_KEY)) || defaultDB();
+    } catch(e) {
+        return defaultDB();
+    }
+}
+function saveDB(db) { localStorage.setItem(PROD_KEY, JSON.stringify(db)); }
+function getCadDB() {
+    try {
+        return JSON.parse(localStorage.getItem(CAD_KEY)) || { pedidos: [], produtos: [], setores: [] };
+    } catch(e) {
+        return { pedidos: [], produtos: [], setores: [] };
+    }
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function fmtDate(iso) { if (!iso) return '—'; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
+function fmtDuration(ms) {
+    if (!ms || ms < 0) return '00:00:00';
+    const s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function switchView(view) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display = 'none');
+    const el = document.getElementById('view-' + view);
+    if (el) el.style.display = '';
+    document.querySelectorAll('.sidebar .nav-item').forEach(a => a.classList.remove('active'));
+    const nav = document.getElementById('nav-' + view);
+    if (nav) nav.classList.add('active');
+    if (view === 'dashboard')  renderDashboard();
+    else if (view === 'ordens')    renderOrdens();
+    else if (view === 'nova-op')   renderNovaOPForm();
+    else if (view === 'apontamento') renderApontamento();
+    else if (view === 'config')    renderConfig();
+}
+
+let editingOPId = null;
+function openNovaOP(id) {
+    editingOPId = id;
+    switchView('nova-op');
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+    const db = getDB();
+    const cad = getCadDB();
+    const modeLabels = {
+        op:       'Apontamento por Ordem de Produção',
+        processo: 'Apontamento por Ponto Produtivo',
+        ambos:    'Modo Completo — Ordem de Produção + Ponto Produtivo'
+    };
+    document.getElementById('dash-mode-label').textContent = modeLabels[db.config.modo] || '';
+
+    const oeeData = calcOEE(db);
+    renderOEEGauges(oeeData);
+    renderDashStats(db);
+
+    // Active / paused OPs
+    const active = db.ordens.filter(o => o.status === 'em_andamento' || o.status === 'pausada');
+    const tbody = document.getElementById('tbody-active-ops');
+    tbody.innerHTML = '';
+    document.getElementById('empty-active-ops').style.display = active.length === 0 ? '' : 'none';
+    active.forEach(op => {
+        const prod  = cad.produtos.find(p => p.id === op.produtoId);
+        const ped   = cad.pedidos.find(p => p.id === op.pedidoId);
+        const maq   = db.config.maquinas.find(m => m.id === op.maquinaId);
+        const turno = db.config.turnos.find(t => t.id === op.turnoId);
+        const pct   = op.quantidade > 0 ? Math.min(100, Math.round((op.qtdeReal||0)/op.quantidade*100)) : 0;
+        tbody.innerHTML += `<tr onclick="openNovaOP('${op.id}')">
+            <td><strong style="color:var(--primary)">${op.numero}</strong></td>
+            <td>${prod ? prod.nome : '—'}<br><small style="color:rgba(255,255,255,.28)">${ped ? (ped.numero||ped.id) : '—'}</small></td>
+            <td>${maq ? maq.nome : '—'}</td>
+            <td>${turno ? turno.nome : '—'}</td>
+            <td style="min-width:120px">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <div class="prog-bar-wrap" style="flex:1"><div class="prog-bar" style="width:${pct}%;background:${pct>=100?'#10b981':'var(--primary)'}"></div></div>
+                    <span style="font-size:.74rem;color:rgba(255,255,255,.4)">${pct}%</span>
+                </div>
+                <div style="font-size:.72rem;color:rgba(255,255,255,.3);margin-top:3px">${op.qtdeReal||0} / ${op.quantidade} ${op.unidade||'un'}</div>
+            </td>
+            <td>${statusBadge(op.status)}</td>
+            <td class="col-actions" onclick="event.stopPropagation()">
+                ${op.status==='em_andamento'?`<button class="tbl-btn warning" onclick="pauseOP('${op.id}')"><i class="fas fa-pause"></i></button>`:''}
+                ${op.status==='pausada'?`<button class="tbl-btn accent" onclick="resumeOP('${op.id}')"><i class="fas fa-play"></i></button>`:''}
+                <button class="tbl-btn accent" onclick="concludeOP('${op.id}')"><i class="fas fa-check"></i></button>
+            </td>
+        </tr>`;
+    });
+
+    // Recent apontamentos
+    const aps = [...db.apontamentos].sort((a,b) => b.timestamp - a.timestamp).slice(0, 12);
+    const tl = document.getElementById('recent-apontamentos');
+    tl.innerHTML = '';
+    document.getElementById('empty-apontamentos').style.display = aps.length === 0 ? '' : 'none';
+    const tiposAp = {
+        inicio:   { icon: 'fa-play',            color: '#10b981', label: 'Início de produção' },
+        parada:   { icon: 'fa-pause',            color: '#ef4444', label: 'Parada' },
+        retomada: { icon: 'fa-rotate-right',     color: '#0f75bd', label: 'Retomada' },
+        fim:      { icon: 'fa-flag-checkered',   color: '#8b5cf6', label: 'Fim de produção' }
+    };
+    aps.forEach(a => {
+        const maq    = db.config.maquinas.find(m => m.id === a.maquinaId);
+        const motivo = db.config.motivosParada.find(m => m.id === a.motivoId);
+        const t      = tiposAp[a.tipo] || tiposAp.inicio;
+        const cls    = a.tipo==='parada'?'stopped': a.tipo==='fim'?'done':'running';
+        const dt     = new Date(a.timestamp);
+        tl.innerHTML += `<div class="tl-item ${cls}">
+            <div class="tl-time">${dt.toLocaleString('pt-BR')} — ${maq ? maq.nome : 'Máquina'}</div>
+            <div class="tl-text"><i class="fas ${t.icon}" style="color:${t.color};margin-right:6px"></i><strong>${t.label}</strong>${motivo ? ' — ' + motivo.nome : ''}${a.obs ? ` <span style="color:rgba(255,255,255,.3)">(${a.obs})</span>` : ''}</div>
+        </div>`;
+    });
+}
+
+function calcOEE(db) {
+    let totalQtde = 0, totalBoa = 0, totalParadaPenMs = 0, totalParadaMs = 0;
+    db.ordens.filter(o => o.status !== 'cancelada').forEach(op => {
+        totalQtde += (op.qtdeReal || 0);
+        totalBoa  += Math.max(0, (op.qtdeReal||0) - (op.qtdeDefeito||0));
+    });
+    db.apontamentos.filter(a => a.tipo === 'parada' && a.durMs).forEach(ap => {
+        totalParadaMs += ap.durMs;
+        const motivo = db.config.motivosParada.find(m => m.id === ap.motivoId);
+        if (motivo && motivo.penalizaOEE) totalParadaPenMs += ap.durMs;
+    });
+    const qualidade   = totalQtde > 0 ? Math.round((totalBoa / totalQtde) * 100) : 95;
+    const disponib    = totalParadaMs > 0 ? Math.max(0, Math.round(((totalParadaMs - totalParadaPenMs) / totalParadaMs) * 100)) : 88;
+    const performance = 92; // simplificado — expandir com tempo de ciclo real
+    const oee = Math.round((disponib / 100) * (performance / 100) * (qualidade / 100) * 100);
+    return { oee, disponib, performance, qualidade, totalQtde, totalBoa };
+}
+
+function renderOEEGauges({ oee, disponib, performance, qualidade }) {
+    const gauges = [
+        { label: 'OEE Geral',        value: oee,         color: oee >= 85 ? '#10b981' : oee >= 65 ? '#f59e0b' : '#ef4444', sub: 'Eficiência global' },
+        { label: 'Disponibilidade',  value: disponib,    color: '#0f75bd',  sub: 'Horas produtivas vs disponíveis' },
+        { label: 'Performance',      value: performance, color: '#8b5cf6',  sub: 'Velocidade real vs ideal' },
+        { label: 'Qualidade',        value: qualidade,   color: '#10b981',  sub: 'Peças boas vs total produzido' }
+    ];
+    document.getElementById('oee-gauges').innerHTML = gauges.map(g => {
+        const r = 44, circ = 2*Math.PI*r, fill = circ*(g.value/100);
+        return `<div class="oee-card">
+            <div class="oee-gauge">
+                <svg width="110" height="110" viewBox="0 0 110 110">
+                    <circle cx="55" cy="55" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="9"/>
+                    <circle cx="55" cy="55" r="${r}" fill="none" stroke="${g.color}" stroke-width="9"
+                        stroke-dasharray="${fill} ${circ-fill}" stroke-linecap="round"
+                        style="transition:stroke-dasharray .9s ease"/>
+                </svg>
+                <div class="oee-gauge-value" style="color:${g.color}">${g.value}%</div>
+            </div>
+            <div class="oee-label">${g.label}</div>
+            <div class="oee-sublabel">${g.sub}</div>
+        </div>`;
+    }).join('');
+}
+
+function renderDashStats(db) {
+    const total      = db.ordens.length;
+    const andamento  = db.ordens.filter(o => o.status==='em_andamento').length;
+    const concluidas = db.ordens.filter(o => o.status==='concluida').length;
+    const pausadas   = db.ordens.filter(o => o.status==='pausada').length;
+    document.getElementById('dash-stats').innerHTML = `
+        <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)"><i class="fas fa-list-check"></i></div></div><div class="stat-value">${total}</div><div class="stat-label">Ordens Totais</div></div>
+        <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-play"></i></div></div><div class="stat-value">${andamento}</div><div class="stat-label">Em Andamento</div></div>
+        <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-pause"></i></div></div><div class="stat-value">${pausadas}</div><div class="stat-label">Pausadas</div></div>
+        <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(139,92,246,.1);color:var(--purple)"><i class="fas fa-flag-checkered"></i></div></div><div class="stat-value">${concluidas}</div><div class="stat-label">Concluídas</div></div>
+        <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(239,68,68,.1);color:#f87171"><i class="fas fa-cog"></i></div></div><div class="stat-value">${db.config.maquinas.filter(m=>m.ativa).length}</div><div class="stat-label">Máquinas Ativas</div></div>`;
+}
+
+function statusBadge(s) {
+    const map = {
+        pendente:     ['Pendente',     'pendente'],
+        em_andamento: ['Em Andamento', 'em_andamento'],
+        pausada:      ['Pausada',      'pausada'],
+        concluida:    ['Concluída',    'concluida'],
+        cancelada:    ['Cancelada',    'cancelada']
+    };
+    const [label, cls] = map[s] || [s, 'pendente'];
+    return `<span class="op-status ${cls}">${label}</span>`;
+}
+
+// ============================================================
+// ORDENS DE PRODUÇÃO
+// ============================================================
+function renderOrdens() {
+    const db  = getDB();
+    const cad = getCadDB();
+    const search      = (document.getElementById('searchOP')?.value || '').toLowerCase();
+    const filterStatus = document.getElementById('filterOPStatus')?.value || '';
+    const filterMaq   = document.getElementById('filterOPMaquina')?.value || '';
+
+    // Populate machine filter
+    const maqSel = document.getElementById('filterOPMaquina');
+    if (maqSel) {
+        const cur = maqSel.value;
+        maqSel.innerHTML = '<option value="">Todas as máquinas</option>' +
+            db.config.maquinas.map(m => `<option value="${m.id}" ${m.id===cur?'selected':''}>${m.nome}</option>`).join('');
+    }
+
+    let ordens = [...db.ordens];
+    if (filterStatus) ordens = ordens.filter(o => o.status === filterStatus);
+    if (filterMaq)    ordens = ordens.filter(o => o.maquinaId === filterMaq);
+    if (search) ordens = ordens.filter(o => {
+        const prod = cad.produtos.find(p => p.id === o.produtoId);
+        const ped  = cad.pedidos.find(p => p.id === o.pedidoId);
+        return o.numero.toLowerCase().includes(search) ||
+               (prod && prod.nome.toLowerCase().includes(search)) ||
+               (ped && (ped.numero||ped.id||'').toLowerCase().includes(search));
+    });
+    ordens.sort((a,b) => b.createdAt - a.createdAt);
+
+    const tbody = document.getElementById('tbody-ordens');
+    tbody.innerHTML = '';
+    const hasRows = ordens.length > 0;
+    document.getElementById('empty-ordens').style.display          = hasRows ? 'none' : '';
+    document.getElementById('wrap-table-ordens').style.display     = hasRows ? ''     : 'none';
+
+    ordens.forEach(op => {
+        const prod  = cad.produtos.find(p => p.id === op.produtoId);
+        const ped   = cad.pedidos.find(p => p.id === op.pedidoId);
+        const maq   = db.config.maquinas.find(m => m.id === op.maquinaId);
+        const turno = db.config.turnos.find(t => t.id === op.turnoId);
+        tbody.innerHTML += `<tr onclick="openNovaOP('${op.id}')">
+            <td><strong style="color:var(--primary)">${op.numero}</strong></td>
+            <td>${ped ? (ped.numero||ped.id) : '<span style="color:rgba(255,255,255,.25)">—</span>'}</td>
+            <td>${prod ? prod.nome : '—'}</td>
+            <td>${op.qtdeReal||0} / <strong>${op.quantidade}</strong> ${op.unidade||'un'}</td>
+            <td>${maq ? maq.nome : '—'}</td>
+            <td>${turno ? turno.nome : '—'}</td>
+            <td>${fmtDate(op.dataInicio)}</td>
+            <td>${fmtDate(op.dataPrazo)}</td>
+            <td>${statusBadge(op.status)}</td>
+            <td class="col-actions" onclick="event.stopPropagation()">
+                <button class="tbl-btn" onclick="openNovaOP('${op.id}')"><i class="fas fa-pen"></i></button>
+                ${op.status==='em_andamento'?`<button class="tbl-btn warning" onclick="pauseOP('${op.id}')"><i class="fas fa-pause"></i></button>`:''}
+                ${op.status==='pausada'?`<button class="tbl-btn accent" onclick="resumeOP('${op.id}')"><i class="fas fa-play"></i></button>`:''}
+                ${(op.status==='em_andamento'||op.status==='pausada')?`<button class="tbl-btn accent" onclick="concludeOP('${op.id}')"><i class="fas fa-check"></i></button>`:''}
+                <button class="tbl-btn danger" onclick="deleteOP('${op.id}')"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>`;
+    });
+}
+
+// ============================================================
+// NOVA / EDITAR OP FORM
+// ============================================================
+function renderNovaOPForm() {
+    const db  = getDB();
+    const cad = getCadDB();
+
+    // Fill selects
+    document.getElementById('op-pedido').innerHTML =
+        '<option value="">— Sem pedido vinculado —</option>' +
+        cad.pedidos.map(p => `<option value="${p.id}">${p.numero||p.id}${p.cliente ? ' — '+p.cliente : ''}</option>`).join('');
+
+    document.getElementById('op-produto').innerHTML =
+        '<option value="">— Selecionar produto —</option>' +
+        cad.produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+
+    document.getElementById('op-turno').innerHTML =
+        '<option value="">— Sem turno definido —</option>' +
+        db.config.turnos.filter(t=>t.ativo).map(t => `<option value="${t.id}">${t.nome} (${t.inicio}—${t.fim})</option>`).join('');
+
+    document.getElementById('op-maquina').innerHTML =
+        '<option value="">— Sem máquina —</option>' +
+        db.config.maquinas.filter(m=>m.ativa).map(m => `<option value="${m.id}">${m.codigo} — ${m.nome}</option>`).join('');
+
+    if (editingOPId) {
+        const op = db.ordens.find(o => o.id === editingOPId);
+        if (op) {
+            document.getElementById('nova-op-title').innerHTML = '<i class="fas fa-pen" style="color:var(--warning);margin-right:10px"></i>Editar Ordem de Produção';
+            document.getElementById('op-edit-id').value       = op.id;
+            document.getElementById('op-numero').value        = op.numero;
+            document.getElementById('op-pedido').value        = op.pedidoId   || '';
+            document.getElementById('op-produto').value       = op.produtoId  || '';
+            document.getElementById('op-quantidade').value    = op.quantidade;
+            document.getElementById('op-unidade').value       = op.unidade    || 'un';
+            document.getElementById('op-responsavel').value   = op.responsavel|| '';
+            document.getElementById('op-data-inicio').value   = op.dataInicio || '';
+            document.getElementById('op-data-prazo').value    = op.dataPrazo  || '';
+            document.getElementById('op-turno').value         = op.turnoId    || '';
+            document.getElementById('op-maquina').value       = op.maquinaId  || '';
+            document.getElementById('op-ciclo').value         = op.cicloMin   || '';
+            document.getElementById('op-status').value        = op.status;
+            document.getElementById('op-qtde-real').value     = op.qtdeReal   || 0;
+            document.getElementById('op-qtde-defeito').value  = op.qtdeDefeito|| 0;
+            document.getElementById('op-obs').value           = op.obs        || '';
+            return;
+        }
+    }
+    // New OP
+    document.getElementById('nova-op-title').innerHTML = '<i class="fas fa-plus-circle" style="color:var(--accent);margin-right:10px"></i>Nova Ordem de Produção';
+    document.getElementById('op-form').reset();
+    document.getElementById('op-edit-id').value    = '';
+    document.getElementById('op-unidade').value    = 'un';
+    document.getElementById('op-qtde-real').value  = '0';
+    document.getElementById('op-qtde-defeito').value = '0';
+    document.getElementById('op-data-inicio').value = new Date().toISOString().slice(0,10);
+    const nextNum = String(db.ordens.length + 1).padStart(4,'0');
+    document.getElementById('op-numero').value = `OP-${nextNum}`;
+}
+
+function onPedidoChange() {
+    const cad   = getCadDB();
+    const pedId = document.getElementById('op-pedido').value;
+    if (!pedId) return;
+    const ped = cad.pedidos.find(p => p.id === pedId);
+    if (!ped) return;
+    if (ped.produtoId)  document.getElementById('op-produto').value    = ped.produtoId;
+    if (ped.quantidade) document.getElementById('op-quantidade').value = ped.quantidade;
+    if (ped.prazo)      document.getElementById('op-data-prazo').value = ped.prazo;
+}
+
+function saveOP(e) {
+    e.preventDefault();
+    const db = getDB();
+    const id = document.getElementById('op-edit-id').value;
+    const op = {
+        id:           id || uid(),
+        numero:       document.getElementById('op-numero').value.trim(),
+        pedidoId:     document.getElementById('op-pedido').value,
+        produtoId:    document.getElementById('op-produto').value,
+        quantidade:   parseInt(document.getElementById('op-quantidade').value) || 0,
+        unidade:      document.getElementById('op-unidade').value || 'un',
+        responsavel:  document.getElementById('op-responsavel').value.trim(),
+        dataInicio:   document.getElementById('op-data-inicio').value,
+        dataPrazo:    document.getElementById('op-data-prazo').value,
+        turnoId:      document.getElementById('op-turno').value,
+        maquinaId:    document.getElementById('op-maquina').value,
+        cicloMin:     parseFloat(document.getElementById('op-ciclo').value) || null,
+        status:       document.getElementById('op-status').value,
+        qtdeReal:     parseInt(document.getElementById('op-qtde-real').value)    || 0,
+        qtdeDefeito:  parseInt(document.getElementById('op-qtde-defeito').value) || 0,
+        obs:          document.getElementById('op-obs').value.trim(),
+        createdAt:    id ? (db.ordens.find(o=>o.id===id)?.createdAt || Date.now()) : Date.now(),
+        updatedAt:    Date.now()
+    };
+    if (id) {
+        const idx = db.ordens.findIndex(o => o.id === id);
+        if (idx >= 0) db.ordens[idx] = op; else db.ordens.push(op);
+    } else {
+        db.ordens.push(op);
+    }
+    saveDB(db);
+    showToast(id ? 'Ordem atualizada com sucesso!' : 'Ordem criada com sucesso!', 'success');
+    switchView('ordens');
+}
+
+function pauseOP(id)    { const db = getDB(); const op = db.ordens.find(o=>o.id===id); if(op){op.status='pausada'; saveDB(db); renderDashboard(); renderOrdens();} }
+function resumeOP(id)   { const db = getDB(); const op = db.ordens.find(o=>o.id===id); if(op){op.status='em_andamento'; saveDB(db); renderDashboard(); renderOrdens();} }
+function concludeOP(id) {
+    if (!confirm('Marcar esta ordem como concluída?')) return;
+    const db = getDB(); const op = db.ordens.find(o=>o.id===id);
+    if(op){ op.status='concluida'; op.dataConclusao=new Date().toISOString().slice(0,10); saveDB(db); renderDashboard(); renderOrdens(); }
+}
+function deleteOP(id) {
+    if (!confirm('Excluir esta ordem de produção? Esta ação não pode ser desfeita.')) return;
+    const db = getDB(); db.ordens = db.ordens.filter(o=>o.id!==id); saveDB(db); renderOrdens();
+}
+function exportOPs() {
+    const db = getDB(), cad = getCadDB();
+    const rows = [['OP','Pedido','Produto','Qtde Prev.','Qtde Real','Defeitos','Máquina','Turno','Status','Início','Prazo','Conclusão']];
+    db.ordens.forEach(op => {
+        const prod  = cad.produtos.find(p=>p.id===op.produtoId);
+        const ped   = cad.pedidos.find(p=>p.id===op.pedidoId);
+        const maq   = db.config.maquinas.find(m=>m.id===op.maquinaId);
+        const turno = db.config.turnos.find(t=>t.id===op.turnoId);
+        rows.push([op.numero, ped?ped.numero||ped.id:'', prod?prod.nome:'', op.quantidade, op.qtdeReal||0, op.qtdeDefeito||0, maq?maq.nome:'', turno?turno.nome:'', op.status, fmtDate(op.dataInicio), fmtDate(op.dataPrazo), fmtDate(op.dataConclusao)]);
+    });
+    const csv = rows.map(r => r.map(c => `"${c}"`).join(';')).join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF'+csv);
+    a.download = `ordens_producao_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+}
+
+// ============================================================
+// TABLET — PAINEL PRODUTIVO
+// ============================================================
+let tabMachineStates = {}; // maquinaId -> { status, since, motivoId }
+let paradaMaqId = null;
+let selectedParadaReasonId = null;
+let clockInterval = null;
+
+function renderApontamento() {
+    const db = getDB();
+    const grid  = document.getElementById('tab-machines-grid');
+    const empty = document.getElementById('empty-machines');
+    const maqsAtivas = db.config.maquinas.filter(m => m.ativa);
+
+    // Restore states from last apontamento per machine
+    db.config.maquinas.forEach(maq => {
+        if (tabMachineStates[maq.id]) return; // already tracked live
+        const last = [...db.apontamentos].filter(a => a.maquinaId === maq.id).sort((a,b)=>b.timestamp-a.timestamp)[0];
+        if (last && (last.tipo==='inicio'||last.tipo==='retomada')) {
+            tabMachineStates[maq.id] = { status:'running', since:last.timestamp, motivoId:null };
+        } else if (last && last.tipo==='parada') {
+            tabMachineStates[maq.id] = { status:'stopped', since:last.timestamp, motivoId:last.motivoId };
+        } else {
+            tabMachineStates[maq.id] = { status:'idle', since:null, motivoId:null };
+        }
+    });
+
+    if (maqsAtivas.length === 0) {
+        grid.style.display  = 'none';
+        empty.style.display = '';
+        return;
+    }
+    grid.style.display  = '';
+    empty.style.display = 'none';
+    grid.innerHTML = maqsAtivas.map(maq => buildMachineCard(maq, tabMachineStates[maq.id] || { status:'idle' }, db)).join('');
+
+    // Clock ticker
+    if (clockInterval) clearInterval(clockInterval);
+    clockInterval = setInterval(() => { updateTabClock(); updateTabTimers(db); }, 1000);
+    updateTabClock();
+
+    // Current turno indicator
+    const now = new Date(), hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const turnoAtivo = db.config.turnos.find(t => t.ativo && hhmm >= t.inicio && hhmm < t.fim);
+    const chip = document.getElementById('tab-turno-ativo');
+    if (turnoAtivo) { chip.style.display='inline-flex'; chip.querySelector('span').textContent=turnoAtivo.nome; }
+    else chip.style.display='none';
+}
+
+function buildMachineCard(maq, state, db) {
+    const sClass = state.status==='running' ? 'status-running' : state.status==='stopped' ? 'status-stopped' : 'status-idle';
+    const sLabel = state.status==='running'
+        ? '<span class="tab-machine-status running"><i class="fas fa-circle" style="font-size:.45rem"></i> RODANDO</span>'
+        : state.status==='stopped'
+            ? '<span class="tab-machine-status stopped"><i class="fas fa-circle" style="font-size:.45rem"></i> PARADA</span>'
+            : '<span class="tab-machine-status idle"><i class="fas fa-circle" style="font-size:.45rem"></i> AGUARDANDO</span>';
+    const tClass = state.status==='running' ? 'running' : state.status==='stopped' ? 'stopped' : 'idle';
+    const motivo = state.motivoId ? db.config.motivosParada.find(m=>m.id===state.motivoId) : null;
+    const motivoBar = motivo ? `<div class="tab-motivo-bar"><i class="fas fa-triangle-exclamation"></i>${motivo.nome} ${motivo.penalizaOEE?'<span style="font-size:.72rem;opacity:.7">· Penalizando OEE</span>':''}</div>` : '';
+    const btnIniciar  = state.status==='idle'    ? `<button class="tab-btn green"  onclick="tabIniciar('${maq.id}')"><i class="fas fa-play"></i> Iniciar</button>` : '';
+    const btnRetomar  = state.status==='stopped' ? `<button class="tab-btn green"  onclick="tabRetomar('${maq.id}')"><i class="fas fa-rotate-right"></i> Retomar</button>` : '';
+    const btnParar    = state.status==='running' ? `<button class="tab-btn red"    onclick="tabPararModal('${maq.id}')"><i class="fas fa-hand"></i> Registrar Parada</button>` : '';
+    const btnFinalizar= state.status!=='idle'    ? `<button class="tab-btn gray"   onclick="tabFinalizar('${maq.id}')"><i class="fas fa-flag-checkered"></i> Finalizar</button>` : '';
+    return `<div class="tab-machine-card ${sClass}" id="card-${maq.id}">
+        <div class="tab-machine-name">${maq.nome}</div>
+        <div class="tab-machine-code">${maq.codigo}${maq.setor ? ' &middot; ' + maq.setor : ''}</div>
+        ${sLabel}
+        ${motivoBar}
+        <div class="tab-timer ${tClass}" id="timer-${maq.id}">${state.since ? fmtDuration(Date.now()-state.since) : '00:00:00'}</div>
+        <div class="tab-btn-row">${btnIniciar}${btnRetomar}${btnParar}${btnFinalizar}</div>
+    </div>`;
+}
+
+function updateTabClock() {
+    const el = document.getElementById('tab-clock');
+    if (el) el.textContent = new Date().toLocaleTimeString('pt-BR');
+}
+function updateTabTimers(db) {
+    (db || getDB()).config.maquinas.forEach(maq => {
+        const state = tabMachineStates[maq.id];
+        const el    = document.getElementById('timer-'+maq.id);
+        if (el && state && state.since) el.textContent = fmtDuration(Date.now()-state.since);
+    });
+}
+
+function tabIniciar(maqId) {
+    const db = getDB();
+    db.apontamentos.push({ id:uid(), maquinaId:maqId, tipo:'inicio', timestamp:Date.now(), obs:'' });
+    saveDB(db);
+    tabMachineStates[maqId] = { status:'running', since:Date.now(), motivoId:null };
+    renderApontamento();
+}
+function tabRetomar(maqId) {
+    const db = getDB();
+    const prev = tabMachineStates[maqId];
+    if (prev && prev.since) {
+        const last = [...db.apontamentos].filter(a=>a.maquinaId===maqId&&a.tipo==='parada').sort((a,b)=>b.timestamp-a.timestamp)[0];
+        if (last) last.durMs = Date.now() - prev.since;
+    }
+    db.apontamentos.push({ id:uid(), maquinaId:maqId, tipo:'retomada', timestamp:Date.now(), obs:'' });
+    saveDB(db);
+    tabMachineStates[maqId] = { status:'running', since:Date.now(), motivoId:null };
+    renderApontamento();
+}
+function tabFinalizar(maqId) {
+    if (!confirm('Finalizar produção nesta máquina?')) return;
+    const db = getDB();
+    db.apontamentos.push({ id:uid(), maquinaId:maqId, tipo:'fim', timestamp:Date.now(), obs:'' });
+    saveDB(db);
+    tabMachineStates[maqId] = { status:'idle', since:null, motivoId:null };
+    renderApontamento();
+}
+function tabPararModal(maqId) {
+    paradaMaqId = maqId;
+    selectedParadaReasonId = null;
+    const db = getDB();
+    document.getElementById('stop-reasons-list').innerHTML = db.config.motivosParada.map(m =>
+        `<div class="stop-reason-btn" id="sr-${m.id}" onclick="selectParadaReason('${m.id}')" style="border-left:4px solid ${m.cor}">
+            <i class="fas fa-circle" style="color:${m.cor};font-size:.6rem;margin-bottom:5px"></i>
+            <div>${m.nome}</div>
+            <div class="sr-cat">${m.categoria} - ${m.penalizaOEE ? '<span style="color:#f87171">Penaliza OEE</span>' : 'Não penaliza'}</div>
+        </div>`
+    ).join('');
+    document.getElementById('parada-obs').value = '';
+    document.getElementById('modal-parada-overlay').classList.add('active');
+}
+function selectParadaReason(id) {
+    selectedParadaReasonId = id;
+    document.querySelectorAll('.stop-reason-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('sr-'+id)?.classList.add('selected');
+}
+function confirmarParada() {
+    if (!selectedParadaReasonId) { showToast('Selecione um motivo de parada.', 'warn'); return; }
+    const db  = getDB();
+    const obs = document.getElementById('parada-obs').value.trim();
+    db.apontamentos.push({ id:uid(), maquinaId:paradaMaqId, tipo:'parada', timestamp:Date.now(), motivoId:selectedParadaReasonId, obs });
+    saveDB(db);
+    tabMachineStates[paradaMaqId] = { status:'stopped', since:Date.now(), motivoId:selectedParadaReasonId };
+    closeParadaModal();
+    renderApontamento();
+}
+function closeParadaModal() { document.getElementById('modal-parada-overlay').classList.remove('active'); }
+function closeParadaBG(e) { if(e.target===document.getElementById('modal-parada-overlay')) closeParadaModal(); }
+
+// ============================================================
+// CONFIGURAÇÕES
+// ============================================================
+function renderConfig() {
+    const db = getDB();
+    const modoMap = { op:'mode-card-op', processo:'mode-card-processo', ambos:'mode-card-ambos' };
+    Object.values(modoMap).forEach(id => document.getElementById(id)?.classList.remove('active'));
+    document.getElementById(modoMap[db.config.modo] || 'mode-card-ambos')?.classList.add('active');
+    selectedModo = db.config.modo;
+    renderTurnos();
+    renderMaquinas();
+    renderParadas();
+}
+
+function switchConfigTab(tab) {
+    document.querySelectorAll('.config-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.config-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('ctab-'+tab)?.classList.add('active');
+    document.getElementById('cpanel-'+tab)?.classList.add('active');
+}
+
+let selectedModo = 'ambos';
+function setModo(modo) {
+    selectedModo = modo;
+    const modoMap = { op:'mode-card-op', processo:'mode-card-processo', ambos:'mode-card-ambos' };
+    Object.values(modoMap).forEach(id => document.getElementById(id)?.classList.remove('active'));
+    document.getElementById(modoMap[modo])?.classList.add('active');
+}
+function saveModo() {
+    const db = getDB();
+    db.config.modo = selectedModo;
+    saveDB(db);
+    updateSidebarByModo(selectedModo);
+    showToast('Tipo de processo salvo!', 'success');
+}
+function updateSidebarByModo(modo) {
+    document.getElementById('nav-section-op').style.display          = (modo==='op'||modo==='ambos')      ? '' : 'none';
+    document.getElementById('nav-section-apontamento').style.display = (modo==='processo'||modo==='ambos') ? '' : 'none';
+}
+
+// ---- Turnos ----
+function renderTurnos() {
+    const db = getDB();
+    const lista = document.getElementById('lista-turnos');
+    const empty = document.getElementById('empty-turnos');
+    if (db.config.turnos.length === 0) { lista.innerHTML=''; empty.style.display=''; return; }
+    empty.style.display = 'none';
+    const diasNomes = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    lista.innerHTML = db.config.turnos.map(t => `
+        <div class="form-card" style="margin-bottom:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <i class="fas fa-clock" style="color:var(--primary);font-size:1.1rem"></i>
+                    <div>
+                        <div style="font-weight:700;color:#fff">${t.nome}</div>
+                        <div style="font-size:.8rem;color:rgba(255,255,255,.38)">${t.inicio} — ${t.fim} &middot; ${turnoHoras(t.inicio,t.fim)}h/turno</div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <div>${t.diasSemana.map(d=>`<span class="turno-chip">${diasNomes[d]}</span>`).join('')}</div>
+                    <span class="tag ${t.ativo?'green':'gray'}">${t.ativo?'Ativo':'Inativo'}</span>
+                    <button class="tbl-btn" onclick="openTurnoModal('${t.id}')"><i class="fas fa-pen"></i></button>
+                    <button class="tbl-btn danger" onclick="deleteTurno('${t.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        </div>`).join('');
+}
+function turnoHoras(ini, fim) {
+    const [h1,m1]=ini.split(':').map(Number), [h2,m2]=fim.split(':').map(Number);
+    const tot=(h2*60+m2)-(h1*60+m1);
+    return (tot>0 ? tot : 24*60+tot)/60 < 10 ? ((tot>0?tot:24*60+tot)/60).toFixed(1) : ((tot>0?tot:24*60+tot)/60).toFixed(1);
+}
+function openTurnoModal(id) {
+    const db = getDB();
+    const t  = id ? db.config.turnos.find(x=>x.id===id) : null;
+    const diasNomes = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    showModal('Turno de Trabalho', `
+        <div class="form-group" style="margin-bottom:14px">
+            <label>Nome do Turno *</label>
+            <input type="text" id="m-turno-nome" value="${t?t.nome:''}" placeholder="Ex: Turno A">
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>Início</label><input type="time" id="m-turno-ini" value="${t?t.inicio:'06:00'}"></div>
+            <div class="form-group"><label>Fim</label><input type="time" id="m-turno-fim" value="${t?t.fim:'14:00'}"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+            <label>Dias da Semana</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+                ${diasNomes.map((d,i)=>`<label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;padding:5px 10px;background:rgba(255,255,255,.06);border-radius:6px;font-size:.8rem;color:rgba(255,255,255,.6)"><input type="checkbox" id="m-dia-${i}" ${t&&t.diasSemana.includes(i)?'checked':!t&&i>=1&&i<=5?'checked':''} style="accent-color:var(--primary)"> ${d}</label>`).join('')}
+            </div>
+        </div>
+        <div class="form-group" style="margin-bottom:18px">
+            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem;color:rgba(255,255,255,.65)">
+                <input type="checkbox" id="m-turno-ativo" ${!t||t.ativo?'checked':''} style="accent-color:var(--primary)"> Turno Ativo
+            </label>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="mod-btn ghost" onclick="closeAllModals()">Cancelar</button>
+            <button class="mod-btn primary" onclick="saveTurno('${id||''}')"><i class="fas fa-save"></i> Salvar</button>
+        </div>`);
+}
+function saveTurno(id) {
+    const nome = document.getElementById('m-turno-nome').value.trim();
+    if (!nome) { showToast('Informe o nome do turno','warn'); return; }
+    const db = getDB();
+    const obj = { id:id||uid(), nome, inicio:document.getElementById('m-turno-ini').value, fim:document.getElementById('m-turno-fim').value, diasSemana:[0,1,2,3,4,5,6].filter(i=>document.getElementById('m-dia-'+i)?.checked), ativo:document.getElementById('m-turno-ativo').checked };
+    if (id) { const idx=db.config.turnos.findIndex(t=>t.id===id); if(idx>=0) db.config.turnos[idx]=obj; } else db.config.turnos.push(obj);
+    saveDB(db); closeAllModals(); renderTurnos(); showToast('Turno salvo!','success');
+}
+function deleteTurno(id) {
+    if (!confirm('Remover este turno?')) return;
+    const db=getDB(); db.config.turnos=db.config.turnos.filter(t=>t.id!==id); saveDB(db); renderTurnos();
+}
+
+// ---- Máquinas ----
+function renderMaquinas() {
+    const db = getDB();
+    const empty = document.getElementById('empty-maquinas');
+    const wrap  = document.getElementById('lista-maquinas');
+    if (db.config.maquinas.length===0) { wrap.style.display='none'; empty.style.display=''; return; }
+    empty.style.display='none'; wrap.style.display='';
+    document.getElementById('tbody-maquinas').innerHTML = db.config.maquinas.map(m=>`
+        <tr>
+            <td><strong style="color:var(--primary)">${m.codigo}</strong></td>
+            <td>${m.nome}</td>
+            <td>${m.setor||'—'}</td>
+            <td><span class="tag ${m.ativa?'green':'gray'}">${m.ativa?'Ativa':'Inativa'}</span></td>
+            <td>${m.metaOEE ? m.metaOEE+'%' : '—'}</td>
+            <td class="col-actions">
+                <button class="tbl-btn" onclick="openMaquinaModal('${m.id}')"><i class="fas fa-pen"></i></button>
+                <button class="tbl-btn danger" onclick="deleteMaquina('${m.id}')"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>`).join('');
+}
+function openMaquinaModal(id) {
+    const db     = getDB();
+    const cad    = getCadDB();
+    const m      = id ? db.config.maquinas.find(x=>x.id===id) : null;
+    const setores= cad.setores || [];
+    showModal('Máquina / Centro de Trabalho', `
+        <div class="form-row">
+            <div class="form-group"><label>Código *</label><input type="text" id="m-maq-cod" value="${m?m.codigo:''}" placeholder="MAQ-001"></div>
+            <div class="form-group"><label>Nome *</label><input type="text" id="m-maq-nome" value="${m?m.nome:''}" placeholder="Injetora 01"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Setor</label>
+                <select id="m-maq-setor">
+                    <option value="">— Sem setor —</option>
+                    ${setores.map(s=>`<option value="${s.nome}" ${m&&m.setor===s.nome?'selected':''}>${s.nome}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group"><label>Meta OEE (%)</label><input type="number" id="m-maq-oee" min="0" max="100" value="${m?m.metaOEE||'':''}" placeholder="85"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:18px">
+            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem;color:rgba(255,255,255,.65)">
+                <input type="checkbox" id="m-maq-ativa" ${!m||m.ativa?'checked':''} style="accent-color:var(--primary)"> Máquina Ativa
+            </label>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="mod-btn ghost" onclick="closeAllModals()">Cancelar</button>
+            <button class="mod-btn primary" onclick="saveMaquina('${id||''}')"><i class="fas fa-save"></i> Salvar</button>
+        </div>`);
+}
+function saveMaquina(id) {
+    const cod=document.getElementById('m-maq-cod').value.trim(), nome=document.getElementById('m-maq-nome').value.trim();
+    if(!cod||!nome){showToast('Código e nome são obrigatórios','warn');return;}
+    const db=getDB();
+    const obj={id:id||uid(),codigo:cod,nome,setor:document.getElementById('m-maq-setor').value||'',metaOEE:parseInt(document.getElementById('m-maq-oee').value)||null,ativa:document.getElementById('m-maq-ativa').checked};
+    if(id){const idx=db.config.maquinas.findIndex(m=>m.id===id);if(idx>=0)db.config.maquinas[idx]=obj;}else db.config.maquinas.push(obj);
+    saveDB(db);closeAllModals();renderMaquinas();showToast('Máquina salva!','success');
+}
+function deleteMaquina(id){
+    if(!confirm('Remover esta máquina?'))return;
+    const db=getDB();db.config.maquinas=db.config.maquinas.filter(m=>m.id!==id);saveDB(db);renderMaquinas();
+}
+
+// ---- Motivos de Parada ----
+function renderParadas() {
+    const db=getDB();
+    const empty=document.getElementById('empty-paradas'), wrap=document.getElementById('lista-paradas');
+    if(db.config.motivosParada.length===0){wrap.style.display='none';empty.style.display='';return;}
+    empty.style.display='none';wrap.style.display='';
+    document.getElementById('tbody-paradas').innerHTML=db.config.motivosParada.map(m=>`
+        <tr>
+            <td><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:50%;background:${m.cor};display:inline-block;flex-shrink:0"></span>${m.nome}</span></td>
+            <td><span class="tag gray">${m.categoria}</span></td>
+            <td><span style="width:22px;height:22px;border-radius:5px;background:${m.cor};display:inline-block;border:1px solid rgba(255,255,255,.1)"></span></td>
+            <td>${m.penalizaOEE?'<span class="tag red"><i class="fas fa-arrow-trend-down" style="margin-right:3px"></i>Penaliza</span>':'<span class="tag green"><i class="fas fa-check" style="margin-right:3px"></i>Não penaliza</span>'}</td>
+            <td class="col-actions">
+                <button class="tbl-btn" onclick="openParadaModal('${m.id}')"><i class="fas fa-pen"></i></button>
+                <button class="tbl-btn danger" onclick="deleteParada('${m.id}')"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>`).join('');
+}
+function openParadaModal(id){
+    const db=getDB(), m=id?db.config.motivosParada.find(x=>x.id===id):null;
+    const cats=['Setup','Manutenção','Logística','Programada','Qualidade','Infraestrutura','Outro'];
+    showModal('Motivo de Parada',`
+        <div class="form-row">
+            <div class="form-group"><label>Nome do Motivo *</label><input type="text" id="m-par-nome" value="${m?m.nome:''}" placeholder="Ex: Troca de ferramenta"></div>
+            <div class="form-group"><label>Categoria</label><select id="m-par-cat">${cats.map(c=>`<option value="${c}" ${m&&m.categoria===c?'selected':''}>${c}</option>`).join('')}</select></div>
+        </div>
+        <div class="form-group" style="margin-bottom:16px"><label>Cor de identificação</label><input type="color" id="m-par-cor" value="${m?m.cor:'#f59e0b'}" style="height:42px;cursor:pointer;width:80px;padding:2px 4px;border-radius:6px"></div>
+        <div style="padding:16px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);border-radius:10px;margin-bottom:18px">
+            <label class="pen-toggle">
+                <input type="checkbox" id="m-par-pen" ${m&&m.penalizaOEE?'checked':''}>
+                <div>
+                    <div style="font-weight:700;color:#fff;font-size:.88rem">Penaliza indicadores de OEE</div>
+                    <div style="font-size:.76rem;color:rgba(255,255,255,.38);margin-top:3px">As horas desta parada serão deduzidas das horas disponíveis do turno</div>
+                </div>
+            </label>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="mod-btn ghost" onclick="closeAllModals()">Cancelar</button>
+            <button class="mod-btn primary" onclick="saveParada('${id||''}')"><i class="fas fa-save"></i> Salvar</button>
+        </div>`);
+}
+function saveParada(id){
+    const nome=document.getElementById('m-par-nome').value.trim();
+    if(!nome){showToast('Informe o nome do motivo','warn');return;}
+    const db=getDB();
+    const obj={id:id||uid(),nome,categoria:document.getElementById('m-par-cat').value,cor:document.getElementById('m-par-cor').value,penalizaOEE:document.getElementById('m-par-pen').checked};
+    if(id){const idx=db.config.motivosParada.findIndex(m=>m.id===id);if(idx>=0)db.config.motivosParada[idx]=obj;}else db.config.motivosParada.push(obj);
+    saveDB(db);closeAllModals();renderParadas();showToast('Motivo salvo!','success');
+}
+function deleteParada(id){
+    if(!confirm('Remover este motivo de parada?'))return;
+    const db=getDB();db.config.motivosParada=db.config.motivosParada.filter(m=>m.id!==id);saveDB(db);renderParadas();
+}
+
+// ============================================================
+// MODAL HELPERS
+// ============================================================
+function showModal(title, body) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-body').innerHTML    = body;
+    document.getElementById('modal-overlay').classList.add('active');
+}
+function closeModalBG(e) { if(e.target===document.getElementById('modal-overlay')) closeAllModals(); }
+function closeAllModals() { document.getElementById('modal-overlay').classList.remove('active'); }
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, type='success') {
+    const colors = { success:'#10b981', error:'#ef4444', warn:'#f59e0b', info:'#0f75bd' };
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:28px;right:28px;z-index:99999;background:#1a1a2e;border:1px solid ${colors[type]||colors.success};color:#fff;padding:13px 22px;border-radius:10px;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 28px rgba(0,0,0,.5);animation:fadeInUp .25s ease`;
+    t.innerHTML = `<i class="fas fa-circle-check" style="color:${colors[type]||colors.success}"></i>${msg}`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+}
+
+// ============================================================
+// USER MENU
+// ============================================================
+function toggleUserMenu(e) { e.stopPropagation(); document.getElementById('userMenu')?.classList.toggle('open'); }
+document.addEventListener('click', () => document.getElementById('userMenu')?.classList.remove('open'));
+
+// ============================================================
+// TOUR
+// ============================================================
+function startModuleTour() {
+    showToast('Comece em Configurações → Máquinas para cadastrar seus centros de trabalho. Depois crie uma Ordem de Produção e abra o Painel Produtivo no tablet!', 'info');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+(function init() {
+    // Inject animation keyframes
+    const style = document.createElement('style');
+    style.textContent = '@keyframes fadeInUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}';
+    document.head.appendChild(style);
+    const db = getDB();
+    selectedModo = db.config.modo;
+    updateSidebarByModo(db.config.modo);
+    renderDashboard();
+})();
+</script>
+</body>
+</html>

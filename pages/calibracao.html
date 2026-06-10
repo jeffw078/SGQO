@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calibração de Equipamentos - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-ruler-combined" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Calibração de Equipamentos</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Instrumentos</div>
+                <a href="#" class="nav-item active" id="nav-instrumentos" onclick="switchView('instrumentos');return false"><i class="fas fa-ruler-combined"></i> Instrumentos de Medição</a>
+                <a href="#" class="nav-item" id="nav-historico" onclick="switchView('historico');return false"><i class="fas fa-clock-rotate-left"></i> Histórico de Calibrações</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Configurações</div>
+                <a href="#" class="nav-item" id="nav-categorias" onclick="switchView('categorias');return false"><i class="fas fa-tags"></i> Categorias e Critários</a>
+                <a href="#" class="nav-item" id="nav-config" onclick="switchView('config');return false"><i class="fas fa-gear"></i> Configurações</a>
+            </div>
+        </nav>
+        </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar instrumento..."></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JD</div>
+                        <span class="user-btn-name">Jo\u00e3o Demo</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JD</div>
+                            <div><div class="user-name">Jo\u00e3o Demo</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- VIEW: INSTRUMENTOS -->
+            <div id="view-instrumentos" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-ruler-combined" style="color:var(--primary);margin-right:10px"></i>Instrumentos de Medição</h2>
+                        <p>Gestão de calibração de equipamentos - requisito 7.1.5</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn primary" onclick="openNovoInstrumentoModal()"><i class="fas fa-plus"></i> Novo Instrumento</button>
+                    </div>
+                </div>
+
+                <div class="mod-stats">
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-check-circle"></i></div></div>
+                        <div class="stat-value" id="stat-vigentes">0</div>
+                        <div class="stat-label">Vigentes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-clock"></i></div></div>
+                        <div class="stat-value" id="stat-vencendo">0</div>
+                        <div class="stat-label">Vencendo em 30d</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fas fa-exclamation-triangle"></i></div></div>
+                        <div class="stat-value" id="stat-vencidos">0</div>
+                        <div class="stat-label">Vencidos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header"><div class="stat-icon" style="background:rgba(139,92,246,.1);color:var(--purple)"><i class="fas fa-tools"></i></div></div>
+                        <div class="stat-value" id="stat-calibrando">0</div>
+                        <div class="stat-label">Em Calibração</div>
+                    </div>
+                </div>
+
+                <div class="mod-filter-bar">
+                    <div class="mod-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInstr" placeholder="Buscar por código, nome ou categoria..." oninput="renderInstrumentos()">
+                    </div>
+                    <select class="mod-select" id="filterStatus" onchange="renderInstrumentos()">
+                        <option value="">Todos os status</option>
+                        <option value="vigente">Vigentes</option>
+                        <option value="vencendo">Vencendo</option>
+                        <option value="vencido">Vencidos</option>
+                        <option value="calibrando">Em Calibração</option>
+                        <option value="inativo">Inativos</option>
+                    </select>
+                    <select class="mod-select" id="filterCategoria" onchange="renderInstrumentos()">
+                        <option value="">Todas as categorias</option>
+                        <option>Dimensional</option>
+                        <option>Forã e Torque</option>
+                        <option>Massa / Peso</option>
+                        <option>Temperatura</option>
+                        <option>Elétrico</option>
+                    </select>
+                </div>
+
+                <div id="lista-instrumentos"></div>
+                <div class="mod-empty" id="empty-instrumentos" style="display:none">
+                    <i class="fas fa-ruler-combined"></i>
+                    <h3>Nenhum instrumento cadastrado</h3>
+                    <p>Cadastre seus instrumentos de medição clicando em Novo Instrumento</p>
+                </div>
+            </div>
+
+            <!-- VIEW: HISTÓRICO -->
+            <div id="view-historico" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Histórico de Calibrações</h2><p>Registro completo de todas as calibrações realizadas</p></div>
+                </div>
+                <div class="mod-table-wrap">
+                    <table class="mod-table">
+                        <thead><tr><th>Instrumento</th><th>Categoria</th><th>Data Calibração</th><th>Vencimento</th><th>Empresa Responsável</th><th>Resultado</th><th></th></tr></thead>
+                        <tbody id="tbody-historico"></tbody>
+                    </table>
+                </div>
+                <div class="mod-empty" id="empty-historico" style="display:none">
+                    <i class="fas fa-clock-rotate-left"></i>
+                    <h3>Sem histórico de calibrações</h3>
+                </div>
+            </div>
+
+            <!-- VIEW: CATEGORIAS -->
+            <div id="view-categorias" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Categorias e Critários de Aceitação</h2><p>Defina categorias e critários para cada tipo de instrumento</p></div>
+                    <button class="mod-btn primary" onclick="openNovaCategoriaModal()"><i class="fas fa-plus"></i> Nova Categoria</button>
+                </div>
+                <div id="lista-categorias"></div>
+            </div>
+
+            <!-- VIEW: CONFIG -->
+            <div id="view-config" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Configurações de Calibração</h2></div></div>
+                <div class="card">
+                    <div class="card-header"><h4>Alertas e Responsabilidades</h4></div>
+                    <div class="card-body">
+                        <div class="mod-form-row">
+                            <div class="mod-form-group">
+                                <label>Alertar com quantos dias antes do vencimento</label>
+                                <input class="mod-input" type="number" value="30">
+                            </div>
+                            <div class="mod-form-group">
+                                <label>Responsável pelo controle de calibração</label>
+                                <input class="mod-input" value="João Teste">
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                            <button class="mod-btn primary"><i class="fas fa-save"></i> Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: DETALHE INSTRUMENTO -->
+<div class="mod-modal-overlay" id="modalDetalhe">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3 id="detalhe-title"><i class="fas fa-ruler-combined" style="color:var(--primary)"></i> Instrumento</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalDetalhe')">&times;</button>
+        </div>
+        <div class="mod-modal-body" id="detalhe-body"></div>
+        <div class="mod-modal-footer" id="detalhe-footer"></div>
+    </div>
+</div>
+
+<!-- MODAL: NOVO INSTRUMENTO -->
+<div class="mod-modal-overlay" id="modalNovo">
+    <div class="mod-modal md">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-plus-circle" style="color:var(--primary)"></i> Novo Instrumento de Medição</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNovo')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Código <span>*</span></label><input class="mod-input" id="ni-codigo" placeholder="Ex: DP-001"></div>
+                <div class="mod-form-group"><label>Nome / Descrição <span>*</span></label><input class="mod-input" id="ni-nome" placeholder="Ex: Paquímetro Digital"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Categoria <span>*</span></label>
+                    <select class="mod-select-inp" id="ni-categoria">
+                        <option value="">Selecione...</option>
+                        <option>Dimensional</option>
+                        <option>Forã e Torque</option>
+                        <option>Massa / Peso</option>
+                        <option>Temperatura</option>
+                        <option>Elétrico</option>
+                    </select>
+                </div>
+                <div class="mod-form-group"><label>Local de Uso</label><input class="mod-input" id="ni-local" placeholder="Ex: Linha de Produção 01"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Data da Última Calibração</label><input class="mod-input" type="date" id="ni-data-cal"></div>
+                <div class="mod-form-group"><label>Data de Vencimento <span>*</span></label><input class="mod-input" type="date" id="ni-vencimento"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Empresa Responsável pela Calibração</label><input class="mod-input" id="ni-empresa" placeholder="Nome do laboratério ou empresa"></div>
+                <div class="mod-form-group"><label>Número do Certificado</label><input class="mod-input" id="ni-certificado" placeholder="Ex: CAL-2026-0089"></div>
+            </div>
+            <div class="mod-form-row full">
+                <div class="mod-form-group"><label>Observações</label><textarea class="mod-textarea" id="ni-obs" rows="2" placeholder="Informações adicionais sobre o instrumento..."></textarea></div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovo')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarInstrumento()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: ENVIAR PARA CALIBRAÇÃO -->
+<div class="mod-modal-overlay" id="modalCalibrar">
+    <div class="mod-modal sm">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-tools" style="color:var(--warning)"></i> Enviar para Calibração</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalCalibrar')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-group" style="margin-bottom:14px"><label>Instrumento</label><input class="mod-input" id="cal-nome" readonly style="opacity:.6"></div>
+            <div class="mod-form-group" style="margin-bottom:14px"><label>Fornecedor de Calibração <span>*</span></label>
+                <select class="mod-select-inp" id="cal-fornecedor">
+                    <option value="">Selecione...</option>
+                    <option>LabCal Metrologia</option>
+                    <option>MetroCheck Serviços</option>
+                    <option>Inmetro Credenciado</option>
+                    <option>Outro</option>
+                </select>
+            </div>
+            <div class="mod-form-group" style="margin-bottom:14px"><label>Data Prevista de Retorno <span>*</span></label><input class="mod-input" type="date" id="cal-retorno"></div>
+            <div class="mod-form-group"><label>Observações</label><textarea class="mod-textarea" id="cal-obs" rows="2" placeholder="Instruções para o laboratério..."></textarea></div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalCalibrar')">Cancelar</button>
+            <button class="mod-btn warning" onclick="confirmarEnvioCalibrar()"><i class="fas fa-paper-plane"></i> Confirmar Envio</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: RETORNO CALIBRAÇÃO -->
+<div class="mod-modal-overlay" id="modalRetorno">
+    <div class="mod-modal md">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-check-circle" style="color:var(--accent)"></i> Registrar Retorno de Calibração</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalRetorno')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Data da Calibração <span>*</span></label><input class="mod-input" type="date" id="ret-data"></div>
+                <div class="mod-form-group"><label>Nova Data de Vencimento <span>*</span></label><input class="mod-input" type="date" id="ret-vencimento"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Número do Certificado <span>*</span></label><input class="mod-input" id="ret-cert" placeholder="CAL-2026-XXXX"></div>
+                <div class="mod-form-group"><label>Resultado da Calibração <span>*</span></label>
+                    <select class="mod-select-inp" id="ret-resultado">
+                        <option value="aprovado">Aprovado - Conforme com os critários</option>
+                        <option value="reprovado">Reprovado - Fora dos critários</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mod-form-row full">
+                <div class="mod-form-group"><label>Observações do Certificado</label><textarea class="mod-textarea" id="ret-obs" rows="2" placeholder="Dados do certificado, incerteza de medição..."></textarea></div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalRetorno')">Cancelar</button>
+            <button class="mod-btn accent" onclick="confirmarRetorno()"><i class="fas fa-check"></i> Registrar Calibração</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: DESATIVAR -->
+<div class="mod-modal-overlay" id="modalDesativar">
+    <div class="mod-modal sm">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-power-off" style="color:var(--danger)"></i> Desativar Instrumento</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalDesativar')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-alert warn" style="margin-bottom:16px">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>O instrumento será marcado como inativo e não poderá ser selecionado em novas inspeções.</div>
+            </div>
+            <div class="mod-form-group" style="margin-bottom:14px"><label>Instrumento</label><input class="mod-input" id="des-nome" readonly style="opacity:.6"></div>
+            <div class="mod-form-group" style="margin-bottom:14px">
+                <label>Motivo da Desativação <span>*</span></label>
+                <select class="mod-select-inp" id="des-motivo">
+                    <option value="">Selecione...</option>
+                    <option>Dano físico / quebra</option>
+                    <option>Fora da faixa de uso</option>
+                    <option>Obsoleto - substituído</option>
+                    <option>Mal uso - abrir RNC</option>
+                </select>
+            </div>
+            <div class="mod-toggle-row">
+                <label class="mod-toggle"><input type="checkbox" id="des-rnc"><span class="mod-toggle-slider"></span></label>
+                <span class="mod-toggle-label">Abrir RNC automaticamente para investigação</span>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalDesativar')">Cancelar</button>
+            <button class="mod-btn danger" onclick="confirmarDesativacao()"><i class="fas fa-power-off"></i> Desativar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVA CATEGORIA -->
+<div class="mod-modal-overlay" id="modalCategoria">
+    <div class="mod-modal sm">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-tag" style="color:var(--primary)"></i> Nova Categoria</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalCategoria')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-group" style="margin-bottom:14px"><label>Nome da Categoria <span>*</span></label><input class="mod-input" id="cat-nome" placeholder="Ex: Dimensional"></div>
+            <div class="mod-form-group" style="margin-bottom:14px"><label>Periodicidade de Calibração (meses)</label><input class="mod-input" type="number" id="cat-periodo" placeholder="12"></div>
+            <div class="mod-form-group"><label>Critário de Aceitação</label><textarea class="mod-textarea" id="cat-criterio" rows="3" placeholder="Descreva os critários de aceitação para instrumentos desta categoria..."></textarea></div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalCategoria')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarCategoria()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const DB_KEY = 'sgq_calibracao';
+let currentInstrId = null;
+
+function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"instrumentos":[],"categorias":[],"historico":[]}'); }
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+function seedData() {
+    const db = getDB();
+    if (db.instrumentos.length) return;
+    const today = new Date();
+    const addDays = (d, n) => { const dt = new Date(d); dt.setDate(dt.getDate()+n); return dt.toISOString().slice(0,10); };
+    db.instrumentos = [
+        { id:1, codigo:'DP-01', nome:'Paqu?metro Digital', categoria:'Dimensional', local:'Linha 1', dataCal:addDays(today,-60), vencimento:addDays(today,305), empresa:'LabCal Metrologia', certificado:'CAL-2026-0041', obs:'', status:'vigente', historico:[] },
+        { id:2, codigo:'MK-03', nome:'Micrômetro Externo 0-25mm', categoria:'Dimensional', local:'CQ', dataCal:addDays(today,-330), vencimento:addDays(today,25), empresa:'MetroCheck Serviços', certificado:'CAL-2025-0188', obs:'', status:'vencendo', historico:[] },
+        { id:3, codigo:'BE-02', nome:'Balança Eletrúnica 5kg', categoria:'Massa / Peso', local:'Almoxarifado', dataCal:addDays(today,-400), vencimento:addDays(today,-30), empresa:'LabCal Metrologia', certificado:'CAL-2025-0099', obs:'', status:'vencido', historico:[] },
+        { id:4, codigo:'C-07', nome:'Calibrador Tampão Go/No-Go', categoria:'Dimensional', local:'Linha 2', dataCal:addDays(today,-10), vencimento:addDays(today,355), empresa:'Inmetro Credenciado', certificado:'CAL-2026-0072', obs:'', status:'calibrando', fornecedorCal:'LabCal Metrologia', retornoPrevisto: addDays(today,5) },
+        { id:5, codigo:'TR-01', nome:'Termômetro Industrial', categoria:'Temperatura', local:'Forno 1', dataCal:addDays(today,-180), vencimento:addDays(today,185), empresa:'MetroCheck Serviços', certificado:'CAL-2026-0012', obs:'', status:'vigente', historico:[] },
+    ];
+    db.categorias = [
+        { id:1, nome:'Dimensional', periodo:12, criterio:'Incerteza máxima de 1/10 da tolerância do produto. Rastreável ao SI.' },
+        { id:2, nome:'Massa / Peso', periodo:12, criterio:'Incerteza máxima de 0,01% do fundo de escala.' },
+        { id:3, nome:'Temperatura', periodo:6, criterio:'Incerteza máxima �0,5�C.' },
+        { id:4, nome:'Força e Torque', periodo:12, criterio:'Incerteza máxima de 1% do valor indicado.' },
+    ];
+    saveDB(db);
+}
+
+function switchView(v) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display='none');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-'+v).style.display='block';
+    const nav = document.getElementById('nav-'+v);
+    if (nav) nav.classList.add('active');
+    if (v==='instrumentos') renderInstrumentos();
+    if (v==='historico') renderHistorico();
+    if (v==='categorias') renderCategorias();
+}
+
+function getStatusClass(instr) {
+    const today = new Date();
+    const venc = new Date(instr.vencimento);
+    const diff = Math.ceil((venc - today) / (1000*60*60*24));
+    if (instr.status === 'inativo') return 'inativa';
+    if (instr.status === 'calibrando') return 'andamento';
+    if (diff < 0) return 'vencido';
+    if (diff <= 30) return 'vencendo';
+    return 'vigente';
+}
+
+function renderInstrumentos() {
+    const db = getDB();
+    const search = (document.getElementById('searchInstr')?.value||'').toLowerCase();
+    const sf = document.getElementById('filterStatus')?.value||'';
+    const cf = document.getElementById('filterCategoria')?.value||'';
+
+    // Recalculate status
+    db.instrumentos.forEach(i => {
+        if (i.status !== 'calibrando' && i.status !== 'inativo') {
+            i.status = getStatusClass(i);
+        }
+    });
+
+    let items = db.instrumentos.filter(i => {
+        if (search && !i.nome.toLowerCase().includes(search) && !i.codigo.toLowerCase().includes(search)) return false;
+        if (sf && i.status !== sf) return false;
+        if (cf && i.categoria !== cf) return false;
+        return true;
+    }).sort((a,b) => new Date(a.vencimento) - new Date(b.vencimento));
+
+    const vigentes = db.instrumentos.filter(i => i.status==='vigente').length;
+    const vencendo = db.instrumentos.filter(i => i.status==='vencendo').length;
+    const vencidos  = db.instrumentos.filter(i => i.status==='vencido').length;
+    const calibrando= db.instrumentos.filter(i => i.status==='calibrando').length;
+    document.getElementById('stat-vigentes').textContent = vigentes;
+    document.getElementById('stat-vencendo').textContent = vencendo;
+    document.getElementById('stat-vencidos').textContent = vencidos;
+    document.getElementById('stat-calibrando').textContent = calibrando;
+
+    const listEl = document.getElementById('lista-instrumentos');
+    const emptyEl = document.getElementById('empty-instrumentos');
+    if (!items.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    emptyEl.style.display='none';
+
+    const today = new Date();
+    listEl.innerHTML = items.map(i => {
+        const venc = new Date(i.vencimento);
+        const diff = Math.ceil((venc-today)/(1000*60*60*24));
+        const statusClass = i.status;
+        const borderColor = {vigente:'rgba(16,185,129,.3)',vencendo:'rgba(245,158,11,.4)',vencido:'rgba(239,68,68,.4)',calibrando:'rgba(139,92,246,.3)',inativa:'rgba(255,255,255,.1)'}[statusClass]||'rgba(255,255,255,.1)';
+
+        return `<div style="display:flex;align-items:center;gap:16px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid ${borderColor};border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all .2s" onmouseenter="this.style.background='rgba(255,255,255,.06)'" onmouseleave="this.style.background='rgba(255,255,255,.03)'" onclick="openDetalhe(${i.id})">
+            <div style="width:44px;height:44px;border-radius:10px;background:rgba(15,117,189,.12);display:flex;align-items:center;justify-content:center;color:var(--primary-light);font-size:.9rem;flex-shrink:0"><i class="fas fa-ruler-combined"></i></div>
+            <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+                    <span style="font-weight:700;color:#fff;font-size:.95rem">${i.nome}</span>
+                    <span style="font-size:.75rem;font-weight:700;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);padding:2px 7px;border-radius:4px">${i.codigo}</span>
+                    <span class="sbadge ${statusClass}">${{vigente:'Vigente',vencendo:'Vencendo',vencido:'Vencido',calibrando:'Em Calibração',inativa:'Inativo'}[statusClass]||statusClass}</span>
+                </div>
+                <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:rgba(255,255,255,.4)">
+                    <span><i class="fas fa-tag" style="margin-right:4px"></i>${i.categoria}</span>
+                    <span><i class="fas fa-map-marker-alt" style="margin-right:4px"></i>${i.local}</span>
+                    <span><i class="fas fa-industry" style="margin-right:4px"></i>${i.empresa}</span>
+                    <span style="color:${statusClass==='vencido'?'#f87171':statusClass==='vencendo'?'#fbbf24':'rgba(255,255,255,.4)'}"><i class="fas fa-calendar" style="margin-right:4px"></i>Vence: ${formatDate(i.vencimento)} ${diff >= 0 ? '('+diff+'d)' : '('+Math.abs(diff)+'d atrás)'}</span>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function openDetalhe(id) {
+    const db = getDB();
+    const instr = db.instrumentos.find(i => i.id===id);
+    if (!instr) return;
+    currentInstrId = id;
+    const statusClass = instr.status;
+    document.getElementById('detalhe-title').innerHTML = `<i class="fas fa-ruler-combined" style="color:var(--primary)"></i> ${instr.nome} <span class="sbadge ${statusClass}" style="margin-left:8px">${{vigente:'Vigente',vencendo:'Vencendo',vencido:'Vencido',calibrando:'Em Calibração',inativo:'Inativo'}[statusClass]||statusClass}</span>`;
+
+    const hist = instr.historico || [];
+    const histHtml = hist.length ? hist.slice(-3).map(h => `
+        <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+            <div style="font-size:.82rem;color:rgba(255,255,255,.6);flex:1">Calibrado em ${formatDate(h.data)} � Vencimento ${formatDate(h.vencimento)}</div>
+            <span style="font-size:.72rem;color:rgba(255,255,255,.35)">${h.empresa}</span>
+            <span class="sbadge ${h.resultado==='aprovado'?'aprovado':'reprovado'}">${h.resultado==='aprovado'?'Aprovado':'Reprovado'}</span>
+        </div>
+    `).join('') : '<div style="color:rgba(255,255,255,.3);font-size:.85rem">Sem hist?rico anterior</div>';
+
+    document.getElementById('detalhe-body').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">C?DIGO</div><div style="font-weight:700;color:#fff">${instr.codigo}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">CATEGORIA</div><div style="font-weight:700;color:#fff">${instr.categoria}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">LOCAL DE USO</div><div style="font-weight:700;color:#fff">${instr.local}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">ÚLTIMA CALIBRAÇÃO</div><div style="font-weight:700;color:#fff">${formatDate(instr.dataCal)}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">VENCIMENTO</div><div style="font-weight:700;color:${statusClass==='vencido'?'#f87171':statusClass==='vencendo'?'#fbbf24':'#fff'}">${formatDate(instr.vencimento)}</div></div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:14px;margin-bottom:20px">
+            <div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:8px">CERTIFICADO DE CALIBRAÇÃO VIGENTE - ${instr.certificado}</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:14px;background:rgba(15,117,189,.08);border:1px solid rgba(15,117,189,.2);border-radius:8px;cursor:pointer" onclick="alert('Em ambiente de produção, o certificado PDF ser? exibido aqui.')">
+                <i class="fas fa-file-pdf" style="color:#ef4444;font-size:1.5rem"></i>
+                <div><div style="font-size:.9rem;font-weight:600;color:#fff">Certificado_${instr.codigo}_${formatDate(instr.dataCal).replace(/\//g,'-')}.pdf</div><div style="font-size:.75rem;color:rgba(255,255,255,.4)">Empresa: ${instr.empresa}</div></div>
+                <i class="fas fa-external-link-alt" style="margin-left:auto;color:rgba(255,255,255,.3)"></i>
+            </div>
+        </div>
+        <div class="mod-form-section-title">Histórico de Calibrações (últimas 3)</div>
+        <div style="margin-bottom:20px">${histHtml}</div>
+        ${instr.status==='calibrando' ? `<div class="mod-alert warn"><i class="fas fa-spinner fa-spin"></i><div>Instrumento em calibração. Retorno previsto: ${formatDate(instr.retornoPrevisto)}. Fornecedor: ${instr.fornecedorCal||'-'}</div></div>` : ''}
+    `;
+
+    let footerHtml = '<button class="mod-btn ghost" onclick="closeModal(\'modalDetalhe\')">Fechar</button>';
+    if (instr.status === 'calibrando') {
+        footerHtml += `<button class="mod-btn accent" onclick="openRetornoModal(${id})"><i class="fas fa-check"></i> Registrar Retorno</button>`;
+    } else if (instr.status !== 'inativo') {
+        footerHtml += `<button class="mod-btn danger" onclick="openDesativarModal(${id})" style="margin-right:auto"><i class="fas fa-power-off"></i> Desativar</button>`;
+        footerHtml += `<button class="mod-btn warning" onclick="openCalibrarModal(${id})"><i class="fas fa-tools"></i> Enviar para Calibração</button>`;
+    }
+    document.getElementById('detalhe-footer').innerHTML = footerHtml;
+    openModal('modalDetalhe');
+}
+
+function renderHistorico() {
+    const db = getDB();
+    const all = [];
+    db.instrumentos.forEach(i => { (i.historico||[]).forEach(h => all.push({...h, instrNome: i.nome, instrCodigo: i.codigo})); });
+    all.sort((a,b) => new Date(b.data) - new Date(a.data));
+    const tbody = document.getElementById('tbody-historico');
+    const emptyEl = document.getElementById('empty-historico');
+    if (!all.length) { tbody.innerHTML=''; emptyEl.style.display='flex'; document.querySelector('.mod-table-wrap').style.display='none'; return; }
+    emptyEl.style.display='none';
+    document.querySelector('.mod-table-wrap').style.display='block';
+    tbody.innerHTML = all.map(h => `<tr><td style="font-weight:600;color:#fff">${h.instrNome}<div style="font-size:.72rem;color:rgba(255,255,255,.35)">${h.instrCodigo}</div></td><td>-</td><td>${formatDate(h.data)}</td><td>${formatDate(h.vencimento)}</td><td>${h.empresa||'-'}</td><td><span class="sbadge ${h.resultado==='aprovado'?'aprovado':'reprovado'}">${h.resultado==='aprovado'?'Aprovado':'Reprovado'}</span></td><td><button class="tbl-btn primary">Ver</button></td></tr>`).join('');
+}
+
+function renderCategorias() {
+    const db = getDB();
+    const cont = document.getElementById('lista-categorias');
+    if (!db.categorias.length) { cont.innerHTML = '<div class="mod-empty"><i class="fas fa-tags"></i><h3>Nenhuma categoria</h3></div>'; return; }
+    cont.innerHTML = db.categorias.map(c => `
+        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px 20px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span style="font-weight:700;color:#fff;font-size:.95rem">${c.nome}</span>
+                <span style="font-size:.78rem;color:rgba(255,255,255,.4)">Periodicidade: ${c.periodo} meses</span>
+            </div>
+            <div style="font-size:.82rem;color:rgba(255,255,255,.5)">${c.criterio}</div>
+        </div>
+    `).join('');
+}
+
+function openNovoInstrumentoModal() { openModal('modalNovo'); }
+
+function salvarInstrumento() {
+    const codigo = document.getElementById('ni-codigo').value.trim();
+    const nome = document.getElementById('ni-nome').value.trim();
+    const categoria = document.getElementById('ni-categoria').value;
+    const vencimento = document.getElementById('ni-vencimento').value;
+    if (!codigo || !nome || !categoria || !vencimento) return alert('Preencha os campos obrigatórios.');
+    const db = getDB();
+    const newId = db.instrumentos.length ? Math.max(...db.instrumentos.map(i=>i.id))+1 : 1;
+    const today = new Date();
+    const venc = new Date(vencimento);
+    const diff = Math.ceil((venc-today)/(1000*60*60*24));
+    let status = diff < 0 ? 'vencido' : diff <= 30 ? 'vencendo' : 'vigente';
+    db.instrumentos.push({ id:newId, codigo, nome, categoria, local:document.getElementById('ni-local').value, dataCal:document.getElementById('ni-data-cal').value, vencimento, empresa:document.getElementById('ni-empresa').value, certificado:document.getElementById('ni-certificado').value, obs:document.getElementById('ni-obs').value, status, historico:[] });
+    saveDB(db);
+    closeModal('modalNovo');
+    renderInstrumentos();
+    showToast('Instrumento cadastrado!', 'success');
+}
+
+function openCalibrarModal(id) {
+    const db = getDB();
+    const i = db.instrumentos.find(x=>x.id===id);
+    if (!i) return;
+    currentInstrId = id;
+    document.getElementById('cal-nome').value = i.nome;
+    closeModal('modalDetalhe');
+    openModal('modalCalibrar');
+}
+
+function confirmarEnvioCalibrar() {
+    const forn = document.getElementById('cal-fornecedor').value;
+    const ret = document.getElementById('cal-retorno').value;
+    if (!forn || !ret) return alert('Preencha fornecedor e data de retorno.');
+    const db = getDB();
+    const i = db.instrumentos.find(x=>x.id===currentInstrId);
+    if (i) { i.status='calibrando'; i.fornecedorCal=forn; i.retornoPrevisto=ret; }
+    saveDB(db);
+    closeModal('modalCalibrar');
+    renderInstrumentos();
+    showToast('Instrumento enviado para calibração!', 'success');
+}
+
+function openRetornoModal(id) {
+    currentInstrId = id;
+    closeModal('modalDetalhe');
+    openModal('modalRetorno');
+}
+
+function confirmarRetorno() {
+    const data = document.getElementById('ret-data').value;
+    const venc = document.getElementById('ret-vencimento').value;
+    const cert = document.getElementById('ret-cert').value.trim();
+    const res = document.getElementById('ret-resultado').value;
+    if (!data || !venc || !cert) return alert('Preencha todos os campos obrigatórios.');
+    const db = getDB();
+    const i = db.instrumentos.find(x=>x.id===currentInstrId);
+    if (i) {
+        if (!i.historico) i.historico = [];
+        i.historico.push({ data:i.dataCal, vencimento:i.vencimento, empresa:i.empresa, certificado:i.certificado, resultado:'aprovado' });
+        i.dataCal=data; i.vencimento=venc; i.certificado=cert;
+        const today=new Date(); const vencD=new Date(venc); const diff=Math.ceil((vencD-today)/(1000*60*60*24));
+        i.status = diff<0?'vencido':diff<=30?'vencendo':'vigente';
+        i.fornecedorCal=undefined; i.retornoPrevisto=undefined;
+    }
+    saveDB(db);
+    closeModal('modalRetorno');
+    renderInstrumentos();
+    showToast('Calibração registrada com sucesso!', 'success');
+}
+
+function openDesativarModal(id) {
+    const db = getDB();
+    const i = db.instrumentos.find(x=>x.id===id);
+    if (!i) return;
+    currentInstrId = id;
+    document.getElementById('des-nome').value = i.nome;
+    closeModal('modalDetalhe');
+    openModal('modalDesativar');
+}
+
+function confirmarDesativacao() {
+    const motivo = document.getElementById('des-motivo').value;
+    if (!motivo) return alert('Selecione o motivo de desativação.');
+    const db = getDB();
+    const i = db.instrumentos.find(x=>x.id===currentInstrId);
+    if (i) { i.status='inativo'; i.motivoDesativacao=motivo; i.desativadoEm=new Date().toISOString(); }
+    saveDB(db);
+    closeModal('modalDesativar');
+    renderInstrumentos();
+    showToast('Instrumento desativado.', 'success');
+}
+
+function openNovaCategoriaModal() { openModal('modalCategoria'); }
+
+function salvarCategoria() {
+    const nome = document.getElementById('cat-nome').value.trim();
+    if (!nome) return alert('Informe o nome da categoria.');
+    const db = getDB();
+    const newId = db.categorias.length ? Math.max(...db.categorias.map(c=>c.id))+1 : 1;
+    db.categorias.push({ id:newId, nome, periodo:parseInt(document.getElementById('cat-periodo').value)||12, criterio:document.getElementById('cat-criterio').value });
+    saveDB(db);
+    closeModal('modalCategoria');
+    renderCategorias();
+}
+
+function formatDate(str) {
+    if (!str) return '-';
+    const d = new Date(str + (str.length===10?'T00:00':''));
+    return d.toLocaleDateString('pt-BR');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;font-size:.88rem;z-index:9999;background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+document.querySelectorAll('.mod-modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target===o) o.classList.remove('active'); }));
+
+seedData();
+renderInstrumentos();
+</script>
+<script>
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');});
+</script><script>
+function startModuleTour() {
+    alert('Tour deste módulo em breve! ');
+}
+</script></body>
+</html>

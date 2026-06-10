@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indicadores e KPIs - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-chart-line" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Indicadores e KPIs</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Indicadores</div>
+                <a href="#" class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard');return false"><i class="fas fa-chart-line"></i> Dashboard KPIs</a>
+                <a href="#" class="nav-item" id="nav-kpis" onclick="switchView('kpis');return false"><i class="fas fa-bullseye"></i> Cadastro e Configuração</a>
+                <a href="#" class="nav-item" id="nav-lancamentos" onclick="switchView('lancamentos');return false"><i class="fas fa-plus-circle"></i> Lanãr Resultado</a>
+                <a href="#" class="nav-item" id="nav-metas" onclick="switchView('metas');return false"><i class="fas fa-trophy"></i> Definição de Metas</a>
+            </div>
+        </nav>
+        </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+
+                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar indicador..."></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <select class="mod-select" id="periodo-select" style="font-size:.8rem;padding:6px 12px;border-radius:7px" onchange="renderDashboard()">
+                    <option value="mai/2026">Mai/2026</option>
+                    <option value="abr/2026">Abr/2026</option>
+                    <option value="mar/2026">Mar/2026</option>
+                    <option value="q1-2026">Q1 2026</option>
+                </select>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JD</div>
+                        <span class="user-btn-name">João Teste</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JD</div>
+                            <div><div class="user-name">João Teste</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <!-- DASHBOARD KPIs -->
+            <div id="view-dashboard" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-chart-line" style="color:var(--accent);margin-right:10px"></i>Indicadores e KPIs de Qualidade</h2>
+                        <p>Monitore e analise os indicadores do SGQ - requisitos 6.2, 9.1</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn accent" onclick="switchView('lancamentos')"><i class="fas fa-plus"></i> Lanãr Resultado</button>
+                    </div>
+                </div>
+
+                <div class="mod-stats">
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-check-circle"></i></div></div><div class="stat-value" id="stat-atingidos">0</div><div class="stat-label">KPIs Atingidos</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fas fa-times-circle"></i></div></div><div class="stat-value" id="stat-nao-atingidos">0</div><div class="stat-label">KPIs Não Atingidos</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-minus-circle"></i></div></div><div class="stat-value" id="stat-sem-dados">0</div><div class="stat-label">Sem Dados (perãodo)</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)"><i class="fas fa-bullseye"></i></div></div><div class="stat-value" id="stat-total-kpi">0</div><div class="stat-label">Total de KPIs</div></div>
+                </div>
+
+                <div id="kpi-grid" class="kpi-grid"></div>
+                <div class="mod-empty" id="empty-kpi" style="display:none"><i class="fas fa-chart-line"></i><h3>Nenhum KPI cadastrado</h3><p>Cadastre os indicadores de qualidade clicando em "Cadastro e Configuração"</p></div>
+            </div>
+
+            <!-- CADASTRO KPIs -->
+            <div id="view-kpis" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Cadastro de KPIs</h2><p>Configure os indicadores de qualidade do SGQ</p></div>
+                    <button class="mod-btn primary" onclick="openNovoKPIModal()"><i class="fas fa-plus"></i> Novo KPI</button>
+                </div>
+                <div class="mod-table-wrap">
+                    <table class="mod-table">
+                        <thead><tr><th>Indicador</th><th>Unidade</th><th>Frequência</th><th>Meta</th><th>Responsável</th><th>Fonte</th><th>Status</th><th></th></tr></thead>
+                        <tbody id="tbody-kpis"></tbody>
+                    </table>
+                </div>
+                <div class="mod-empty" id="empty-kpis-tab" style="display:none"><i class="fas fa-bullseye"></i><h3>Nenhum KPI cadastrado</h3></div>
+            </div>
+
+            <!-- LANÇAMENTOS -->
+            <div id="view-lancamentos" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Lanãr Resultado de KPI</h2><p>Registre o resultado medido para o perãodo</p></div></div>
+                <div class="card"><div class="card-header"><h4>Novo Lanãmento</h4></div>
+                    <div class="card-body">
+                        <div class="mod-form-row">
+                            <div class="mod-form-group"><label>KPI <span>*</span></label><select class="mod-select-inp" id="lanc-kpi"><option value="">Selecione...</option></select></div>
+                            <div class="mod-form-group"><label>Perãodo <span>*</span></label><input class="mod-input" id="lanc-periodo" placeholder="Ex: Mai/2026"></div>
+                        </div>
+                        <div class="mod-form-row">
+                            <div class="mod-form-group"><label>Resultado Medido <span>*</span></label><input class="mod-input" type="number" id="lanc-resultado" step="0.01" placeholder="Valor numérico"></div>
+                            <div class="mod-form-group"><label>Data da Medição</label><input class="mod-input" type="date" id="lanc-data"></div>
+                        </div>
+                        <div class="mod-form-group"><label>Observações</label><textarea class="mod-textarea" id="lanc-obs" rows="2" placeholder="Contextualização do resultado..."></textarea></div>
+                        <div style="display:flex;justify-content:flex-end;margin-top:16px"><button class="mod-btn primary" onclick="salvarLancamento()"><i class="fas fa-save"></i> Registrar</button></div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top:20px"><div class="card-header"><h4>Histórico de Lanãmentos</h4></div>
+                    <div class="card-body" style="padding:0"><div id="historico-lanc"></div></div>
+                </div>
+            </div>
+
+            <!-- METAS -->
+            <div id="view-metas" class="mod-view" style="display:none">
+                <div class="mod-header"><div><h2>Definição de Metas</h2><p>Configure as metas por perãodo e KPI</p></div></div>
+                <div class="mod-alert info"><i class="fas fa-info-circle"></i><div>As metas são definidas no cadastro de cada KPI. Utilize esta tela para revisés periódicas e ajuste de metas por perãodo.</div></div>
+                <div id="metas-lista"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NOVO KPI -->
+<div class="mod-modal-overlay" id="modalNovoKPI">
+    <div class="mod-modal md">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-bullseye" style="color:var(--accent)"></i> Novo KPI / Indicador</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNovoKPI')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Nome do Indicador <span>*</span></label><input class="mod-input" id="kpi-nome" placeholder="Ex: Índice de Defeitos"></div>
+                <div class="mod-form-group"><label>Sigla</label><input class="mod-input" id="kpi-sigla" placeholder="Ex: IDQ" style="max-width:100px"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Unidade de Medida <span>*</span></label>
+                    <select class="mod-select-inp" id="kpi-unidade"><option>%</option><option>ppm</option><option>dias</option><option>unidades</option><option>R$</option><option>nota (0-10)</option><option>horas</option></select>
+                </div>
+                <div class="mod-form-group"><label>Frequência de Medição</label>
+                    <select class="mod-select-inp" id="kpi-freq"><option>Mensal</option><option>Semanal</option><option>Trimestral</option><option>Diária</option></select>
+                </div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Meta (valor) <span>*</span></label><input class="mod-input" type="number" id="kpi-meta" placeholder="Ex: 2" step="0.01"></div>
+                <div class="mod-form-group"><label>Direção da Meta</label>
+                    <select class="mod-select-inp" id="kpi-direcao"><option value="menor">? (menor é melhor)</option><option value="maior">? (maior é melhor)</option><option value="igual">= (igual)</option></select>
+                </div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Responsável</label>
+                    <select class="mod-select-inp" id="kpi-resp"><option>João Teste</option><option>Ana Carvalho</option><option>Carlos Ferreira</option></select>
+                </div>
+                <div class="mod-form-group"><label>Fonte de Dados</label>
+                    <select class="mod-select-inp" id="kpi-fonte"><option>Manual</option><option>Módulo Inspeções</option><option>Módulo NC</option><option>Módulo Satisfação</option><option>Módulo Fornecedores</option></select>
+                </div>
+            </div>
+            <div class="mod-form-group" style="margin-top:4px"><label>Cláusula ISO 9001</label>
+                <select class="mod-select-inp" id="kpi-clausula"><option>6.2 - Objetivos</option><option>9.1 - Monitoramento</option><option>8.4 - Fornecedores</option><option>9.1.2 - Satisfação</option><option>8.6 - Liberação</option></select>
+            </div>
+            <div class="mod-form-group" style="margin-top:14px"><label>Descrição</label><textarea class="mod-textarea" id="kpi-desc" rows="2" placeholder="Como este indicador é calculado..."></textarea></div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovoKPI')">Cancelar</button>
+            <button class="mod-btn primary" onclick="salvarKPI()"><i class="fas fa-save"></i> Salvar KPI</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const DB_KEY = 'sgq_indicadores';
+
+function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"kpis":[],"lancamentos":[]}'); }
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+function seedData() {
+    const db = getDB();
+    if (db.kpis.length) return;
+    db.kpis = [
+        { id:1, nome:'Índice de Defeitos', sigla:'IDQ', unidade:'ppm', freq:'Mensal', meta:500, direcao:'menor', resp:'João Teste', fonte:'Módulo Inspe��es', clausula:'9.1 - Monitoramento', desc:'PPM de peças defeituosas no processo' },
+        { id:2, nome:'OTD - On-Time Delivery', sigla:'OTD', unidade:'%', freq:'Mensal', meta:95, direcao:'maior', resp:'João Teste', fonte:'Manual', clausula:'9.1 - Monitoramento', desc:'Percentual de pedidos entregues no prazo' },
+        { id:3, nome:'NPS Score', sigla:'NPS', unidade:'nota (0-10)', freq:'Mensal', meta:70, direcao:'maior', resp:'Ana Carvalho', fonte:'Módulo Satisfação', clausula:'9.1.2 - Satisfação', desc:'Net Promoter Score dos clientes' },
+        { id:4, nome:'Índice de Reclamações', sigla:'IRC', unidade:'%', freq:'Mensal', meta:1, direcao:'menor', resp:'João Teste', fonte:'Módulo Satisfação', clausula:'9.1.2 - Satisfação', desc:'% de pedidos que geraram reclamação' },
+        { id:5, nome:'Score de Fornecedores', sigla:'SFQ', unidade:'nota (0-10)', freq:'Trimestral', meta:3.5, direcao:'maior', resp:'Carlos Ferreira', fonte:'Módulo Fornecedores', clausula:'8.4 - Fornecedores', desc:'Score médio de avaliação de fornecedores' },
+    ];
+    db.lancamentos = [
+        { id:1, kpiId:1, periodo:'Mai/2026', resultado:420, data:'2026-05-30', obs:'Melhoria apçs ajuste na linha 3' },
+        { id:2, kpiId:2, periodo:'Mai/2026', resultado:92, data:'2026-05-30', obs:'' },
+        { id:3, kpiId:3, periodo:'Mai/2026', resultado:72, data:'2026-05-30', obs:'Pesquisa com 4 respostas' },
+        { id:4, kpiId:4, periodo:'Mai/2026', resultado:2.1, data:'2026-05-30', obs:'Acima da meta, investigar' },
+        { id:5, kpiId:5, periodo:'Mar/2026', resultado:3.8, data:'2026-03-31', obs:'Resultado trimestral' },
+        { id:6, kpiId:1, periodo:'Abr/2026', resultado:650, data:'2026-04-30', obs:'Pico no início do màs' },
+        { id:7, kpiId:2, periodo:'Abr/2026', resultado:97, data:'2026-04-30', obs:'Melhor resultado hist?rico' },
+    ];
+    saveDB(db);
+}
+
+function switchView(v) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display='none');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-'+v).style.display='block';
+    const nav = document.getElementById('nav-'+v);
+    if (nav) nav.classList.add('active');
+    if (v==='dashboard') renderDashboard();
+    if (v==='kpis') renderKPIsTable();
+    if (v==='lancamentos') { populateLancKPI(); renderHistoricoLanc(); }
+    if (v==='metas') renderMetas();
+}
+
+function getUltimoLancamento(kpiId) {
+    const db = getDB();
+    const periodo = document.getElementById('periodo-select')?.value || 'Mai/2026';
+    const lanc = db.lancamentos.filter(l => l.kpiId===kpiId && l.periodo===periodo);
+    return lanc.length ? lanc[lanc.length-1] : null;
+}
+
+function isKpiAtingido(kpi, resultado) {
+    if (resultado === null || resultado === undefined) return null;
+    if (kpi.direcao === 'menor') return resultado <= kpi.meta;
+    if (kpi.direcao === 'maior') return resultado >= kpi.meta;
+    return Math.abs(resultado - kpi.meta) < 0.001;
+}
+
+function renderDashboard() {
+    const db = getDB();
+    let atingidos = 0, naoAtingidos = 0, semDados = 0;
+    const kpiHtml = db.kpis.map(kpi => {
+        const lanc = getUltimoLancamento(kpi.id);
+        const resultado = lanc ? lanc.resultado : null;
+        const atingido = isKpiAtingido(kpi, resultado);
+        if (resultado === null) semDados++;
+        else if (atingido) atingidos++;
+        else naoAtingidos++;
+
+        const metaLabel = kpi.direcao==='menor' ? `? ${kpi.meta}${kpi.unidade!=='%'?'':' %'}` : kpi.direcao==='maior' ? `? ${kpi.meta}${kpi.unidade==='%'?' %':''}` : `= ${kpi.meta}`;
+        const pct = resultado !== null && kpi.meta > 0 ? Math.min((kpi.direcao==='maior'?resultado/kpi.meta:(2*kpi.meta-resultado)/kpi.meta)*100, 130) : 0;
+        const statusClass = resultado === null ? 'sem-dados' : atingido ? 'atingido' : 'nao-atingido';
+        const trend = lanc && db.lancamentos.filter(l=>l.kpiId===kpi.id).length > 1 ? (() => {
+            const ordered = db.lancamentos.filter(l=>l.kpiId===kpi.id).slice(-2);
+            if (ordered.length < 2) return null;
+            return ordered[1].resultado > ordered[0].resultado ? 'up' : ordered[1].resultado < ordered[0].resultado ? 'down' : 'stable';
+        })() : null;
+
+        return `<div class="kpi-card ${statusClass}">
+            <div class="kpi-header">
+                <div><div class="kpi-sigla">${kpi.sigla}</div><div class="kpi-nome">${kpi.nome}</div></div>
+                <div class="kpi-status-icon">${resultado===null?'<i class="fas fa-minus" style="color:rgba(255,255,255,.2)"></i>':atingido?'<i class="fas fa-check-circle" style="color:var(--accent)"></i>':'<i class="fas fa-times-circle" style="color:var(--danger)"></i>'}</div>
+            </div>
+            <div class="kpi-valor">${resultado !== null ? resultado + ' <span class="kpi-unid">' + kpi.unidade + '</span>' : '<span style="color:rgba(255,255,255,.25);font-size:1rem">Sem dados</span>'}</div>
+            <div class="kpi-meta-row"><span class="kpi-meta-label">Meta: ${metaLabel}</span>${trend?`<span class="kpi-trend ${trend}"><i class="fas fa-arrow-trend-${trend==='up'?'up':'down'}"></i></span>`:''}</div>
+            ${resultado !== null ? `<div class="score-bar" style="margin-top:8px"><div class="score-fill ${atingido?'ok':'fail'}" style="width:${Math.min(pct,100)}%"></div></div>` : ''}
+            <div class="kpi-footer"><span class="kpi-fonte">${kpi.fonte}</span><span class="kpi-clausula">${kpi.clausula}</span></div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('stat-atingidos').textContent = atingidos;
+    document.getElementById('stat-nao-atingidos').textContent = naoAtingidos;
+    document.getElementById('stat-sem-dados').textContent = semDados;
+    document.getElementById('stat-total-kpi').textContent = db.kpis.length;
+    document.getElementById('kpi-grid').innerHTML = kpiHtml;
+    document.getElementById('empty-kpi').style.display = db.kpis.length ? 'none' : 'flex';
+    document.getElementById('kpi-grid').style.display = db.kpis.length ? 'grid' : 'none';
+}
+
+function renderKPIsTable() {
+    const db = getDB();
+    const tbody = document.getElementById('tbody-kpis');
+    const emptyEl = document.getElementById('empty-kpis-tab');
+    const tableWrap = document.querySelector('.mod-table-wrap');
+    if (!db.kpis.length) { tbody.innerHTML=''; emptyEl.style.display='flex'; tableWrap.style.display='none'; return; }
+    emptyEl.style.display='none'; tableWrap.style.display='block';
+    tbody.innerHTML = db.kpis.map(k => `<tr>
+        <td><span style="font-weight:700;color:#fff">${k.nome}</span><div style="font-size:.73rem;color:rgba(255,255,255,.3)">${k.desc}</div></td>
+        <td>${k.unidade}</td>
+        <td>${k.freq}</td>
+        <td><span style="font-weight:700;color:var(--accent)">${k.direcao==='menor'?'?':k.direcao==='maior'?'?':'='} ${k.meta} ${k.unidade}</span></td>
+        <td>${k.resp}</td>
+        <td><span style="font-size:.78rem;color:rgba(255,255,255,.4)">${k.fonte}</span></td>
+        <td><span class="sbadge concluida">Ativo</span></td>
+        <td><button class="tbl-btn danger" onclick="deleteKPI(${k.id})"><i class="fas fa-trash"></i></button></td>
+    </tr>`).join('');
+}
+
+function populateLancKPI() {
+    const db = getDB();
+    const sel = document.getElementById('lanc-kpi');
+    sel.innerHTML = '<option value="">Selecione...</option>' + db.kpis.map(k=>`<option value="${k.id}">${k.nome} (${k.sigla})</option>`).join('');
+    document.getElementById('lanc-data').value = new Date().toISOString().slice(0,10);
+}
+
+function renderHistoricoLanc() {
+    const db = getDB();
+    const cont = document.getElementById('historico-lanc');
+    if (!db.lancamentos.length) { cont.innerHTML='<div style="padding:20px;text-align:center;color:rgba(255,255,255,.25)">Nenhum lançamento</div>'; return; }
+    cont.innerHTML = [...db.lancamentos].reverse().slice(0,10).map(l => {
+        const kpi = db.kpis.find(k=>k.id===l.kpiId);
+        if (!kpi) return '';
+        const atingido = isKpiAtingido(kpi, l.resultado);
+        return `<div style="display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.04)">
+            <div style="width:8px;height:8px;border-radius:50%;background:${atingido?'var(--accent)':'var(--danger)'};flex-shrink:0"></div>
+            <div style="flex:1"><div style="font-size:.85rem;font-weight:600;color:#fff">${kpi.nome}</div><div style="font-size:.75rem;color:rgba(255,255,255,.35)">${l.periodo} � ${formatDate(l.data)}${l.obs?' � '+l.obs:''}</div></div>
+            <div style="font-size:1.1rem;font-weight:800;color:${atingido?'var(--accent)':'var(--danger)'}">${l.resultado} <span style="font-size:.72rem;color:rgba(255,255,255,.3)">${kpi.unidade}</span></div>
+        </div>`;
+    }).join('');
+}
+
+function renderMetas() {
+    const db = getDB();
+    const cont = document.getElementById('metas-lista');
+    cont.innerHTML = db.kpis.map(k => `<div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
+        <div style="flex:1"><div style="font-weight:700;color:#fff">${k.nome} <span style="font-size:.78rem;color:rgba(255,255,255,.35)">(${k.sigla})</span></div><div style="font-size:.78rem;color:rgba(255,255,255,.35)">Frequência: ${k.freq} � Responsável: ${k.resp}</div></div>
+        <div style="text-align:right"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">${k.direcao==='menor'?'?':k.direcao==='maior'?'?':'='} ${k.meta} <span style="font-size:.75rem">${k.unidade}</span></div><div style="font-size:.72rem;color:rgba(255,255,255,.3)">${k.clausula}</div></div>
+    </div>`).join('');
+}
+
+function salvarKPI() {
+    const nome = document.getElementById('kpi-nome').value.trim();
+    const meta = parseFloat(document.getElementById('kpi-meta').value);
+    if (!nome || isNaN(meta)) return alert('Preencha nome e meta do KPI.');
+    const db = getDB();
+    const newId = db.kpis.length ? Math.max(...db.kpis.map(k=>k.id))+1 : 1;
+    db.kpis.push({ id:newId, nome, sigla:document.getElementById('kpi-sigla').value, unidade:document.getElementById('kpi-unidade').value, freq:document.getElementById('kpi-freq').value, meta, direcao:document.getElementById('kpi-direcao').value, resp:document.getElementById('kpi-resp').value, fonte:document.getElementById('kpi-fonte').value, clausula:document.getElementById('kpi-clausula').value, desc:document.getElementById('kpi-desc').value });
+    saveDB(db);
+    closeModal('modalNovoKPI');
+    renderKPIsTable();
+    showToast('KPI cadastrado!', 'success');
+}
+
+function salvarLancamento() {
+    const kpiId = parseInt(document.getElementById('lanc-kpi').value);
+    const periodo = document.getElementById('lanc-periodo').value.trim();
+    const resultado = parseFloat(document.getElementById('lanc-resultado').value);
+    if (!kpiId || !periodo || isNaN(resultado)) return alert('Preencha KPI, período e resultado.');
+    const db = getDB();
+    const newId = db.lancamentos.length ? Math.max(...db.lancamentos.map(l=>l.id))+1 : 1;
+    db.lancamentos.push({ id:newId, kpiId, periodo, resultado, data:document.getElementById('lanc-data').value, obs:document.getElementById('lanc-obs').value });
+    saveDB(db);
+    renderHistoricoLanc();
+    showToast('Resultado registrado!', 'success');
+    document.getElementById('lanc-resultado').value = '';
+    document.getElementById('lanc-obs').value = '';
+}
+
+function deleteKPI(id) {
+    if (!confirm('Excluir este KPI e todos os seus lançamentos?')) return;
+    const db = getDB();
+    db.kpis = db.kpis.filter(k=>k.id!==id);
+    db.lancamentos = db.lancamentos.filter(l=>l.kpiId!==id);
+    saveDB(db);
+    renderKPIsTable();
+    showToast('KPI removido.','success');
+}
+
+function openNovoKPIModal() { openModal('modalNovoKPI'); }
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function formatDate(str) { if(!str) return '-'; const d=new Date(str+(str.length===10?'T00:00':'')); return d.toLocaleDateString('pt-BR'); }
+function showToast(msg, type) {
+    const t=document.createElement('div'); t.style.cssText=`position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;z-index:9999;background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent=msg; document.body.appendChild(t); setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},3000);
+}
+document.querySelectorAll('.mod-modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active');}));
+seedData();
+renderDashboard();
+</script>
+<script>
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');});
+</script><script>
+function startModuleTour() {
+    alert('Tour deste módulo em breve! ');
+}
+</script></body>
+</html>
