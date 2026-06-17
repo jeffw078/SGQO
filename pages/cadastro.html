@@ -278,6 +278,19 @@
     document.getElementById('cadastroForm').addEventListener('submit', function(e) {
         e.preventDefault();
         if (!validateStep(3)) return;
+        const setupEmpresa = {
+            razaoSocial: document.getElementById('empresa').value.trim(),
+            nomeFantasia: document.getElementById('empresa').value.trim(),
+            cidade: document.getElementById('cidade').value.trim(),
+            estado: document.getElementById('estado').value,
+            produtosServicos: document.getElementById('ramo').value,
+            certificacao: document.getElementById('certificacao').selectedOptions[0]?.textContent || '',
+            desafios: document.getElementById('desafio').value,
+            perfil: 'Admin da empresa',
+            empresa_id: document.getElementById('empresa').value.trim().toLowerCase().replace(/\s+/g, '_') || 'empresa_demo',
+            dataCadastro: new Date().toISOString()
+        };
+        localStorage.setItem('sgq_company_setup', JSON.stringify(setupEmpresa));
         // Show success state
         const card = document.querySelector('.cadastro-card');
         card.innerHTML = `
@@ -286,13 +299,12 @@
                     <i class="fas fa-check"></i>
                 </div>
                 <h2 style="color:var(--dark);margin-bottom:10px">Conta criada com sucesso!</h2>
-                <p style="max-width:380px;margin:0 auto 28px">Seu período de teste de 15 dias começou agora. Verifique seu e-mail para confirmar o acesso.</p>
-                <a href="login.html" class="btn btn-primary btn-lg" style="justify-content:center">
-                    <i class="fas fa-arrow-right"></i> Acessar o Sistema
+                <p style="max-width:420px;margin:0 auto 28px">Seu período de teste de 15 dias começou agora. O próximo passo é completar o setup da empresa e o diagnóstico inicial do SGQ.</p>
+                <a href="setup-sgq.html" class="btn btn-primary btn-lg" style="justify-content:center">
+                    <i class="fas fa-gears"></i> Abrir setup da empresa
                 </a>
             </div>`;
     });
 </script>
 </body>
 </html>
-

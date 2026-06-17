@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organização - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .org-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+        .org-grid.three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+        .org-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:18px; }
+        .org-card h3 { color:#fff; font-size:1rem; margin:0 0 8px; display:flex; align-items:center; gap:8px; }
+        .org-card p { color:rgba(255,255,255,.52); font-size:.86rem; line-height:1.55; margin:0; }
+        .org-card.metric strong { display:block; color:#fff; font-size:2rem; line-height:1; margin-top:8px; }
+        .org-card.metric span { color:rgba(255,255,255,.38); font-size:.76rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+        .swot-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+        .swot-col { border-radius:12px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.035); overflow:hidden; }
+        .swot-head { padding:12px 14px; display:flex; justify-content:space-between; align-items:center; color:#fff; font-weight:800; }
+        .swot-head small { color:rgba(255,255,255,.5); font-weight:700; }
+        .swot-body { padding:12px; display:flex; flex-direction:column; gap:10px; }
+        .swot-item { background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.06); border-radius:9px; padding:11px; }
+        .swot-item strong { color:#fff; display:block; font-size:.88rem; margin-bottom:5px; }
+        .swot-item p { color:rgba(255,255,255,.48); font-size:.78rem; line-height:1.45; margin:0 0 9px; }
+        .score-row { display:flex; gap:6px; flex-wrap:wrap; }
+        .score-pill { display:inline-flex; gap:4px; align-items:center; padding:3px 7px; border-radius:999px; background:rgba(255,255,255,.07); color:rgba(255,255,255,.62); font-size:.7rem; font-weight:700; }
+        .score-pill.hot { background:rgba(245,158,11,.14); color:#fbbf24; }
+        .iso-coverage-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+        .iso-req { padding:13px; border-radius:10px; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.04); }
+        .iso-req-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:8px; }
+        .iso-req-code { color:#fff; font-weight:900; }
+        .iso-req-title { color:rgba(255,255,255,.72); font-size:.82rem; margin-top:2px; }
+        .status-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 8px; border-radius:999px; font-size:.7rem; font-weight:800; white-space:nowrap; }
+        .status-chip.ok { background:rgba(16,185,129,.13); color:#34d399; }
+        .status-chip.partial { background:rgba(245,158,11,.14); color:#fbbf24; }
+        .status-chip.gap { background:rgba(239,68,68,.13); color:#f87171; }
+        .org-list { display:flex; flex-direction:column; gap:10px; }
+        .org-list-item { display:grid; grid-template-columns:48px 1fr auto; gap:12px; align-items:center; padding:13px; border-radius:10px; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.035); }
+        .org-list-icon { width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
+        .org-list-title { color:#fff; font-weight:750; font-size:.9rem; }
+        .org-list-meta { color:rgba(255,255,255,.42); font-size:.78rem; margin-top:2px; }
+        .analysis-note { border-left:3px solid var(--primary); background:rgba(15,117,189,.1); padding:13px 14px; border-radius:9px; color:rgba(255,255,255,.68); font-size:.84rem; line-height:1.55; }
+        .pd-actions-row { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; }
+        @media (max-width: 980px) {
+            .org-grid, .org-grid.three, .swot-grid { grid-template-columns:1fr; }
+            .org-list-item { grid-template-columns:42px 1fr; }
+            .org-list-item .mod-btn { grid-column:1 / -1; justify-content:center; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-building-shield" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Organização</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Organização</div>
+                <a href="#" class="nav-item active" id="nav-visao" onclick="switchView('visao');return false"><i class="fas fa-gauge"></i> Visão Geral</a>
+                <a href="#" class="nav-item" id="nav-contexto" onclick="switchView('contexto');return false"><i class="fas fa-chess-board"></i> Contexto e SWOT</a>
+                <a href="#" class="nav-item" id="nav-partes" onclick="switchView('partes');return false"><i class="fas fa-users-viewfinder"></i> Partes Interessadas</a>
+                <a href="#" class="nav-item" id="nav-recursos" onclick="switchView('recursos');return false"><i class="fas fa-screwdriver-wrench"></i> Recursos e Ambiente</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Rotinas ISO</div>
+                <a href="#" class="nav-item" id="nav-mudancas" onclick="switchView('mudancas');return false"><i class="fas fa-repeat"></i> Controle de Mudanças</a>
+                <a href="projeto-desenvolvimento.html" class="nav-item"><i class="fas fa-pen-ruler"></i> Projeto e Desenvolvimento</a>
+                <a href="#" class="nav-item" id="nav-analise" onclick="switchView('analise');return false"><i class="fas fa-people-roof"></i> Análise Crítica</a>
+                <a href="#" class="nav-item" id="nav-dados" onclick="switchView('dados');return false"><i class="fas fa-chart-simple"></i> Análise de Dados</a>
+                <a href="#" class="nav-item" id="nav-diagnostico" onclick="switchView('diagnostico');return false"><i class="fas fa-shield-halved"></i> Diagnóstico ISO</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Atalhos</div>
+                <a href="nao-conformidades.html?tipo=melhoria" class="nav-item"><i class="fas fa-lightbulb"></i> Melhoria Contínua</a>
+                <a href="nao-conformidades.html?tipo=plano" class="nav-item"><i class="fas fa-list-check"></i> Planos de Ação</a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar requisito, parte interessada, mudança..."></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon" title="Diagnóstico automático"><i class="fas fa-brain"></i></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JW</div>
+                        <span class="user-btn-name">Jefferson Willian</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JW</div>
+                            <div><div class="user-name">Jefferson Willian</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <section id="view-visao" class="mod-view">
+                <div class="mod-header">
+                    <div>
+                        <h2><i class="fas fa-building-shield" style="color:var(--primary);margin-right:10px"></i>Organização e Governança do SGQ</h2>
+                        <p>Contexto, partes interessadas, escopo, recursos, mudanças, análise crítica e diagnóstico ISO 9001.</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn primary" onclick="switchView('diagnostico')"><i class="fas fa-shield-halved"></i> Ver diagnóstico</button>
+                    </div>
+                </div>
+                <div class="mod-stats">
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-check-circle"></i></div></div><div class="stat-value" id="stat-ok">0</div><div class="stat-label">Requisitos atendidos</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-circle-half-stroke"></i></div></div><div class="stat-value" id="stat-parcial">0</div><div class="stat-label">Cobertura parcial</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fas fa-triangle-exclamation"></i></div></div><div class="stat-value" id="stat-gap">0</div><div class="stat-label">Lacunas abertas</div></div>
+                    <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)"><i class="fas fa-repeat"></i></div></div><div class="stat-value" id="stat-mudancas">0</div><div class="stat-label">Mudanças em análise</div></div>
+                </div>
+                <div class="org-grid">
+                    <div class="org-card">
+                        <h3><i class="fas fa-chess-board" style="color:var(--purple)"></i> Contexto e SWOT</h3>
+                        <p>A SWOT fica disponível conforme a periodicidade configurada. A tela combina fatores internos e externos com pontuação para priorizar o planejamento estratégico.</p>
+                    </div>
+                    <div class="org-card">
+                        <h3><i class="fas fa-users-viewfinder" style="color:var(--accent)"></i> Partes interessadas</h3>
+                        <p>Cadastro de partes interessadas com necessidades, expectativas, requisitos aplicáveis, riscos, oportunidades e evidências de atendimento.</p>
+                    </div>
+                    <div class="org-card">
+                        <h3><i class="fas fa-repeat" style="color:var(--warning)"></i> Controle de mudanças</h3>
+                        <p>Toda mudança exige motivo, impacto, avaliação de risco, aprovação e vínculo com plano de ação quando necessário.</p>
+                    </div>
+                    <div class="org-card">
+                        <h3><i class="fas fa-people-roof" style="color:var(--primary)"></i> Análise crítica pela direção</h3>
+                        <p>Fluxo de preparação, avaliação, aprovação e registro das decisões da direção, com frequência ajustável nas configurações da empresa.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-contexto" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div>
+                        <h2>Contexto da Organização e SWOT</h2>
+                        <p>Requisitos 4.1, 4.3, 6.1 e base para o planejamento estratégico do SGQ.</p>
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn ghost" onclick="openSwotModal()"><i class="fas fa-plus"></i> Novo item SWOT</button>
+                        <button class="mod-btn primary" onclick="saveContexto()"><i class="fas fa-save"></i> Salvar contexto</button>
+                    </div>
+                </div>
+                <div class="org-grid" style="margin-bottom:18px">
+                    <div class="card">
+                        <div class="card-header"><h4>Configurações da Organização</h4></div>
+                        <div class="card-body">
+                            <div class="mod-form-row">
+                                <div class="mod-form-group"><label>Frequência da SWOT</label><select class="mod-select-inp" id="cfg-swot"><option>Mensal</option><option selected>Trimestral</option><option>Semestral</option><option>Anual</option></select></div>
+                                <div class="mod-form-group"><label>Frequência da análise crítica</label><select class="mod-select-inp" id="cfg-analise"><option>Mensal</option><option>Trimestral</option><option selected>Semestral</option><option>Anual</option></select></div>
+                            </div>
+                            <div class="mod-form-group"><label>Escopo do SGQ</label><textarea class="mod-textarea" id="ctx-escopo" rows="3"></textarea></div>
+                            <div class="mod-form-hint">A política da qualidade deve permanecer como documento controlado. A comprovação de comunicação será feita por registros de treinamento.</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h4>Planejamento Estratégico</h4></div>
+                        <div class="card-body">
+                            <div class="mod-form-group"><label>Direcionamento estratégico</label><textarea class="mod-textarea" id="ctx-direcao" rows="3"></textarea></div>
+                            <div class="mod-form-row">
+                                <div class="mod-form-group"><label>Objetivo prioritário</label><input class="mod-input" id="ctx-objetivo"></div>
+                                <div class="mod-form-group"><label>Pontuação mínima para ação</label><input class="mod-input" type="number" id="ctx-corte" value="12"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="analysis-note" style="margin-bottom:16px">
+                    A pontuação da SWOT considera impacto, urgência e capacidade de controle. Itens acima do corte configurado devem gerar plano de ação, risco ou melhoria contínua.
+                </div>
+                <div class="swot-grid" id="swotGrid"></div>
+            </section>
+
+            <section id="view-partes" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Partes Interessadas</h2><p>Requisito 4.2: necessidades, expectativas e requisitos relevantes para o SGQ.</p></div>
+                    <button class="mod-btn primary" onclick="openParteModal()"><i class="fas fa-plus"></i> Nova parte</button>
+                </div>
+                <div class="mod-table-wrap"><table class="mod-table">
+                    <thead><tr><th>Parte interessada</th><th>Necessidades e expectativas</th><th>Requisitos aplicáveis</th><th>Riscos/Oportunidades</th><th>Monitoramento</th><th></th></tr></thead>
+                    <tbody id="partesBody"></tbody>
+                </table></div>
+            </section>
+
+            <section id="view-recursos" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Recursos, Infraestrutura e Ambiente</h2><p>Requisitos 7.1.1 a 7.1.6: recursos necessários para operação e conformidade.</p></div>
+                    <button class="mod-btn primary" onclick="openRecursoModal()"><i class="fas fa-plus"></i> Novo recurso</button>
+                </div>
+                <div class="org-grid three" id="recursosGrid"></div>
+                <div class="analysis-note" style="margin-top:16px">
+                    A ISO 9001 pede que a organização determine e disponibilize recursos, pessoas, infraestrutura, ambiente de operação, recursos de monitoramento e conhecimento organizacional. Calibração continua no módulo específico.
+                </div>
+            </section>
+
+            <section id="view-mudancas" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Controle de Mudanças</h2><p>Requisito 8.5.6 e apoio ao 6.1: mudanças planejadas com risco, aprovação e ação.</p></div>
+                    <button class="mod-btn primary" onclick="openMudancaModal()"><i class="fas fa-plus"></i> Nova mudança</button>
+                </div>
+                <div class="mod-filter-bar">
+                    <select class="mod-select" id="mudancaStatus" onchange="renderMudancas()"><option value="">Todos os status</option><option value="analise">Em análise</option><option value="aprovada">Aprovada</option><option value="implantacao">Em implantação</option><option value="concluida">Concluída</option></select>
+                    <a class="mod-btn ghost" href="nao-conformidades.html?tipo=plano"><i class="fas fa-list-check"></i> Ver planos vinculados</a>
+                </div>
+                <div id="mudancasList" class="org-list"></div>
+            </section>
+
+            <section id="view-projetos" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Projeto e Desenvolvimento</h2><p>Requisito 8.3: processo padrão editável para empresas que desenvolvem produto ou serviço.</p></div>
+                    <a href="projeto-desenvolvimento.html" class="mod-btn primary"><i class="fas fa-pen-ruler"></i> Executar processo</a>
+                </div>
+                <div class="org-grid">
+                    <div class="org-card"><h3><i class="fas fa-clipboard-list" style="color:var(--primary)"></i> 1. Planejamento</h3><p>Definir etapas, responsáveis, controles, interfaces, recursos, critérios de aceite e registros.</p></div>
+                    <div class="org-card"><h3><i class="fas fa-inbox" style="color:var(--purple)"></i> 2. Entradas</h3><p>Requisitos funcionais, desempenho, legais, normativos, lições aprendidas e riscos aplicáveis.</p></div>
+                    <div class="org-card"><h3><i class="fas fa-file-circle-check" style="color:var(--accent)"></i> 3. Saídas</h3><p>Especificações, desenhos, instruções, critérios de aceitação e informações para produção ou prestação do serviço.</p></div>
+                    <div class="org-card"><h3><i class="fas fa-magnifying-glass-chart" style="color:var(--warning)"></i> 4. Análises, verificação e validação</h3><p>Revisar etapas, verificar atendimento às entradas e validar aplicação pretendida antes da liberação.</p></div>
+                    <div class="org-card"><h3><i class="fas fa-repeat" style="color:var(--danger)"></i> 5. Mudanças de projeto</h3><p>Mudanças devem passar pelo controle de mudanças, avaliação de risco, aprovação e registros.</p></div>
+                </div>
+                <div class="analysis-note" style="margin-top:18px">O processo executável agora fica no menu principal de Análise e Melhoria. O BPM permanece disponível para clientes que precisam customizar formulários e aprovações.</div>
+            </section>
+
+            <section id="view-analise" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Análise Crítica pela Direção</h2><p>Requisito 9.3: pauta, entradas obrigatórias, decisões, ações e aprovação.</p></div>
+                    <button class="mod-btn primary" onclick="openAnaliseModal()"><i class="fas fa-plus"></i> Nova análise</button>
+                </div>
+                <div id="analiseList" class="org-list"></div>
+            </section>
+
+            <section id="view-dados" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Análise Consolidada de Dados</h2><p>Requisito 9.1.3: avaliação de tendências, desempenho e eficácia do SGQ.</p></div>
+                    <button class="mod-btn ghost" onclick="renderDados()"><i class="fas fa-rotate"></i> Atualizar</button>
+                </div>
+                <div class="org-grid three" id="dadosGrid"></div>
+                <div class="card" style="margin-top:16px">
+                    <div class="card-header"><h4>Leitura executiva</h4></div>
+                    <div class="card-body" id="dadosResumo"></div>
+                </div>
+            </section>
+
+            <section id="view-diagnostico" class="mod-view" style="display:none">
+                <div class="mod-header">
+                    <div><h2>Diagnóstico Automático de Cobertura ISO</h2><p>Mapa de requisitos atendidos, parciais e não atendidos. Preparado para futura API de IA.</p></div>
+                    <div class="mod-actions">
+                        <button class="mod-btn ghost" onclick="runDiagnostic()"><i class="fas fa-shield-halved"></i> Atualizar cobertura</button>
+                        <button class="mod-btn primary" onclick="runAiDiagnosticSimulation()"><i class="fas fa-brain"></i> Simular análise IA</button>
+                    </div>
+                </div>
+                <div class="analysis-note" style="margin-bottom:16px">
+                    Neste protótipo, o diagnóstico usa regras locais gratuitas baseadas nos módulos e dados cadastrados. Futuramente, a API de IA poderá analisar evidências documentais e emitir recomendações mais precisas.
+                </div>
+                <div id="aiDiagnosticPanel" style="display:none;margin-bottom:18px"></div>
+                <div class="iso-coverage-grid" id="isoGrid"></div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<div class="mod-modal-overlay" id="modalSwot">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-chess-board"></i> Item SWOT</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalSwot')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <input type="hidden" id="swot-index">
+            <div class="mod-form-row">
+                <div class="mod-form-group">
+                    <label>Quadrante <span>*</span></label>
+                    <select class="mod-select-inp" id="swot-tipo">
+                        <option value="forca">Força</option>
+                        <option value="fraqueza">Fraqueza</option>
+                        <option value="oportunidade">Oportunidade</option>
+                        <option value="ameaca">Ameaça</option>
+                    </select>
+                </div>
+                <div class="mod-form-group"><label>Responsável</label><input class="mod-input" id="swot-responsavel" placeholder="Responsável pelo acompanhamento"></div>
+            </div>
+            <div class="mod-form-group"><label>Título <span>*</span></label><input class="mod-input" id="swot-titulo" placeholder="Resumo do fator estratégico"></div>
+            <div class="mod-form-group"><label>Descrição</label><textarea class="mod-textarea" id="swot-descricao" rows="3" placeholder="Descreva causa, evidência, contexto e impacto no SGQ"></textarea></div>
+            <div class="mod-form-row three">
+                <div class="mod-form-group"><label>Impacto</label><input class="mod-input" id="swot-impacto" type="number" min="1" max="5" value="3"></div>
+                <div class="mod-form-group"><label>Urgência</label><input class="mod-input" id="swot-urgencia" type="number" min="1" max="5" value="3"></div>
+                <div class="mod-form-group"><label>Controle</label><input class="mod-input" id="swot-controle" type="number" min="1" max="5" value="3"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Ação recomendada</label><textarea class="mod-textarea" id="swot-acao" rows="2" placeholder="Plano, risco ou melhoria recomendado"></textarea></div>
+                <div class="mod-form-group"><label>Status</label><select class="mod-select-inp" id="swot-status"><option>Aberto</option><option>Em tratamento</option><option>Monitorado</option><option>Encerrado</option></select></div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalSwot')">Cancelar</button>
+            <button class="mod-btn primary" onclick="saveSwotItem()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<div class="mod-modal-overlay" id="modalParte">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-users-viewfinder"></i> Parte interessada</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalParte')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <input type="hidden" id="parte-index">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Parte interessada <span>*</span></label><input class="mod-input" id="parte-nome" placeholder="Cliente, fornecedor, órgão regulador..."></div>
+                <div class="mod-form-group"><label>Responsável interno</label><input class="mod-input" id="parte-responsavel" placeholder="Área ou pessoa responsável"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Necessidades e expectativas <span>*</span></label><textarea class="mod-textarea" id="parte-necessidades" rows="3"></textarea></div>
+                <div class="mod-form-group"><label>Requisitos aplicáveis</label><textarea class="mod-textarea" id="parte-requisitos" rows="3" placeholder="Contratuais, legais, normativos, técnicos"></textarea></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Riscos e oportunidades</label><textarea class="mod-textarea" id="parte-riscos" rows="3"></textarea></div>
+                <div class="mod-form-group"><label>Monitoramento / evidência</label><textarea class="mod-textarea" id="parte-monitoramento" rows="3" placeholder="Indicador, auditoria, avaliação, reunião, documento"></textarea></div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalParte')">Cancelar</button>
+            <button class="mod-btn primary" onclick="saveParte()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<div class="mod-modal-overlay" id="modalRecurso">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-screwdriver-wrench"></i> Recurso do SGQ</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalRecurso')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <input type="hidden" id="rec-index">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Tipo de recurso <span>*</span></label><input class="mod-input" id="rec-tipo" placeholder="Pessoas, infraestrutura, ambiente, conhecimento..."></div>
+                <div class="mod-form-group"><label>Requisito ISO</label><select class="mod-select-inp" id="rec-requisito"><option>7.1.1</option><option>7.1.2</option><option>7.1.3</option><option>7.1.4</option><option>7.1.5</option><option>7.1.6</option></select></div>
+            </div>
+            <div class="mod-form-group"><label>Descrição / necessidade</label><textarea class="mod-textarea" id="rec-descricao" rows="3"></textarea></div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Evidência / controle</label><textarea class="mod-textarea" id="rec-evidencia" rows="3" placeholder="Checklist, manutenção, treinamento, calibração, documento"></textarea></div>
+                <div class="mod-form-group"><label>Critério de aceitação</label><textarea class="mod-textarea" id="rec-criterio" rows="3" placeholder="Condição mínima esperada para o recurso estar adequado"></textarea></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Frequência de verificação</label><select class="mod-select-inp" id="rec-frequencia"><option>Mensal</option><option>Trimestral</option><option>Semestral</option><option>Anual</option><option>Sob demanda</option></select></div>
+                <div class="mod-form-group"><label>Status</label><select class="mod-select-inp" id="rec-status"><option>Atendido</option><option>Parcial</option><option>Pendente</option><option>Não aplicável</option></select></div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalRecurso')">Cancelar</button>
+            <button class="mod-btn primary" onclick="saveRecurso()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<div class="mod-modal-overlay" id="modalAnalise">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-people-roof"></i> Análise crítica pela direção</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalAnalise')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <input type="hidden" id="ana-index">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Título <span>*</span></label><input class="mod-input" id="ana-titulo" placeholder="Ex: Análise crítica do SGQ - 1º semestre"></div>
+                <div class="mod-form-group"><label>Data planejada</label><input class="mod-input" id="ana-data" type="date"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Participantes</label><textarea class="mod-textarea" id="ana-participantes" rows="3" placeholder="Direção, qualidade, processos, áreas envolvidas"></textarea></div>
+                <div class="mod-form-group"><label>Status</label><select class="mod-select-inp" id="ana-status"><option value="preparacao">Preparação</option><option value="avaliacao">Em avaliação</option><option value="aprovada">Aprovada</option><option value="concluida">Concluída</option></select></div>
+            </div>
+            <div class="mod-form-group"><label>Pauta e entradas obrigatórias ISO 9001</label><textarea class="mod-textarea" id="ana-pauta" rows="4" placeholder="Mudanças, desempenho, satisfação, auditorias, NCs, ações, riscos, recursos, oportunidades"></textarea></div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Decisões e saídas</label><textarea class="mod-textarea" id="ana-decisoes" rows="3" placeholder="Decisões sobre oportunidades, mudanças, recursos e melhoria"></textarea></div>
+                <div class="mod-form-group"><label>Ações definidas</label><textarea class="mod-textarea" id="ana-acoes" rows="3" placeholder="Ações, responsáveis, prazos ou planos vinculados"></textarea></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Aprovador</label><input class="mod-input" id="ana-aprovador" placeholder="Diretor ou responsável pela aprovação"></div>
+                <div class="mod-form-group"><label>Evidência / ata</label><input class="mod-input" id="ana-evidencia" placeholder="Ata, documento, link ou registro"></div>
+            </div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalAnalise')">Cancelar</button>
+            <button class="mod-btn primary" onclick="saveAnalise()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<div class="mod-modal-overlay" id="modalMudanca">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-repeat"></i> Nova mudança</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalMudanca')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <input type="hidden" id="mud-index">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Tipo de mudança <span>*</span></label><select class="mod-select-inp" id="mud-tipo"><option>Processo</option><option>Produto ou serviço</option><option>Documento</option><option>Fornecedor</option><option>Equipamento</option><option>Layout</option><option>Equipe</option><option>Sistema</option></select></div>
+                <div class="mod-form-group"><label>Aprovador <span>*</span></label><input class="mod-input" id="mud-aprovador" placeholder="Responsável pela aprovação"></div>
+            </div>
+            <div class="mod-form-group"><label>Título <span>*</span></label><input class="mod-input" id="mud-titulo" placeholder="Resumo da mudança"></div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Motivo</label><textarea class="mod-textarea" id="mud-motivo" rows="3"></textarea></div>
+                <div class="mod-form-group"><label>Impacto esperado</label><textarea class="mod-textarea" id="mud-impacto" rows="3"></textarea></div>
+            </div>
+            <div class="mod-form-row three">
+                <div class="mod-form-group"><label>Risco</label><select class="mod-select-inp" id="mud-risco"><option>Baixo</option><option selected>Médio</option><option>Alto</option><option>Crítico</option></select></div>
+                <div class="mod-form-group"><label>Prazo</label><input class="mod-input" id="mud-prazo" type="date"></div>
+                <div class="mod-form-group"><label>Plano de ação obrigatório?</label><select class="mod-select-inp" id="mud-plano"><option selected>Sim</option><option>Não justificado</option></select></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Status</label><select class="mod-select-inp" id="mud-status"><option value="analise">Em análise</option><option value="aprovada">Aprovada</option><option value="implantacao">Em implantação</option><option value="concluida">Concluída</option><option value="reprovada">Reprovada</option></select></div>
+                <div class="mod-form-group"><label>Decisão / aprovação</label><input class="mod-input" id="mud-decisao" placeholder="Parecer de aprovação, reprovação ou condição"></div>
+            </div>
+            <div class="mod-form-group"><label>Evidências planejadas</label><textarea class="mod-textarea" id="mud-evidencia" rows="2" placeholder="Ex: análise de risco, aprovação, treinamento, documento revisado, validação"></textarea></div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalMudanca')">Cancelar</button>
+            <button class="mod-btn primary" onclick="saveMudanca()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const ORG_KEY = 'sgq_organizacao_iso';
+const today = new Date().toISOString().slice(0, 10);
+
+function defaultData() {
+    return {
+        contexto: {
+            swotFreq: 'Trimestral',
+            analiseFreq: 'Semestral',
+            escopo: 'Sistema de Gestão da Qualidade aplicado aos processos de venda, produção, inspeção, liberação e suporte aos clientes.',
+            direcao: 'Aumentar a satisfação dos clientes, reduzir falhas operacionais e fortalecer a cultura de melhoria contínua.',
+            objetivo: 'Reduzir não conformidades recorrentes em 20% no próximo ciclo.',
+            corte: 12
+        },
+        swot: [
+            {tipo:'forca', titulo:'Equipe de qualidade experiente', descricao:'Conhecimento prático dos processos críticos e boa resposta às auditorias.', impacto:4, urgencia:3, controle:5},
+            {tipo:'fraqueza', titulo:'Registros dispersos', descricao:'Algumas evidências ainda dependem de planilhas e e-mails.', impacto:5, urgencia:4, controle:4},
+            {tipo:'oportunidade', titulo:'Digitalização de inspeções', descricao:'Automatizar checklists e rastreabilidade para reduzir retrabalho.', impacto:4, urgencia:4, controle:4},
+            {tipo:'ameaca', titulo:'Variação de fornecedor crítico', descricao:'Atrasos e desvios podem afetar prazo e conformidade do produto.', impacto:5, urgencia:4, controle:3}
+        ],
+        partes: [
+            {nome:'Clientes', necessidades:'Produtos conformes, prazo cumprido, suporte rápido e rastreabilidade.', requisitos:'Requisitos contratuais, técnicos, legais e de satisfação.', riscos:'Reclamações, devoluções, perda de contrato.', monitoramento:'NPS, reclamações, análise crítica de pedidos', responsavel:'Comercial e Qualidade'},
+            {nome:'Órgãos reguladores', necessidades:'Conformidade legal, registros íntegros e resposta a requisitos aplicáveis.', requisitos:'Legislação aplicável, normas técnicas e licenças.', riscos:'Autuações, bloqueios, restrições de mercado.', monitoramento:'Checklist legal e auditorias internas', responsavel:'Qualidade'},
+            {nome:'Fornecedores externos', necessidades:'Critérios claros de compra, avaliação justa e comunicação de desempenho.', requisitos:'8.4 - Controle de provedores externos.', riscos:'Insumos não conformes, atrasos, variação de qualidade.', monitoramento:'Score de fornecedores', responsavel:'Compras'}
+        ],
+        recursos: [
+            {tipo:'Pessoas', requisito:'7.1.2', descricao:'Determinar pessoas necessárias para operação e manutenção do SGQ.', evidencia:'Matriz de competências e treinamentos', status:'Atendido'},
+            {tipo:'Infraestrutura', requisito:'7.1.3', descricao:'Instalações, equipamentos, TI, transporte e serviços de apoio.', evidencia:'Cadastro e planos de manutenção/checklist', status:'Parcial'},
+            {tipo:'Ambiente de operação', requisito:'7.1.4', descricao:'Condições físicas, sociais e psicológicas adequadas ao processo.', evidencia:'Checklists de ambiente, segurança, limpeza e ergonomia', status:'Parcial'},
+            {tipo:'Monitoramento e medição', requisito:'7.1.5', descricao:'Recursos de medição adequados e calibrados.', evidencia:'Módulo de calibração', status:'Atendido'},
+            {tipo:'Conhecimento organizacional', requisito:'7.1.6', descricao:'Conhecimento necessário para operar processos e atingir conformidade.', evidencia:'Documentos, treinamentos e lições aprendidas', status:'Parcial'}
+        ],
+        mudancas: [
+            {id:1, tipo:'Processo', titulo:'Alterar fluxo de inspeção de entrada', motivo:'Reduzir atraso na liberação de materiais críticos.', impacto:'Mudança em responsabilidades, registros e treinamento.', risco:'Médio', aprovador:'Gerente da Qualidade', prazo:'2026-07-15', plano:'Sim', status:'analise', evidencia:'Análise de risco, treinamento e procedimento revisado'}
+        ],
+        analises: [
+            {id:1, titulo:'Análise crítica do SGQ - 1º semestre', status:'preparacao', data:'2026-06-30', pauta:'Indicadores, auditorias, NCs, riscos, satisfação, recursos, mudanças e oportunidades de melhoria.', decisoes:'Aguardando reunião da direção.'}
+        ]
+    };
+}
+
+function getData() {
+    try {
+        const parsed = JSON.parse(localStorage.getItem(ORG_KEY));
+        return parsed || defaultData();
+    } catch(e) {
+        return defaultData();
+    }
+}
+
+function saveData(data) {
+    localStorage.setItem(ORG_KEY, JSON.stringify(data));
+}
+
+function esc(value) {
+    const span = document.createElement('span');
+    span.textContent = value == null ? '' : String(value);
+    return span.innerHTML;
+}
+
+function switchView(view) {
+    document.querySelectorAll('.mod-view').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
+    const pane = document.getElementById('view-' + view);
+    if (pane) pane.style.display = 'block';
+    const nav = document.getElementById('nav-' + view);
+    if (nav) nav.classList.add('active');
+    if (view === 'visao') renderStats();
+    if (view === 'contexto') renderContexto();
+    if (view === 'partes') renderPartes();
+    if (view === 'recursos') renderRecursos();
+    if (view === 'mudancas') renderMudancas();
+    if (view === 'analise') renderAnalises();
+    if (view === 'dados') renderDados();
+    if (view === 'diagnostico') runDiagnostic();
+}
+
+function score(item) {
+    return Number(item.impacto || 0) + Number(item.urgencia || 0) + Number(item.controle || 0);
+}
+
+function setVal(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.value = value == null ? '' : value;
+}
+
+function getVal(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+}
+
+function renderContexto() {
+    const data = getData();
+    const c = data.contexto;
+    document.getElementById('cfg-swot').value = c.swotFreq;
+    document.getElementById('cfg-analise').value = c.analiseFreq;
+    document.getElementById('ctx-escopo').value = c.escopo;
+    document.getElementById('ctx-direcao').value = c.direcao;
+    document.getElementById('ctx-objetivo').value = c.objetivo;
+    document.getElementById('ctx-corte').value = c.corte;
+
+    const labels = {
+        forca: ['Forças', 'Interno positivo', 'var(--accent)', 'fa-circle-up'],
+        fraqueza: ['Fraquezas', 'Interno negativo', 'var(--danger)', 'fa-circle-down'],
+        oportunidade: ['Oportunidades', 'Externo positivo', 'var(--primary)', 'fa-seedling'],
+        ameaca: ['Ameaças', 'Externo negativo', 'var(--warning)', 'fa-triangle-exclamation']
+    };
+
+    document.getElementById('swotGrid').innerHTML = Object.keys(labels).map(tipo => {
+        const cfg = labels[tipo];
+        const items = data.swot.filter(i => i.tipo === tipo);
+        return `<div class="swot-col">
+            <div class="swot-head" style="background:${cfg[2]}22"><span><i class="fas ${cfg[3]}" style="color:${cfg[2]};margin-right:8px"></i>${cfg[0]}</span><small>${cfg[1]}</small></div>
+            <div class="swot-body">
+                ${items.map(i => {
+                    const idx = data.swot.indexOf(i);
+                    return `<div class="swot-item">
+                    <strong>${esc(i.titulo)}</strong>
+                    <p>${esc(i.descricao)}</p>
+                    <div class="score-row">
+                        <span class="score-pill">Impacto ${i.impacto}</span>
+                        <span class="score-pill">Urgência ${i.urgencia}</span>
+                        <span class="score-pill">Controle ${i.controle}</span>
+                        <span class="score-pill hot">Score ${score(i)}</span>
+                        <span class="score-pill">${esc(i.status || 'Aberto')}</span>
+                    </div>
+                    <div class="pd-actions-row" style="margin-top:10px">
+                        <span style="font-size:.72rem;color:rgba(255,255,255,.38)">Responsável: ${esc(i.responsavel || 'Não definido')}</span>
+                        <div class="mod-actions">
+                            <button class="mod-btn ghost" style="padding:6px 9px" onclick="openSwotModal(${idx})"><i class="fas fa-pen"></i></button>
+                            <button class="mod-btn danger" style="padding:6px 9px" onclick="removeSwotItem(${idx})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>`;
+                }).join('')}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function openSwotModal(idx = '') {
+    const data = getData();
+    const item = idx === '' ? {} : data.swot[idx] || {};
+    setVal('swot-index', idx);
+    setVal('swot-tipo', item.tipo || 'forca');
+    setVal('swot-titulo', item.titulo || '');
+    setVal('swot-descricao', item.descricao || '');
+    setVal('swot-impacto', item.impacto || 3);
+    setVal('swot-urgencia', item.urgencia || 3);
+    setVal('swot-controle', item.controle || 3);
+    setVal('swot-responsavel', item.responsavel || '');
+    setVal('swot-acao', item.acao || '');
+    setVal('swot-status', item.status || 'Aberto');
+    openModal('modalSwot');
+}
+
+function saveSwotItem() {
+    const titulo = getVal('swot-titulo');
+    if (!titulo) return alert('Informe o título do item SWOT.');
+    const data = getData();
+    const item = {
+        tipo: getVal('swot-tipo'),
+        titulo,
+        descricao: getVal('swot-descricao'),
+        impacto: Number(getVal('swot-impacto') || 1),
+        urgencia: Number(getVal('swot-urgencia') || 1),
+        controle: Number(getVal('swot-controle') || 1),
+        responsavel: getVal('swot-responsavel'),
+        acao: getVal('swot-acao'),
+        status: getVal('swot-status')
+    };
+    const idx = getVal('swot-index');
+    if (idx === '') data.swot.push(item);
+    else data.swot[Number(idx)] = item;
+    saveData(data);
+    closeModal('modalSwot');
+    renderContexto();
+    showToast('Item SWOT salvo.', 'success');
+}
+
+function removeSwotItem(idx) {
+    if (!confirm('Remover este item SWOT?')) return;
+    const data = getData();
+    data.swot.splice(idx, 1);
+    saveData(data);
+    renderContexto();
+}
+
+function saveContexto() {
+    const data = getData();
+    data.contexto = {
+        swotFreq: document.getElementById('cfg-swot').value,
+        analiseFreq: document.getElementById('cfg-analise').value,
+        escopo: document.getElementById('ctx-escopo').value,
+        direcao: document.getElementById('ctx-direcao').value,
+        objetivo: document.getElementById('ctx-objetivo').value,
+        corte: Number(document.getElementById('ctx-corte').value || 12)
+    };
+    saveData(data);
+    showToast('Contexto salvo com sucesso.', 'success');
+}
+
+function renderPartes() {
+    const data = getData();
+    document.getElementById('partesBody').innerHTML = data.partes.map((p, idx) => `
+        <tr>
+            <td><strong style="color:#fff">${esc(p.nome)}</strong><div style="font-size:.75rem;color:rgba(255,255,255,.35)">${esc(p.responsavel)}</div></td>
+            <td>${esc(p.necessidades)}</td>
+            <td>${esc(p.requisitos)}</td>
+            <td>${esc(p.riscos)}</td>
+            <td>${esc(p.monitoramento)}</td>
+            <td><div class="mod-table .col-actions" style="display:flex;gap:6px">
+                <button class="tbl-btn primary" onclick="openParteModal(${idx});event.stopPropagation()"><i class="fas fa-pen"></i></button>
+                <button class="tbl-btn danger" onclick="removeParte(${idx});event.stopPropagation()"><i class="fas fa-trash"></i></button>
+            </div></td>
+        </tr>
+    `).join('');
+}
+
+function openParteModal(idx = '') {
+    const data = getData();
+    const p = idx === '' ? {} : data.partes[idx] || {};
+    setVal('parte-index', idx);
+    setVal('parte-nome', p.nome || '');
+    setVal('parte-responsavel', p.responsavel || '');
+    setVal('parte-necessidades', p.necessidades || '');
+    setVal('parte-requisitos', p.requisitos || '');
+    setVal('parte-riscos', p.riscos || '');
+    setVal('parte-monitoramento', p.monitoramento || '');
+    openModal('modalParte');
+}
+
+function saveParte() {
+    const nome = getVal('parte-nome');
+    if (!nome) return alert('Informe a parte interessada.');
+    const data = getData();
+    const item = {
+        nome,
+        responsavel: getVal('parte-responsavel'),
+        necessidades: getVal('parte-necessidades'),
+        requisitos: getVal('parte-requisitos'),
+        riscos: getVal('parte-riscos'),
+        monitoramento: getVal('parte-monitoramento')
+    };
+    const idx = getVal('parte-index');
+    if (idx === '') data.partes.push(item);
+    else data.partes[Number(idx)] = item;
+    saveData(data);
+    closeModal('modalParte');
+    renderPartes();
+    showToast('Parte interessada salva.', 'success');
+}
+
+function removeParte(idx) {
+    const data = getData();
+    data.partes.splice(idx, 1);
+    saveData(data);
+    renderPartes();
+}
+
+function renderRecursos() {
+    const data = getData();
+    const colors = ['var(--primary)', 'var(--purple)', 'var(--warning)', 'var(--accent)', 'var(--orange)'];
+    document.getElementById('recursosGrid').innerHTML = data.recursos.map((r, idx) => `
+        <div class="org-card">
+            <h3><i class="fas fa-cube" style="color:${colors[idx % colors.length]}"></i> ${esc(r.tipo)}</h3>
+            <p style="margin-bottom:12px">${esc(r.descricao)}</p>
+            <div class="score-row">
+                <span class="score-pill">${esc(r.requisito)}</span>
+                <span class="score-pill">${esc(r.status)}</span>
+            </div>
+            <p style="margin-top:12px"><strong style="color:#fff">Evidência:</strong> ${esc(r.evidencia)}</p>
+            <p style="margin-top:8px"><strong style="color:#fff">Critério:</strong> ${esc(r.criterio || 'Não definido')}</p>
+            <div class="pd-actions-row" style="margin-top:12px">
+                <span style="font-size:.72rem;color:rgba(255,255,255,.38)">Verificação: ${esc(r.frequencia || 'Sob demanda')}</span>
+                <div class="mod-actions">
+                    <button class="mod-btn ghost" style="padding:6px 9px" onclick="openRecursoModal(${idx})"><i class="fas fa-pen"></i></button>
+                    <button class="mod-btn danger" style="padding:6px 9px" onclick="removeRecurso(${idx})"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openRecursoModal(idx = '') {
+    const data = getData();
+    const r = idx === '' ? {} : data.recursos[idx] || {};
+    setVal('rec-index', idx);
+    setVal('rec-tipo', r.tipo || '');
+    setVal('rec-requisito', r.requisito || '7.1.1');
+    setVal('rec-descricao', r.descricao || '');
+    setVal('rec-evidencia', r.evidencia || '');
+    setVal('rec-criterio', r.criterio || '');
+    setVal('rec-frequencia', r.frequencia || 'Sob demanda');
+    setVal('rec-status', r.status || 'Parcial');
+    openModal('modalRecurso');
+}
+
+function saveRecurso() {
+    const tipo = getVal('rec-tipo');
+    if (!tipo) return;
+    const data = getData();
+    const item = {
+        tipo,
+        requisito: getVal('rec-requisito'),
+        descricao: getVal('rec-descricao'),
+        evidencia: getVal('rec-evidencia'),
+        criterio: getVal('rec-criterio'),
+        frequencia: getVal('rec-frequencia'),
+        status: getVal('rec-status')
+    };
+    const idx = getVal('rec-index');
+    if (idx === '') data.recursos.push(item);
+    else data.recursos[Number(idx)] = item;
+    saveData(data);
+    closeModal('modalRecurso');
+    renderRecursos();
+    showToast('Recurso salvo.', 'success');
+}
+
+function removeRecurso(idx) {
+    if (!confirm('Remover este recurso?')) return;
+    const data = getData();
+    data.recursos.splice(idx, 1);
+    saveData(data);
+    renderRecursos();
+}
+
+function renderMudancas() {
+    const data = getData();
+    const status = document.getElementById('mudancaStatus')?.value || '';
+    const items = data.mudancas.filter(m => !status || m.status === status);
+    document.getElementById('mudancasList').innerHTML = items.map(m => {
+        const idx = data.mudancas.indexOf(m);
+        return `
+        <div class="org-list-item">
+            <div class="org-list-icon" style="background:rgba(245,158,11,.12);color:var(--warning)"><i class="fas fa-repeat"></i></div>
+            <div>
+                <div class="org-list-title">${esc(m.titulo)}</div>
+                <div class="org-list-meta">${esc(m.tipo)} • Status: ${esc(statusMudancaLabel(m.status))} • Risco ${esc(m.risco)} • Aprovador: ${esc(m.aprovador)} • Prazo: ${esc(formatDate(m.prazo))}</div>
+                <div class="org-list-meta">Impacto: ${esc(m.impacto)}</div>
+                <div class="org-list-meta">Decisão: ${esc(m.decisao || 'Pendente')}</div>
+            </div>
+            <div class="mod-actions">
+                <button class="mod-btn ghost" onclick="openMudancaModal(${idx})"><i class="fas fa-pen"></i> Editar</button>
+                <a class="mod-btn ghost" href="nao-conformidades.html?tipo=plano"><i class="fas fa-list-check"></i> Plano</a>
+            </div>
+        </div>
+    `;
+    }).join('') || `<div class="mod-empty"><i class="fas fa-check-circle" style="color:var(--accent)"></i><h3>Nenhuma mudança encontrada</h3></div>`;
+}
+
+function statusMudancaLabel(status) {
+    return {analise:'Em análise', aprovada:'Aprovada', implantacao:'Em implantação', concluida:'Concluída', reprovada:'Reprovada'}[status] || status || 'Em análise';
+}
+
+function openMudancaModal(idx = '') {
+    const data = getData();
+    const m = idx === '' ? {} : data.mudancas[idx] || {};
+    setVal('mud-index', idx);
+    setVal('mud-tipo', m.tipo || 'Processo');
+    setVal('mud-titulo', m.titulo || '');
+    setVal('mud-motivo', m.motivo || '');
+    setVal('mud-impacto', m.impacto || '');
+    setVal('mud-risco', m.risco || 'Médio');
+    setVal('mud-aprovador', m.aprovador || '');
+    setVal('mud-prazo', m.prazo || today);
+    setVal('mud-plano', m.plano || 'Sim');
+    setVal('mud-status', m.status || 'analise');
+    setVal('mud-decisao', m.decisao || '');
+    setVal('mud-evidencia', m.evidencia || '');
+    openModal('modalMudanca');
+}
+
+function saveMudanca() {
+    const titulo = document.getElementById('mud-titulo').value.trim();
+    const aprovador = document.getElementById('mud-aprovador').value.trim();
+    if (!titulo || !aprovador) return alert('Informe título e aprovador.');
+    const data = getData();
+    const idx = getVal('mud-index');
+    const item = {
+        id: idx === '' ? Math.max(0, ...data.mudancas.map(m => m.id || 0)) + 1 : data.mudancas[Number(idx)].id,
+        tipo: document.getElementById('mud-tipo').value,
+        titulo,
+        motivo: document.getElementById('mud-motivo').value,
+        impacto: document.getElementById('mud-impacto').value,
+        risco: document.getElementById('mud-risco').value,
+        aprovador,
+        prazo: document.getElementById('mud-prazo').value,
+        plano: document.getElementById('mud-plano').value,
+        evidencia: document.getElementById('mud-evidencia').value,
+        status: document.getElementById('mud-status').value,
+        decisao: document.getElementById('mud-decisao').value
+    };
+    if (idx === '') data.mudancas.push(item);
+    else data.mudancas[Number(idx)] = item;
+    saveData(data);
+    closeModal('modalMudanca');
+    renderMudancas();
+    showToast('Mudança registrada. Gere ou vincule um plano de ação.', 'success');
+}
+
+function renderAnalises() {
+    const data = getData();
+    document.getElementById('analiseList').innerHTML = data.analises.map((a, idx) => `
+        <div class="org-list-item">
+            <div class="org-list-icon" style="background:rgba(15,117,189,.12);color:var(--primary)"><i class="fas fa-people-roof"></i></div>
+            <div>
+                <div class="org-list-title">${esc(a.titulo)}</div>
+                <div class="org-list-meta">Data: ${esc(formatDate(a.data))} • Status: ${esc(a.status)}</div>
+                <div class="org-list-meta">Pauta: ${esc(a.pauta)}</div>
+                <div class="org-list-meta">Decisões: ${esc(a.decisoes || 'Pendente')}</div>
+            </div>
+            <div class="mod-actions">
+                <button class="mod-btn ghost" onclick="openAnaliseModal(${idx})"><i class="fas fa-pen"></i> Editar</button>
+                <a class="mod-btn ghost" href="nao-conformidades.html?tipo=plano"><i class="fas fa-list-check"></i> Ações</a>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openAnaliseModal(idx = '') {
+    const data = getData();
+    const a = idx === '' ? {
+        titulo: 'Análise crítica do SGQ',
+        data: today,
+        status: 'preparacao',
+        pauta: 'Mudanças internas e externas, desempenho dos processos, satisfação, auditorias, NCs, riscos, recursos, eficácia das ações e oportunidades de melhoria.'
+    } : data.analises[idx] || {};
+    setVal('ana-index', idx);
+    setVal('ana-titulo', a.titulo || '');
+    setVal('ana-data', a.data || today);
+    setVal('ana-participantes', a.participantes || '');
+    setVal('ana-status', a.status || 'preparacao');
+    setVal('ana-pauta', a.pauta || '');
+    setVal('ana-decisoes', a.decisoes || '');
+    setVal('ana-acoes', a.acoes || '');
+    setVal('ana-aprovador', a.aprovador || '');
+    setVal('ana-evidencia', a.evidencia || '');
+    openModal('modalAnalise');
+}
+
+function saveAnalise() {
+    const titulo = getVal('ana-titulo');
+    if (!titulo) return alert('Informe o título da análise crítica.');
+    const data = getData();
+    const idx = getVal('ana-index');
+    const item = {
+        id: idx === '' ? Math.max(0, ...data.analises.map(a => a.id || 0)) + 1 : data.analises[Number(idx)].id,
+        titulo,
+        data: getVal('ana-data'),
+        participantes: getVal('ana-participantes'),
+        status: getVal('ana-status'),
+        pauta: getVal('ana-pauta'),
+        decisoes: getVal('ana-decisoes'),
+        acoes: getVal('ana-acoes'),
+        aprovador: getVal('ana-aprovador'),
+        evidencia: getVal('ana-evidencia')
+    };
+    if (idx === '') data.analises.push(item);
+    else data.analises[Number(idx)] = item;
+    saveData(data);
+    closeModal('modalAnalise');
+    renderAnalises();
+    showToast('Análise crítica salva.', 'success');
+}
+
+function renderDados() {
+    const data = getData();
+    const cards = [
+        ['Indicadores ativos', '5', 'Metas e tendências em indicadores/KPIs', 'fa-chart-line', 'var(--accent)'],
+        ['NCs e ações', '17', 'NCs, planos, melhorias e eficácia', 'fa-list-check', 'var(--warning)'],
+        ['Riscos críticos', '2', 'Riscos e oportunidades monitorados', 'fa-shield-virus', 'var(--danger)'],
+        ['Satisfação', '82', 'NPS e reclamações de clientes', 'fa-face-smile', 'var(--orange)'],
+        ['Fornecedores', '4.1', 'Score médio de provedores externos', 'fa-handshake', 'var(--purple)'],
+        ['Mudanças', String(data.mudancas.length), 'Mudanças em análise e implantação', 'fa-repeat', 'var(--primary)']
+    ];
+    document.getElementById('dadosGrid').innerHTML = cards.map(c => `
+        <div class="org-card metric">
+            <h3><i class="fas ${c[3]}" style="color:${c[4]}"></i> ${c[0]}</h3>
+            <strong>${c[1]}</strong>
+            <span>${c[2]}</span>
+        </div>
+    `).join('');
+    document.getElementById('dadosResumo').innerHTML = `
+        <p style="margin-bottom:10px">A análise consolidada deve ser usada como entrada para a análise crítica pela direção. Neste protótipo, os números são demonstrativos e representam os principais grupos de dados exigidos pela ISO 9001.</p>
+        <p>Quando houver integração com os módulos e API de IA, esta tela poderá gerar tendências, prioridades e recomendações automaticamente.</p>
+    `;
+}
+
+function getCoverage() {
+    const data = getData();
+    return [
+        ['4.1', 'Contexto da organização', data.swot.length ? 'ok' : 'gap', 'SWOT e planejamento estratégico.'],
+        ['4.2', 'Partes interessadas', data.partes.length ? 'ok' : 'gap', 'Cadastro de partes interessadas e requisitos.'],
+        ['4.3', 'Escopo do SGQ', data.contexto.escopo ? 'ok' : 'partial', 'Escopo em configurações da organização.'],
+        ['5.1', 'Liderança', 'partial', 'Evidências da direção ficam para segundo momento.'],
+        ['5.2', 'Política da qualidade', 'partial', 'Documento controlado e comunicação por treinamento.'],
+        ['5.3', 'Responsabilidades e autoridades', 'partial', 'Segundo momento: organograma/RACI/responsáveis ISO.'],
+        ['6.1', 'Riscos e oportunidades', 'ok', 'Módulo de riscos e SWOT.'],
+        ['6.2', 'Objetivos da qualidade', 'ok', 'Indicadores e metas.'],
+        ['6.3', 'Planejamento de mudanças', data.mudancas.length ? 'ok' : 'partial', 'Controle de mudanças com risco, aprovação e plano.'],
+        ['7.1', 'Recursos', data.recursos.length ? 'partial' : 'gap', 'Recursos gerais cadastrados na Organização.'],
+        ['7.2/7.3', 'Competência e conscientização', 'ok', 'Pessoas e treinamentos.'],
+        ['7.4', 'Comunicação', 'partial', 'Será controlada por documentos.'],
+        ['7.5', 'Informação documentada', 'ok', 'Controle de documentos.'],
+        ['8.2', 'Requisitos do cliente', 'partial', 'Modelagem por fluxo customizado no BPM.'],
+        ['8.3', 'Projeto e desenvolvimento', 'ok', 'Módulo executável com etapas ISO e opção de customização no BPM.'],
+        ['8.4', 'Provedores externos', 'ok', 'Avaliação de fornecedores.'],
+        ['8.5/8.6/8.7', 'Operação, liberação e saídas NC', 'ok', 'Produção, inspeções e NCs.'],
+        ['9.1.3', 'Análise e avaliação', 'partial', 'Tela consolidada preparada para integração.'],
+        ['9.2', 'Auditoria interna', 'ok', 'Módulo de auditorias.'],
+        ['9.3', 'Análise crítica pela direção', data.analises.length ? 'ok' : 'partial', 'Fluxo de análise crítica na Organização.'],
+        ['10.2', 'Não conformidade e ação corretiva', 'ok', 'NCs e planos de ação.'],
+        ['10.3', 'Melhoria contínua', 'partial', 'Guia de melhoria contínua no módulo de NCs/planos.']
+    ];
+}
+
+function runDiagnostic() {
+    const coverage = getCoverage();
+    document.getElementById('isoGrid').innerHTML = coverage.map(r => `
+        <div class="iso-req">
+            <div class="iso-req-head">
+                <div><div class="iso-req-code">${r[0]}</div><div class="iso-req-title">${r[1]}</div></div>
+                <span class="status-chip ${r[2]}">${r[2] === 'ok' ? 'Atendido' : r[2] === 'partial' ? 'Parcial' : 'Lacuna'}</span>
+            </div>
+            <p style="font-size:.78rem;color:rgba(255,255,255,.48);margin:0">${r[3]}</p>
+        </div>
+    `).join('');
+    renderStats();
+}
+
+function runAiDiagnosticSimulation() {
+    runDiagnostic();
+    const coverage = getCoverage();
+    const total = coverage.length;
+    const ok = coverage.filter(r => r[2] === 'ok');
+    const partial = coverage.filter(r => r[2] === 'partial');
+    const gaps = coverage.filter(r => r[2] === 'gap');
+    const score = Math.round(((ok.length + partial.length * 0.5) / total) * 100);
+    const priority = gaps.concat(partial).slice(0, 6);
+    const quickWins = partial.slice(0, 4);
+    const panel = document.getElementById('aiDiagnosticPanel');
+    const tone = score >= 80 ? ['var(--accent)', 'Boa maturidade'] : score >= 60 ? ['var(--warning)', 'Maturidade intermediária'] : ['var(--danger)', 'Maturidade inicial'];
+
+    panel.style.display = 'block';
+    panel.innerHTML = `
+        <div class="card" style="border-color:rgba(96,165,250,.22);background:linear-gradient(135deg,rgba(15,117,189,.12),rgba(139,92,246,.08))">
+            <div class="card-header">
+                <h4><i class="fas fa-brain" style="color:#93c5fd;margin-right:8px"></i>IA simulada - diagnóstico executivo</h4>
+            </div>
+            <div class="card-body">
+                <div class="org-grid three" style="margin-bottom:16px">
+                    <div class="org-card metric">
+                        <h3><i class="fas fa-gauge-high" style="color:${tone[0]}"></i> Score estimado</h3>
+                        <strong>${score}%</strong>
+                        <span>${tone[1]}</span>
+                    </div>
+                    <div class="org-card metric">
+                        <h3><i class="fas fa-check-circle" style="color:var(--accent)"></i> Atendidos</h3>
+                        <strong>${ok.length}</strong>
+                        <span>Requisitos com processo definido</span>
+                    </div>
+                    <div class="org-card metric">
+                        <h3><i class="fas fa-triangle-exclamation" style="color:var(--warning)"></i> Prioridades</h3>
+                        <strong>${partial.length + gaps.length}</strong>
+                        <span>Itens parciais ou lacunas</span>
+                    </div>
+                </div>
+                <div class="analysis-note" style="margin-bottom:14px">
+                    Simulação gratuita: este resultado é gerado por regras locais e textos orientativos. Na integração futura, a API de IA poderá ler evidências, documentos e registros para justificar cada conclusão.
+                </div>
+                <div class="org-grid">
+                    <div class="org-card">
+                        <h3><i class="fas fa-list-check" style="color:var(--warning)"></i> Plano recomendado</h3>
+                        <div class="org-list" style="gap:8px">
+                            ${priority.map((r, idx) => `<div class="org-list-item" style="grid-template-columns:34px 1fr;padding:10px">
+                                <div class="org-list-icon" style="width:34px;height:34px;border-radius:8px;background:rgba(245,158,11,.12);color:var(--warning)">${idx + 1}</div>
+                                <div><div class="org-list-title">${r[0]} - ${r[1]}</div><div class="org-list-meta">${r[3]}</div></div>
+                            </div>`).join('')}
+                        </div>
+                    </div>
+                    <div class="org-card">
+                        <h3><i class="fas fa-bolt" style="color:var(--accent)"></i> Ganhos rápidos</h3>
+                        <div class="org-list" style="gap:8px">
+                            ${quickWins.map(r => `<div class="org-list-item" style="grid-template-columns:34px 1fr;padding:10px">
+                                <div class="org-list-icon" style="width:34px;height:34px;border-radius:8px;background:rgba(16,185,129,.12);color:var(--accent)"><i class="fas fa-arrow-up"></i></div>
+                                <div><div class="org-list-title">${r[0]} - ${r[1]}</div><div class="org-list-meta">Completar evidências, responsáveis, periodicidade e registros de aprovação.</div></div>
+                            </div>`).join('') || '<p>Não há ganhos rápidos pendentes neste momento.</p>'}
+                        </div>
+                    </div>
+                </div>
+                <div class="pd-actions-row" style="margin-top:16px">
+                    <span style="font-size:.8rem;color:rgba(255,255,255,.45)">Próximo passo sugerido: converter prioridades em planos de ação e anexar evidências documentadas.</span>
+                    <a class="mod-btn primary" href="nao-conformidades.html?tipo=plano"><i class="fas fa-list-check"></i> Abrir planos de ação</a>
+                </div>
+            </div>
+        </div>
+    `;
+    showToast('Análise IA simulada gerada sem uso de API.', 'success');
+}
+
+function renderStats() {
+    const coverage = getCoverage();
+    document.getElementById('stat-ok').textContent = coverage.filter(r => r[2] === 'ok').length;
+    document.getElementById('stat-parcial').textContent = coverage.filter(r => r[2] === 'partial').length;
+    document.getElementById('stat-gap').textContent = coverage.filter(r => r[2] === 'gap').length;
+    document.getElementById('stat-mudancas').textContent = getData().mudancas.filter(m => m.status !== 'concluida').length;
+}
+
+function applyInitialView() {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view') || 'visao';
+    switchView(view);
+}
+
+function formatDate(str) {
+    if (!str) return '-';
+    const d = new Date(str + (str.length === 10 ? 'T00:00' : ''));
+    return d.toLocaleDateString('pt-BR');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;font-size:.88rem;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');});
+document.querySelectorAll('.mod-modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); }));
+function startModuleTour() { alert('Este módulo centraliza os requisitos organizacionais da ISO 9001: contexto, partes interessadas, escopo, recursos, mudanças, análise crítica e diagnóstico.'); }
+
+if (!localStorage.getItem(ORG_KEY)) saveData(defaultData());
+applyInitialView();
+</script>
+<script src="../assets/js/global-search.js"></script></body>
+</html>

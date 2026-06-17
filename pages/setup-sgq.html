@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup SGQ - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .setup-page .page-content { max-width: 1440px; margin: 0 auto; width: 100%; }
+        .setup-hero { display:grid; grid-template-columns:86px 1fr auto; gap:20px; align-items:center; padding:22px; margin-bottom:22px; border:1px solid rgba(255,255,255,.1); border-radius:12px; background:linear-gradient(135deg,rgba(15,117,189,.2),rgba(16,185,129,.09)); }
+        .setup-hero-icon { width:86px; height:86px; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#60a5fa; background:rgba(255,255,255,.08); font-size:2.7rem; border:1px solid rgba(255,255,255,.1); }
+        .setup-hero h2 { margin:0 0 6px; color:#fff; font-size:1.45rem; }
+        .setup-hero p { margin:0; color:rgba(255,255,255,.58); font-size:.92rem; line-height:1.5; max-width:820px; }
+        .setup-score { min-width:150px; text-align:center; padding:14px; border-radius:10px; background:rgba(255,255,255,.07); }
+        .setup-score strong { display:block; color:#fff; font-size:2rem; line-height:1; }
+        .setup-score span { font-size:.72rem; color:rgba(255,255,255,.42); text-transform:uppercase; font-weight:800; letter-spacing:.06em; }
+        .setup-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+        .setup-tab { border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); color:rgba(255,255,255,.65); border-radius:8px; padding:10px 13px; cursor:pointer; font:inherit; font-size:.86rem; font-weight:700; }
+        .setup-tab.active { background:var(--primary); border-color:var(--primary); color:#fff; }
+        .setup-view { display:none; }
+        .setup-view.active { display:block; }
+        .setup-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+        .setup-form-card, .setup-panel { border:1px solid rgba(255,255,255,.09); background:rgba(255,255,255,.045); border-radius:10px; padding:18px; }
+        .setup-form-card h3, .setup-panel h3 { margin:0 0 14px; color:#fff; font-size:1rem; display:flex; align-items:center; gap:8px; }
+        .setup-field { margin-bottom:13px; position:relative; }
+        .setup-field label { display:block; margin-bottom:6px; font-size:.78rem; color:rgba(255,255,255,.45); font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+        .setup-input, .setup-select, .setup-textarea { width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.065); color:#fff; font-family:inherit; font-size:.88rem; outline:none; }
+        .setup-select { color-scheme: dark; }
+        .setup-select option, .setup-select optgroup { background:#1a2740; color:#fff; }
+        .setup-select option:checked { background:var(--primary); color:#fff; }
+        .setup-textarea { min-height:78px; resize:vertical; }
+        .setup-input:focus, .setup-select:focus, .setup-textarea:focus { border-color:rgba(96,165,250,.55); }
+        .setup-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+        .setup-btn { border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.07); color:#fff; border-radius:8px; padding:10px 13px; cursor:pointer; font:inherit; font-size:.86rem; font-weight:700; display:inline-flex; align-items:center; gap:8px; }
+        .setup-btn.primary { background:var(--primary); border-color:var(--primary); }
+        .setup-btn.success { background:var(--accent); border-color:var(--accent); }
+        .setup-btn.warning { background:rgba(245,158,11,.16); border-color:rgba(245,158,11,.28); color:#fbbf24; }
+        .stage-block { margin-bottom:18px; }
+        .stage-title { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px; color:#fff; font-weight:800; }
+        .question-card { display:grid; grid-template-columns:72px 1fr; gap:14px; padding:15px; margin-bottom:10px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.04); border-radius:10px; }
+        .question-iso { width:72px; min-height:72px; border-radius:10px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:rgba(15,117,189,.16); color:#93c5fd; font-weight:900; }
+        .question-iso span { font-size:.68rem; color:rgba(255,255,255,.45); margin-bottom:4px; }
+        .question-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:6px; }
+        .question-head h4 { margin:0; color:#fff; font-size:.95rem; line-height:1.35; }
+        .question-desc { color:rgba(255,255,255,.45); font-size:.8rem; line-height:1.45; margin:0 0 12px; }
+        .question-controls { display:grid; grid-template-columns:minmax(220px,1fr) 170px; gap:10px; align-items:start; }
+        .badge-soft { display:inline-flex; align-items:center; gap:5px; border-radius:999px; padding:5px 8px; font-size:.72rem; font-weight:800; white-space:nowrap; }
+        .badge-soft.found { background:rgba(16,185,129,.14); color:#34d399; }
+        .badge-soft.missing { background:rgba(239,68,68,.14); color:#f87171; }
+        .badge-soft.pending { background:rgba(245,158,11,.14); color:#fbbf24; }
+        .badge-soft.na { background:rgba(148,163,184,.16); color:#cbd5e1; }
+        .autocomplete-list { display:none; position:absolute; z-index:20; top:70px; left:0; right:0; max-height:230px; overflow:auto; background:#111c2f; border:1px solid rgba(255,255,255,.12); border-radius:8px; box-shadow:0 12px 32px rgba(0,0,0,.35); }
+        .autocomplete-list.open { display:block; }
+        .auto-item { padding:10px 12px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,.06); }
+        .auto-item:hover { background:rgba(15,117,189,.18); }
+        .auto-title { color:#fff; font-weight:700; font-size:.84rem; }
+        .auto-meta { color:rgba(255,255,255,.38); font-size:.72rem; margin-top:2px; }
+        .result-cards { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+        .result-card { padding:16px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.045); }
+        .result-card span { color:rgba(255,255,255,.42); font-size:.72rem; text-transform:uppercase; font-weight:800; letter-spacing:.05em; }
+        .result-card strong { display:block; margin-top:7px; color:#fff; font-size:1.7rem; }
+        .gap-list { display:flex; flex-direction:column; gap:9px; }
+        .gap-item { padding:12px; border-radius:9px; background:rgba(239,68,68,.08); border-left:3px solid var(--danger); }
+        .gap-item strong { color:#fff; font-size:.88rem; }
+        .gap-item p { margin:4px 0 0; color:rgba(255,255,255,.5); font-size:.8rem; line-height:1.45; }
+        .history-table { width:100%; border-collapse:collapse; }
+        .history-table th, .history-table td { padding:11px 10px; border-bottom:1px solid rgba(255,255,255,.07); text-align:left; font-size:.84rem; }
+        .history-table th { color:rgba(255,255,255,.42); text-transform:uppercase; font-size:.7rem; letter-spacing:.05em; }
+        .config-row { display:grid; grid-template-columns:70px 90px 1fr 120px 80px; gap:8px; align-items:center; padding:8px; border-bottom:1px solid rgba(255,255,255,.06); }
+        @media (max-width: 1000px) {
+            .setup-hero { grid-template-columns:70px 1fr; }
+            .setup-hero-icon { width:70px; height:70px; font-size:2.1rem; }
+            .setup-score { grid-column:1 / -1; }
+            .setup-grid, .result-cards { grid-template-columns:1fr; }
+            .question-card, .question-controls { grid-template-columns:1fr; }
+            .question-iso { width:100%; min-height:54px; flex-direction:row; gap:8px; }
+            .config-row { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-layout setup-page">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Setup SGQ</div>
+                <a href="#" class="nav-item active" onclick="showSetupView('empresa');return false"><i class="fas fa-building"></i> Empresa</a>
+                <a href="#" class="nav-item" onclick="showSetupView('diagnostico');return false"><i class="fas fa-list-check"></i> Diagnóstico Inicial</a>
+                <a href="#" class="nav-item" onclick="showSetupView('resultado');return false"><i class="fas fa-chart-simple"></i> Resultado</a>
+                <a href="#" class="nav-item" onclick="showSetupView('historico');return false"><i class="fas fa-clock-rotate-left"></i> Histórico</a>
+                <a href="#" class="nav-item" onclick="showSetupView('perguntas');return false"><i class="fas fa-sliders"></i> Perguntas</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Integrações</div>
+                <a href="documentos.html" class="nav-item"><i class="fas fa-file-lines"></i> Documentos</a>
+                <a href="cadastros.html" class="nav-item"><i class="fas fa-box-archive"></i> Cadastros</a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar perguntas, documentos ou requisitos..." oninput="handleSetupSearch(this.value)"></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon" title="Análise por IA" onclick="runAiAnalysis('manual')"><i class="fas fa-brain"></i></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)"><div class="avatar">JW</div><span class="user-btn-name">Jefferson Willian</span><i class="fas fa-chevron-down"></i></button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header"><div class="avatar">JW</div><div><div class="user-name">Jefferson Willian</div><div class="user-role">Admin da empresa</div></div></div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div class="setup-hero">
+                <div class="setup-hero-icon"><i class="fas fa-gears"></i></div>
+                <div>
+                    <h2>Setup da Empresa e Diagnóstico Inicial do SGQ</h2>
+                    <p>Fluxo guiado para cadastrar dados essenciais da empresa, apontar evidências documentais e gerar uma visão inicial das lacunas ISO 9001.</p>
+                </div>
+                <div class="setup-score"><span>Atendimento</span><strong id="heroPercent">0%</strong></div>
+            </div>
+
+            <div class="setup-tabs">
+                <button class="setup-tab active" onclick="showSetupView('empresa')"><i class="fas fa-building"></i> Empresa</button>
+                <button class="setup-tab" onclick="showSetupView('diagnostico')"><i class="fas fa-list-check"></i> Diagnóstico</button>
+                <button class="setup-tab" onclick="showSetupView('resultado')"><i class="fas fa-chart-simple"></i> Resultado</button>
+                <button class="setup-tab" onclick="showSetupView('historico')"><i class="fas fa-clock-rotate-left"></i> Histórico</button>
+                <button class="setup-tab" onclick="showSetupView('perguntas')"><i class="fas fa-sliders"></i> Perguntas</button>
+            </div>
+
+            <section id="view-empresa" class="setup-view active"></section>
+            <section id="view-diagnostico" class="setup-view"></section>
+            <section id="view-resultado" class="setup-view"></section>
+            <section id="view-historico" class="setup-view"></section>
+            <section id="view-perguntas" class="setup-view"></section>
+        </div>
+    </div>
+</div>
+
+<script>
+const COMPANY_KEY = 'sgq_company_setup';
+const QUESTIONS_KEY = 'sgq_sgq_questions';
+const ANSWERS_KEY = 'sgq_sgq_answers';
+const HISTORY_KEY = 'sgq_sgq_analysis_history';
+const DIAG_KEY = 'sgq_sgq_current_diagnostic';
+const currentUser = 'Jefferson Willian';
+let searchTerm = '';
+
+const defaultQuestions = [
+{id:1,etapa:1,prioridade:'obrigatorio',requisito_iso:'4.3',titulo:'Escopo do SGQ',pergunta:'Onde está definido o escopo do Sistema de Gestão da Qualidade?',descricao_apoio:'Documento de escopo do SGQ, manual do SGQ ou documento equivalente.',tipo_evidencia_esperada:'Escopo ou manual do SGQ',obrigatoria:true,ordem:1,ativa:true},
+{id:2,etapa:1,prioridade:'obrigatorio',requisito_iso:'4.4',titulo:'Mapa de processos',pergunta:'Onde está definido o mapa de processos da empresa?',descricao_apoio:'Mapa de processos, interação entre processos, entradas, saídas e responsáveis.',tipo_evidencia_esperada:'Mapa de processos',obrigatoria:true,ordem:2,ativa:true},
+{id:3,etapa:1,prioridade:'obrigatorio',requisito_iso:'5.2',titulo:'Política da Qualidade',pergunta:'Onde está definida a Política da Qualidade?',descricao_apoio:'Política aprovada, comunicada e disponível.',tipo_evidencia_esperada:'Política da qualidade',obrigatoria:true,ordem:3,ativa:true},
+{id:4,etapa:1,prioridade:'obrigatorio',requisito_iso:'6.2',titulo:'Objetivos da qualidade',pergunta:'Onde estão definidos os objetivos da qualidade?',descricao_apoio:'Objetivos mensuráveis, metas, responsáveis e frequência de acompanhamento.',tipo_evidencia_esperada:'Objetivos e metas',obrigatoria:true,ordem:4,ativa:true},
+{id:5,etapa:1,prioridade:'obrigatorio',requisito_iso:'7.5',titulo:'Controle de documentos',pergunta:'Onde está definido o controle de documentos e registros?',descricao_apoio:'Procedimento ou regra para criação, aprovação, revisão, distribuição e obsolescência.',tipo_evidencia_esperada:'Procedimento documental',obrigatoria:true,ordem:5,ativa:true},
+{id:6,etapa:1,prioridade:'obrigatorio',requisito_iso:'6.1',titulo:'Riscos e oportunidades',pergunta:'Onde está definida a metodologia de riscos e oportunidades?',descricao_apoio:'Procedimento, matriz de riscos ou critério documentado.',tipo_evidencia_esperada:'Matriz ou procedimento de riscos',obrigatoria:true,ordem:6,ativa:true},
+{id:7,etapa:1,prioridade:'obrigatorio',requisito_iso:'5.3',titulo:'Responsabilidades do SGQ',pergunta:'Onde estão definidas as responsabilidades e autoridades do SGQ?',descricao_apoio:'Organograma, matriz de responsabilidades ou descrição de funções.',tipo_evidencia_esperada:'Matriz de responsabilidades',obrigatoria:true,ordem:7,ativa:true},
+{id:8,etapa:1,prioridade:'obrigatorio',requisito_iso:'7.2',titulo:'Competência e treinamento',pergunta:'Onde estão definidos os critérios de competência e treinamento?',descricao_apoio:'Matriz de competência, descrição de cargo, registros de treinamento ou procedimento.',tipo_evidencia_esperada:'Matriz de competência',obrigatoria:true,ordem:8,ativa:true},
+{id:9,etapa:1,prioridade:'obrigatorio',requisito_iso:'9.2',titulo:'Auditoria interna',pergunta:'Onde está definido o processo de auditoria interna?',descricao_apoio:'Procedimento de auditoria, programa anual, plano de auditoria, checklist ou relatório.',tipo_evidencia_esperada:'Procedimento de auditoria',obrigatoria:true,ordem:9,ativa:true},
+{id:10,etapa:1,prioridade:'obrigatorio',requisito_iso:'9.3',titulo:'Análise crítica',pergunta:'Onde está definida a análise crítica pela direção?',descricao_apoio:'Procedimento, ata, pauta mínima ou modelo de análise crítica.',tipo_evidencia_esperada:'Ata ou procedimento',obrigatoria:true,ordem:10,ativa:true},
+{id:11,etapa:1,prioridade:'obrigatorio',requisito_iso:'10.2',titulo:'Não conformidade e ação corretiva',pergunta:'Onde está definido o tratamento de não conformidade e ação corretiva?',descricao_apoio:'Procedimento, formulário, fluxo ou registro de não conformidade e ação corretiva.',tipo_evidencia_esperada:'Procedimento de NC/AC',obrigatoria:true,ordem:11,ativa:true},
+{id:12,etapa:2,prioridade:'importante',requisito_iso:'8.2',titulo:'Requisitos do cliente',pergunta:'Onde está definido o processo de análise crítica de requisitos do cliente?',descricao_apoio:'Procedimento comercial, análise de contrato, pedido, proposta ou fluxo de aprovação.',tipo_evidencia_esperada:'Fluxo comercial',obrigatoria:false,ordem:12,ativa:true},
+{id:13,etapa:2,prioridade:'importante',requisito_iso:'8.4',titulo:'Fornecedores externos',pergunta:'Onde está definido o controle de fornecedores externos?',descricao_apoio:'Procedimento de fornecedores, critérios de homologação, avaliação e reavaliação.',tipo_evidencia_esperada:'Procedimento de fornecedores',obrigatoria:false,ordem:13,ativa:true},
+{id:14,etapa:2,prioridade:'importante',requisito_iso:'8.5',titulo:'Controle de produção ou serviço',pergunta:'Onde estão definidos os controles de produção ou prestação de serviço?',descricao_apoio:'Procedimentos operacionais, instruções de trabalho, planos de controle ou critérios de processo.',tipo_evidencia_esperada:'Procedimento operacional',obrigatoria:false,ordem:14,ativa:true},
+{id:15,etapa:2,prioridade:'importante',requisito_iso:'8.6',titulo:'Liberação de produto ou serviço',pergunta:'Onde está definido o critério de liberação de produto ou serviço?',descricao_apoio:'Inspeção final, checklist de liberação, registros de aprovação ou critérios de aceite.',tipo_evidencia_esperada:'Critério de liberação',obrigatoria:false,ordem:15,ativa:true},
+{id:16,etapa:2,prioridade:'importante',requisito_iso:'7.1.5',titulo:'Equipamentos de medição',pergunta:'Onde está definido o controle de equipamentos de medição?',descricao_apoio:'Plano de calibração, lista de instrumentos, certificados ou procedimento.',tipo_evidencia_esperada:'Plano de calibração',obrigatoria:false,ordem:16,ativa:true},
+{id:17,etapa:2,prioridade:'importante',requisito_iso:'8.5.2',titulo:'Rastreabilidade',pergunta:'Onde está definida a rastreabilidade do produto, processo ou serviço?',descricao_apoio:'Procedimento, registros de lote, ordem de produção, certificado, etiqueta ou identificação.',tipo_evidencia_esperada:'Rastreabilidade',obrigatoria:false,ordem:17,ativa:true},
+{id:18,etapa:2,prioridade:'importante',requisito_iso:'8.7',titulo:'Saídas não conformes',pergunta:'Onde está definido o controle de saídas não conformes?',descricao_apoio:'Procedimento, formulário de segregação, concessão, retrabalho ou disposição.',tipo_evidencia_esperada:'Controle de saídas NC',obrigatoria:false,ordem:18,ativa:true},
+{id:19,etapa:2,prioridade:'importante',requisito_iso:'9.1.2',titulo:'Reclamações e satisfação',pergunta:'Onde está definido o tratamento de reclamações e satisfação de clientes?',descricao_apoio:'Procedimento, registros de reclamação, pesquisa de satisfação ou indicador.',tipo_evidencia_esperada:'Pesquisa ou procedimento',obrigatoria:false,ordem:19,ativa:true},
+{id:20,etapa:2,prioridade:'importante',requisito_iso:'9.1',titulo:'Indicadores dos processos',pergunta:'Onde estão definidos os indicadores dos processos?',descricao_apoio:'Dashboard, planilha, painel de indicadores, metas e responsáveis.',tipo_evidencia_esperada:'Painel de indicadores',obrigatoria:false,ordem:20,ativa:true},
+{id:21,etapa:3,prioridade:'essencial',requisito_iso:'6.3',titulo:'Controle de mudanças',pergunta:'Onde está definido o controle de mudanças no SGQ?',descricao_apoio:'Procedimento, formulário ou critério para avaliar impacto de mudanças.',tipo_evidencia_esperada:'Procedimento de mudanças',obrigatoria:false,ordem:21,ativa:true},
+{id:22,etapa:3,prioridade:'essencial',requisito_iso:'10.3',titulo:'Melhorias do SGQ',pergunta:'Onde estão registradas as melhorias do SGQ?',descricao_apoio:'Plano de melhoria, ações, lições aprendidas ou projetos de melhoria contínua.',tipo_evidencia_esperada:'Plano de melhoria',obrigatoria:false,ordem:22,ativa:true},
+{id:23,etapa:3,prioridade:'essencial',requisito_iso:'7.1',titulo:'Recursos do SGQ',pergunta:'Onde estão definidos os recursos necessários para operação do SGQ?',descricao_apoio:'Planejamento de recursos, infraestrutura, ambiente, pessoas ou equipamentos.',tipo_evidencia_esperada:'Plano de recursos',obrigatoria:false,ordem:23,ativa:true},
+{id:24,etapa:3,prioridade:'essencial',requisito_iso:'8.1',titulo:'Planejamento operacional',pergunta:'Onde está definido o planejamento e controle operacional?',descricao_apoio:'Procedimento, fluxo operacional, plano de qualidade ou controle de processo.',tipo_evidencia_esperada:'Plano operacional',obrigatoria:false,ordem:24,ativa:true},
+{id:25,etapa:3,prioridade:'essencial',requisito_iso:'9.1.3',titulo:'Análise de dados',pergunta:'Onde está definida a análise e avaliação dos dados do SGQ?',descricao_apoio:'Análise de indicadores, relatórios, reuniões, atas ou dashboards.',tipo_evidencia_esperada:'Relatório ou dashboard',obrigatoria:false,ordem:25,ativa:true},
+{id:26,etapa:3,prioridade:'essencial',requisito_iso:'10.2',titulo:'Eficácia das ações corretivas',pergunta:'Onde está definida a verificação de eficácia das ações corretivas?',descricao_apoio:'Campo de eficácia, prazo de verificação, responsável e critério de aceite.',tipo_evidencia_esperada:'Critério de eficácia',obrigatoria:false,ordem:26,ativa:true}
+];
+
+function readJSON(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch(e) { return fallback; } }
+function writeJSON(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+function sanitize(value) { const span = document.createElement('span'); span.textContent = value || ''; return span.innerHTML; }
+
+function seedQuestions() {
+    const stored = localStorage.getItem(QUESTIONS_KEY);
+    if (!stored || /[\u00c3\u00c2\ufffd]/.test(stored)) writeJSON(QUESTIONS_KEY, defaultQuestions);
+}
+function getQuestions() { return readJSON(QUESTIONS_KEY, defaultQuestions).filter(q => q.ativa).sort((a,b) => a.ordem - b.ordem); }
+function getAllQuestions() { return readJSON(QUESTIONS_KEY, defaultQuestions).sort((a,b) => a.ordem - b.ordem); }
+function getAnswers() { return readJSON(ANSWERS_KEY, {}); }
+function saveAnswers(answers) { writeJSON(ANSWERS_KEY, answers); }
+
+function defaultDocFolders() {
+    return [
+        {id:1,name:'Qualidade',children:[
+            {id:11,name:'Procedimentos',children:[],documents:[
+                {id:1001,code:'PQ-001',title:'Controle de Documentos e Registros',category:'Procedimento Operacional',version:'3.0',date:'2026-03-15',type:'pdf'},
+                {id:1002,code:'PQ-002',title:'Auditorias Internas',category:'Procedimento Operacional',version:'2.1',date:'2026-02-20',type:'pdf'},
+                {id:1003,code:'PQ-003',title:'Controle de Produto Nao Conforme',category:'Procedimento Operacional',version:'1.5',date:'2026-01-10',type:'pdf'}]},
+            {id:13,name:'Formularios',children:[],documents:[{id:1006,code:'FQ-001',title:'Registro de Nao Conformidade',category:'Formulario',version:'4.0',date:'2026-03-20',type:'xls'},{id:1007,code:'FQ-002',title:'Checklist de Auditoria',category:'Formulario',version:'2.2',date:'2025-12-10',type:'xls'}]},
+            {id:14,name:'Politica da Qualidade',children:[],documents:[{id:1008,code:'MQ-001',title:'Manual da Qualidade',category:'Manual',version:'5.0',date:'2026-01-05',type:'pdf'}]}
+        ],documents:[]},
+        {id:2,name:'Producao',children:[{id:21,name:'Processos',children:[],documents:[{id:2001,code:'PP-001',title:'Processo de Montagem Linha A',category:'Procedimento Operacional',version:'3.2',date:'2026-03-10',type:'pdf'}]}],documents:[]},
+        {id:4,name:'Recursos Humanos',children:[{id:41,name:'Treinamentos',children:[],documents:[{id:4001,code:'RH-001',title:'Plano Anual de Treinamentos 2026',category:'Plano',version:'1.0',date:'2026-01-02',type:'xls'}]}],documents:[]}
+    ];
+}
+function flattenDocuments(folders, path = []) {
+    let docs = [];
+    (folders || []).forEach(folder => {
+        const currentPath = path.concat(folder.name);
+        (folder.documents || []).forEach(doc => docs.push(Object.assign({}, doc, {folderPath: currentPath.join(' / ')})));
+        docs = docs.concat(flattenDocuments(folder.children || [], currentPath));
+    });
+    return docs;
+}
+function getDocuments() {
+    return flattenDocuments(readJSON('sgq_docFolders', defaultDocFolders()));
+}
+function findDocument(id) {
+    return getDocuments().find(doc => String(doc.id) === String(id));
+}
+
+function renderCompany() {
+    const c = readJSON(COMPANY_KEY, {});
+    document.getElementById('view-empresa').innerHTML = `
+        <div class="setup-grid">
+            <div class="setup-form-card">
+                <h3><i class="fas fa-building" style="color:var(--primary)"></i> Dados da empresa</h3>
+                ${field('Razão social','razaoSocial',c.razaoSocial)}
+                ${field('Nome fantasia','nomeFantasia',c.nomeFantasia)}
+                <div class="setup-grid" style="gap:10px">${field('CNPJ','cnpj',c.cnpj)}${field('Unidade / planta','unidade',c.unidade)}</div>
+                ${field('Endereço','endereco',c.endereco)}
+                <div class="setup-grid" style="gap:10px">${field('Cidade','cidade',c.cidade)}${field('Estado','estado',c.estado)}</div>
+                ${textarea('Escopo de atuação','escopo',c.escopo)}
+            </div>
+            <div class="setup-form-card">
+                <h3><i class="fas fa-sitemap" style="color:var(--accent)"></i> Estrutura do SGQ</h3>
+                ${textarea('Processos principais','processos',c.processos)}
+                ${textarea('Setores envolvidos','setores',c.setores)}
+                ${textarea('Responsáveis pelo SGQ','responsaveis',c.responsaveis)}
+                <div class="setup-grid" style="gap:10px">${field('Representante da direção','representante',c.representante)}${field('Timezone','timezone',c.timezone || 'America/Sao_Paulo')}</div>
+                ${textarea('Produtos ou serviços principais','produtosServicos',c.produtosServicos)}
+            </div>
+            <div class="setup-form-card">
+                <h3><i class="fas fa-certificate" style="color:var(--warning)"></i> Contexto ISO 9001</h3>
+                ${select('Situação da certificação','certificacao',c.certificacao,['Nao certificada','Em implantacao','Certificada','Recertificacao em andamento'])}
+                ${field('Organismo certificador','certificadora',c.certificadora)}
+                ${field('Data da ultima auditoria','ultimaAuditoria',c.ultimaAuditoria,'date')}
+                ${textarea('Principais desafios atuais','desafios',c.desafios)}
+            </div>
+            <div class="setup-form-card">
+                <h3><i class="fas fa-lock" style="color:#c084fc"></i> Regras de acesso para validação</h3>
+                ${select('Perfil atual','perfil',c.perfil || 'Admin da empresa',['Admin da empresa','Usuario qualidade','Usuario leitura','Superadmin do sistema'])}
+                ${textarea('Observações de permissão / tenant','permissoes',c.permissoes || 'MVP local: os dados ficam isolados no navegador via localStorage. Em backend real, aplicar empresa_id/tenant em todos os endpoints.')}
+                <div class="setup-actions">
+                    <button class="setup-btn primary" onclick="saveCompany()"><i class="fas fa-floppy-disk"></i> Salvar setup da empresa</button>
+                    <button class="setup-btn" onclick="showSetupView('diagnostico')"><i class="fas fa-arrow-right"></i> Ir para diagnóstico</button>
+                </div>
+            </div>
+        </div>`;
+}
+function field(label, id, value, type='text') {
+    return `<div class="setup-field"><label>${label}</label><input class="setup-input" id="${id}" type="${type}" value="${sanitize(value)}"></div>`;
+}
+function textarea(label, id, value) {
+    return `<div class="setup-field"><label>${label}</label><textarea class="setup-textarea" id="${id}">${sanitize(value)}</textarea></div>`;
+}
+function select(label, id, value, options) {
+    return `<div class="setup-field"><label>${label}</label><select class="setup-select" id="${id}">${options.map(o => `<option ${o === value ? 'selected' : ''}>${sanitize(o)}</option>`).join('')}</select></div>`;
+}
+function saveCompany() {
+    const ids = ['razaoSocial','nomeFantasia','cnpj','unidade','endereco','cidade','estado','escopo','processos','setores','responsaveis','representante','timezone','produtosServicos','certificacao','certificadora','ultimaAuditoria','desafios','perfil','permissoes'];
+    const data = {};
+    ids.forEach(id => data[id] = document.getElementById(id)?.value || '');
+    data.empresa_id = data.cnpj || 'empresa_demo';
+    data.dataCadastro = data.dataCadastro || new Date().toISOString();
+    writeJSON(COMPANY_KEY, data);
+    toast('Setup da empresa salvo.');
+    updateSummary();
+}
+
+function renderDiagnostic() {
+    const questions = getQuestions().filter(q => {
+        if (!searchTerm) return true;
+        const s = `${q.requisito_iso} ${q.titulo} ${q.pergunta} ${q.descricao_apoio}`.toLowerCase();
+        return s.includes(searchTerm);
+    });
+    const answers = getAnswers();
+    let html = `<div class="setup-actions" style="margin-bottom:14px">
+        <button class="setup-btn primary" onclick="saveAllVisibleAnswers()"><i class="fas fa-floppy-disk"></i> Salvar progresso</button>
+        <button class="setup-btn success" onclick="completeDiagnostic()"><i class="fas fa-check"></i> Concluir diagnóstico</button>
+        <button class="setup-btn warning" onclick="runAiAnalysis('manual')"><i class="fas fa-brain"></i> Gerar/atualizar análise</button>
+    </div>`;
+    [1,2,3].forEach(stage => {
+        const list = questions.filter(q => q.etapa === stage);
+        if (!list.length) return;
+        html += `<div class="stage-block"><div class="stage-title"><span>Etapa ${stage} - ${stageLabel(stage)}</span><span>${stagePercent(stage)}% atendido</span></div>`;
+        list.forEach(q => {
+            const a = answers[q.id] || {};
+            const selectedDoc = a.documento_id ? findDocument(a.documento_id) : null;
+            const status = a.status_evidencia || 'pendente';
+            html += `<div class="question-card" data-question="${q.id}">
+                <div class="question-iso"><span>ISO</span>${sanitize(q.requisito_iso)}</div>
+                <div>
+                    <div class="question-head">
+                        <h4>${sanitize(q.pergunta)}</h4>
+                        ${statusBadge(status)}
+                    </div>
+                    <p class="question-desc">${sanitize(q.descricao_apoio)}</p>
+                    <div class="question-controls">
+                        <div class="setup-field" style="margin-bottom:0">
+                            <label>Documento / evidência</label>
+                            <input class="setup-input" id="doc-q-${q.id}" value="${sanitize(selectedDoc ? `${selectedDoc.code} - ${selectedDoc.title}` : (status === 'nao_existe' ? 'Não existe documento/evidência para este item' : ''))}" placeholder="Digite para buscar documentos..." oninput="showDocSuggestions(${q.id}, this.value)" onfocus="showDocSuggestions(${q.id}, this.value)">
+                            <div class="autocomplete-list" id="auto-q-${q.id}"></div>
+                        </div>
+                        <div class="setup-field" style="margin-bottom:0">
+                            <label>Status</label>
+                            <select class="setup-select" id="status-q-${q.id}" onchange="setAnswerStatus(${q.id}, this.value)">
+                                ${['pendente','encontrado','nao_existe','nao_aplicavel'].map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${statusLabel(s)}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="setup-field" style="margin-top:10px;margin-bottom:0">
+                        <label>Observação</label>
+                        <textarea class="setup-textarea" id="obs-q-${q.id}" oninput="saveQuestionAnswer(${q.id})" placeholder="Comentário, local da evidência, restrição ou responsável...">${sanitize(a.observacao_usuario)}</textarea>
+                    </div>
+                </div>
+            </div>`;
+        });
+        html += `</div>`;
+    });
+    document.getElementById('view-diagnostico').innerHTML = html;
+}
+function statusBadge(status) {
+    const cls = status === 'encontrado' ? 'found' : status === 'nao_existe' ? 'missing' : status === 'nao_aplicavel' ? 'na' : 'pending';
+    const icon = status === 'encontrado' ? 'fa-check' : status === 'nao_existe' ? 'fa-xmark' : status === 'nao_aplicavel' ? 'fa-minus' : 'fa-clock';
+    return `<span class="badge-soft ${cls}"><i class="fas ${icon}"></i>${statusLabel(status)}</span>`;
+}
+function statusLabel(status) {
+    return {encontrado:'Encontrado',nao_existe:'Inexistente',pendente:'Pendente',nao_aplicavel:'N/A'}[status] || status;
+}
+function stageLabel(stage) {
+    return {1:'obrigatórios',2:'importantes',3:'maturidade e melhoria contínua'}[stage];
+}
+function setAnswerStatus(qid, status) {
+    const input = document.getElementById(`doc-q-${qid}`);
+    if (status === 'nao_existe') input.value = 'Não existe documento/evidência para este item';
+    if (status === 'pendente') input.value = '';
+    saveQuestionAnswer(qid);
+    renderDiagnostic();
+}
+function showDocSuggestions(qid, value) {
+    const box = document.getElementById(`auto-q-${qid}`);
+    const q = (value || '').toLowerCase().trim();
+    const docs = getDocuments().filter(d => !q || [d.title,d.code,d.category,d.folderPath,d.type].join(' ').toLowerCase().includes(q)).slice(0, 8);
+    let html = docs.map(d => `<div class="auto-item" onclick="selectDocument(${qid}, ${d.id})"><div class="auto-title">${sanitize(d.code)} - ${sanitize(d.title)}</div><div class="auto-meta">${sanitize(d.category)} | ${sanitize(d.folderPath)} | v${sanitize(d.version)}</div></div>`).join('');
+    if (!docs.length) html += `<div class="auto-item" onclick="markMissing(${qid})"><div class="auto-title">Nenhum documento encontrado. Marcar como inexistente?</div><div class="auto-meta">Status: Não existe documento/evidência para este item</div></div>`;
+    html += `<div class="auto-item" onclick="markMissing(${qid})"><div class="auto-title">Não existe documento/evidência para este item</div><div class="auto-meta">Registrar lacuna para o diagnóstico</div></div>`;
+    box.innerHTML = html;
+    box.classList.add('open');
+}
+function selectDocument(qid, docId) {
+    const doc = findDocument(docId);
+    const answers = getAnswers();
+    answers[qid] = Object.assign({}, answers[qid], {
+        empresa_id: readJSON(COMPANY_KEY, {}).empresa_id || 'empresa_demo',
+        pergunta_id: qid,
+        documento_id: docId,
+        status_evidencia: 'encontrado',
+        respondido_por: currentUser,
+        data_resposta: new Date().toISOString(),
+        data_ultima_revisao: new Date().toISOString()
+    });
+    saveAnswers(answers);
+    document.getElementById(`doc-q-${qid}`).value = `${doc.code} - ${doc.title}`;
+    document.getElementById(`auto-q-${qid}`).classList.remove('open');
+    updateSummary();
+    renderDiagnostic();
+}
+function markMissing(qid) {
+    const answers = getAnswers();
+    answers[qid] = Object.assign({}, answers[qid], {
+        empresa_id: readJSON(COMPANY_KEY, {}).empresa_id || 'empresa_demo',
+        pergunta_id: qid,
+        documento_id: null,
+        status_evidencia: 'nao_existe',
+        respondido_por: currentUser,
+        data_resposta: new Date().toISOString(),
+        data_ultima_revisao: new Date().toISOString()
+    });
+    saveAnswers(answers);
+    updateSummary();
+    renderDiagnostic();
+}
+function saveQuestionAnswer(qid) {
+    const answers = getAnswers();
+    const status = document.getElementById(`status-q-${qid}`)?.value || 'pendente';
+    answers[qid] = Object.assign({}, answers[qid], {
+        empresa_id: readJSON(COMPANY_KEY, {}).empresa_id || 'empresa_demo',
+        pergunta_id: qid,
+        status_evidencia: status,
+        observacao_usuario: document.getElementById(`obs-q-${qid}`)?.value || '',
+        respondido_por: currentUser,
+        data_resposta: answers[qid]?.data_resposta || new Date().toISOString(),
+        data_ultima_revisao: new Date().toISOString()
+    });
+    if (status !== 'encontrado') answers[qid].documento_id = null;
+    saveAnswers(answers);
+    updateSummary();
+}
+function saveAllVisibleAnswers() {
+    document.querySelectorAll('[data-question]').forEach(el => saveQuestionAnswer(Number(el.dataset.question)));
+    toast('Progresso salvo.');
+}
+
+function calculateDiagnostic() {
+    const questions = getQuestions();
+    const answers = getAnswers();
+    const totals = { total: questions.length, respondidas:0, encontradas:0, inexistentes:0, pendentes:0, naoAplicaveis:0 };
+    const byStage = {};
+    const gaps = [];
+    questions.forEach(q => {
+        const a = answers[q.id] || {status_evidencia:'pendente'};
+        const s = a.status_evidencia || 'pendente';
+        if (!byStage[q.etapa]) byStage[q.etapa] = {total:0, ok:0};
+        byStage[q.etapa].total++;
+        if (s !== 'pendente') totals.respondidas++;
+        if (s === 'encontrado') { totals.encontradas++; byStage[q.etapa].ok++; }
+        if (s === 'nao_aplicavel') { totals.naoAplicaveis++; byStage[q.etapa].ok++; }
+        if (s === 'nao_existe') totals.inexistentes++;
+        if (s === 'pendente') totals.pendentes++;
+        if (s === 'nao_existe' || s === 'pendente') {
+            gaps.push({
+                requisito_iso:q.requisito_iso,
+                etapa:q.etapa,
+                prioridade:q.prioridade,
+                descricao_lacuna: s === 'pendente' ? 'Evidência ainda não informada.' : 'Não foi encontrada evidência/documento aplicável.',
+                evidencia_atual: s === 'pendente' ? 'Pendente de resposta' : 'Sem evidência vinculada',
+                recomendacao:`Criar ou localizar ${q.tipo_evidencia_esperada}.`,
+                documento_sugerido:q.tipo_evidencia_esperada,
+                impacto:q.etapa === 1 ? 'Alto' : q.etapa === 2 ? 'Médio' : 'Médio/baixo',
+                prazo_sugerido:q.etapa === 1 ? '30 dias' : q.etapa === 2 ? '60 dias' : '90 dias',
+                responsavel_sugerido:'Qualidade'
+            });
+        }
+    });
+    const percent = questions.length ? Math.round(((totals.encontradas + totals.naoAplicaveis) / questions.length) * 100) : 0;
+    const result = {
+        resumo_executivo:`Diagnóstico inicial calculado localmente: ${percent}% dos itens possuem evidência encontrada ou não aplicável.`,
+        nivel_maturidade_sgq: percent >= 80 ? 'Maduro' : percent >= 55 ? 'Em estruturação' : 'Inicial',
+        percentual_estimado_atendimento: percent,
+        totais: totals,
+        percentual_por_etapa: Object.fromEntries(Object.entries(byStage).map(([k,v]) => [k, v.total ? Math.round((v.ok / v.total) * 100) : 0])),
+        riscos_principais: gaps.filter(g => g.etapa === 1).slice(0, 5).map(g => `Ausência de evidência para ISO ${g.requisito_iso}`),
+        lacunas:gaps,
+        recomendacoes:gaps.slice(0, 8).map(g => g.recomendacao),
+        documentos_a_criar:[...new Set(gaps.map(g => g.documento_sugerido))].slice(0, 10),
+        documentos_a_revisar:[],
+        prioridades_por_etapa:{1:gaps.filter(g=>g.etapa===1).length,2:gaps.filter(g=>g.etapa===2).length,3:gaps.filter(g=>g.etapa===3).length},
+        proximas_acoes:gaps.slice(0, 5).map(g => `${g.prazo_sugerido}: ${g.recomendacao}`),
+        alertas:gaps.some(g => g.etapa === 1) ? ['Existem lacunas em requisitos obrigatórios da Etapa 1.'] : [],
+        fora_do_contexto:[]
+    };
+    writeJSON(DIAG_KEY, result);
+    return result;
+}
+function stagePercent(stage) {
+    return calculateDiagnostic().percentual_por_etapa[stage] || 0;
+}
+function completeDiagnostic() {
+    saveAllVisibleAnswers();
+    const result = runAiAnalysis('inicial');
+    showSetupView('resultado');
+    toast(`Diagnóstico concluído: ${result.percentual_estimado_atendimento}% de atendimento.`);
+}
+function runAiAnalysis(type) {
+    const result = calculateDiagnostic();
+    const history = readJSON(HISTORY_KEY, []);
+    const contextHash = btoa(unescape(encodeURIComponent(JSON.stringify({c:readJSON(COMPANY_KEY,{}),a:getAnswers(),d:getDocuments().map(d=>[d.id,d.date,d.version])})))).slice(0, 32);
+    const previous = history[0];
+    const hasChange = !previous || previous.hash_contexto_analisado !== contextHash || type !== 'automatica';
+    const entry = {
+        id:Date.now(),
+        empresa_id:readJSON(COMPANY_KEY,{}).empresa_id || 'empresa_demo',
+        data_execucao:new Date().toISOString(),
+        tipo_execucao:type,
+        status_execucao:hasChange ? 'sucesso' : 'sem_alteracao',
+        resumo_executivo:hasChange ? result.resumo_executivo : 'Nenhuma alteração documental ou resposta nova detectada.',
+        resultado_json:hasChange ? result : previous?.resultado_json,
+        hash_contexto_analisado:contextHash,
+        percentual_estimado_atendimento:result.percentual_estimado_atendimento,
+        nivel_maturidade_sgq:result.nivel_maturidade_sgq,
+        quantidade_lacunas:result.lacunas.length,
+        quantidade_acoes:result.proximas_acoes.length,
+        comparacao:compareAnalyses(result, previous?.resultado_json),
+        erro_execucao:null
+    };
+    history.unshift(entry);
+    writeJSON(HISTORY_KEY, history.slice(0, 25));
+    renderResult();
+    renderHistory();
+    updateSummary();
+    return result;
+}
+function compareAnalyses(current, previous) {
+    if (!previous) return {novas_lacunas:current.lacunas.length,lacunas_resolvidas:0,lacunas_mantidas:0,evolucao_percentual:current.percentual_estimado_atendimento,mudanca_maturidade:current.nivel_maturidade_sgq};
+    const key = g => `${g.requisito_iso}-${g.descricao_lacuna}`;
+    const c = new Set(current.lacunas.map(key));
+    const p = new Set(previous.lacunas.map(key));
+    return {
+        novas_lacunas:[...c].filter(x => !p.has(x)).length,
+        lacunas_resolvidas:[...p].filter(x => !c.has(x)).length,
+        lacunas_mantidas:[...c].filter(x => p.has(x)).length,
+        evolucao_percentual:current.percentual_estimado_atendimento - previous.percentual_estimado_atendimento,
+        mudanca_maturidade:current.nivel_maturidade_sgq === previous.nivel_maturidade_sgq ? 'Estabilidade' : `${previous.nivel_maturidade_sgq} -> ${current.nivel_maturidade_sgq}`
+    };
+}
+function renderResult() {
+    const r = calculateDiagnostic();
+    document.getElementById('view-resultado').innerHTML = `
+        <div class="result-cards">
+            <div class="result-card"><span>Total</span><strong>${r.totais.total}</strong></div>
+            <div class="result-card"><span>Respondidas</span><strong>${r.totais.respondidas}</strong></div>
+            <div class="result-card"><span>Evidências</span><strong>${r.totais.encontradas}</strong></div>
+            <div class="result-card"><span>Lacunas</span><strong>${r.lacunas.length}</strong></div>
+        </div>
+        <div class="setup-grid">
+            <div class="setup-panel">
+                <h3><i class="fas fa-chart-pie" style="color:var(--accent)"></i> Resumo geral</h3>
+                <p style="color:rgba(255,255,255,.62);line-height:1.55">${sanitize(r.resumo_executivo)}</p>
+                <div class="setup-grid" style="gap:10px">
+                    ${[1,2,3].map(s => `<div class="result-card"><span>Etapa ${s}</span><strong>${r.percentual_por_etapa[s] || 0}%</strong></div>`).join('')}
+                </div>
+                <div class="setup-actions">
+                    <button class="setup-btn warning" onclick="runAiAnalysis('manual')"><i class="fas fa-brain"></i> Reprocessar análise</button>
+                    <button class="setup-btn" onclick="simulateNightlyJob()"><i class="fas fa-moon"></i> Simular rotina noturna</button>
+                </div>
+            </div>
+            <div class="setup-panel">
+                <h3><i class="fas fa-file-circle-plus" style="color:var(--warning)"></i> Documentos recomendados</h3>
+                <div class="gap-list">${r.documentos_a_criar.length ? r.documentos_a_criar.map(d => `<div class="gap-item" style="border-left-color:var(--warning);background:rgba(245,158,11,.08)"><strong>${sanitize(d)}</strong><p>Criar, revisar ou localizar evidência correspondente no repositório documental.</p></div>`).join('') : '<p style="color:rgba(255,255,255,.5)">Nenhum documento recomendado no momento.</p>'}</div>
+            </div>
+        </div>
+        <div class="setup-panel" style="margin-top:14px">
+            <h3><i class="fas fa-triangle-exclamation" style="color:var(--danger)"></i> Lacunas por requisito ISO</h3>
+            <div class="gap-list">${r.lacunas.length ? r.lacunas.map(g => `<div class="gap-item"><strong>ISO ${sanitize(g.requisito_iso)} - Etapa ${g.etapa} (${sanitize(g.prioridade)})</strong><p>${sanitize(g.descricao_lacuna)} Recomendação: ${sanitize(g.recomendacao)} Prazo sugerido: ${sanitize(g.prazo_sugerido)}.</p></div>`).join('') : '<p style="color:rgba(255,255,255,.5)">Nenhuma lacuna encontrada.</p>'}</div>
+        </div>`;
+}
+function simulateNightlyJob() {
+    const entry = runAiAnalysis('automatica');
+    toast(`Rotina automática simulada. Status registrado no histórico.`);
+    return entry;
+}
+function renderHistory() {
+    const history = readJSON(HISTORY_KEY, []);
+    document.getElementById('view-historico').innerHTML = `
+        <div class="setup-panel">
+            <h3><i class="fas fa-clock-rotate-left" style="color:var(--primary)"></i> Histórico de avaliações</h3>
+            <div style="overflow:auto">
+                <table class="history-table">
+                    <thead><tr><th>Data</th><th>Tipo</th><th>Status</th><th>%</th><th>Maturidade</th><th>Lacunas</th><th>Comparação</th></tr></thead>
+                    <tbody>${history.length ? history.map(h => `<tr><td>${new Date(h.data_execucao).toLocaleString('pt-BR')}</td><td>${h.tipo_execucao}</td><td>${h.status_execucao}</td><td>${h.percentual_estimado_atendimento}%</td><td>${sanitize(h.nivel_maturidade_sgq)}</td><td>${h.quantidade_lacunas}</td><td>${formatComparison(h.comparacao)}</td></tr>`).join('') : '<tr><td colspan="7" style="color:rgba(255,255,255,.45)">Nenhuma análise registrada.</td></tr>'}</tbody>
+                </table>
+            </div>
+        </div>`;
+}
+function formatComparison(c) {
+    if (!c) return '-';
+    return `Novas: ${c.novas_lacunas}, resolvidas: ${c.lacunas_resolvidas}, mantidas: ${c.lacunas_mantidas}, evolução: ${c.evolucao_percentual > 0 ? '+' : ''}${c.evolucao_percentual}%`;
+}
+function renderQuestionsConfig() {
+    const rows = getAllQuestions().map(q => `<div class="config-row">
+        <input class="setup-input" value="${q.requisito_iso}" onchange="updateQuestion(${q.id}, 'requisito_iso', this.value)">
+        <select class="setup-select" onchange="updateQuestion(${q.id}, 'etapa', Number(this.value))">${[1,2,3].map(s => `<option value="${s}" ${q.etapa===s?'selected':''}>Etapa ${s}</option>`).join('')}</select>
+        <input class="setup-input" value="${sanitize(q.pergunta)}" onchange="updateQuestion(${q.id}, 'pergunta', this.value)">
+        <select class="setup-select" onchange="updateQuestion(${q.id}, 'prioridade', this.value)">${['obrigatorio','importante','essencial'].map(p => `<option ${q.prioridade===p?'selected':''}>${p}</option>`).join('')}</select>
+        <button class="setup-btn" onclick="toggleQuestion(${q.id})">${q.ativa ? 'Ativa' : 'Inativa'}</button>
+    </div>`).join('');
+    document.getElementById('view-perguntas').innerHTML = `
+        <div class="setup-panel">
+            <h3><i class="fas fa-sliders" style="color:var(--primary)"></i> Configuração de perguntas</h3>
+            <p style="color:rgba(255,255,255,.5);font-size:.86rem;margin-top:0">MVP local: esta tela simula a tabela configurável de perguntas. Em backend real, estes dados virariam migration/seed e endpoints protegidos para superadmin.</p>
+            <div class="setup-actions"><button class="setup-btn primary" onclick="resetQuestions()"><i class="fas fa-rotate"></i> Restaurar perguntas padrão</button></div>
+            <div style="margin-top:12px">${rows}</div>
+        </div>`;
+}
+function updateQuestion(id, key, value) {
+    const all = getAllQuestions();
+    const q = all.find(item => item.id === id);
+    if (q) q[key] = value;
+    writeJSON(QUESTIONS_KEY, all);
+    renderQuestionsConfig();
+    renderDiagnostic();
+}
+function toggleQuestion(id) {
+    const all = getAllQuestions();
+    const q = all.find(item => item.id === id);
+    if (q) q.ativa = !q.ativa;
+    writeJSON(QUESTIONS_KEY, all);
+    renderQuestionsConfig();
+    renderDiagnostic();
+}
+function resetQuestions() {
+    writeJSON(QUESTIONS_KEY, defaultQuestions);
+    renderQuestionsConfig();
+    renderDiagnostic();
+    toast('Perguntas padrão restauradas.');
+}
+
+function showSetupView(view) {
+    document.querySelectorAll('.setup-view').forEach(v => v.classList.remove('active'));
+    document.getElementById(`view-${view}`).classList.add('active');
+    document.querySelectorAll('.setup-tab').forEach(btn => btn.classList.toggle('active', btn.textContent.toLowerCase().includes(view === 'empresa' ? 'empresa' : view === 'diagnostico' ? 'diagn' : view)));
+    document.querySelectorAll('.sidebar .nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.sidebar .nav-item').forEach(item => { if (item.textContent.toLowerCase().includes(view === 'diagnostico' ? 'diagn' : view)) item.classList.add('active'); });
+    if (view === 'empresa') renderCompany();
+    if (view === 'diagnostico') renderDiagnostic();
+    if (view === 'resultado') renderResult();
+    if (view === 'historico') renderHistory();
+    if (view === 'perguntas') renderQuestionsConfig();
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateSummary() {
+    const r = calculateDiagnostic();
+    document.getElementById('heroPercent').textContent = `${r.percentual_estimado_atendimento}%`;
+}
+function handleSetupSearch(value) {
+    searchTerm = (value || '').toLowerCase().trim();
+    if (document.getElementById('view-diagnostico').classList.contains('active')) renderDiagnostic();
+}
+function toggleUserMenu(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu')?.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+    document.getElementById('userMenu')?.classList.remove('open');
+    if (!e.target.closest('.setup-field')) document.querySelectorAll('.autocomplete-list').forEach(el => el.classList.remove('open'));
+});
+function toast(message) {
+    const el = document.createElement('div');
+    el.textContent = message;
+    el.style.cssText = 'position:fixed;right:22px;bottom:22px;z-index:9000;background:#10213a;color:#fff;border:1px solid rgba(255,255,255,.12);padding:12px 14px;border-radius:9px;box-shadow:0 12px 32px rgba(0,0,0,.35);font-size:.86rem;font-weight:700';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2600);
+}
+
+seedQuestions();
+renderCompany();
+renderDiagnostic();
+renderResult();
+renderHistory();
+renderQuestionsConfig();
+updateSummary();
+</script>
+<script src="../assets/js/global-search.js"></script></body>
+</html>

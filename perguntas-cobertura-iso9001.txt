@@ -1,0 +1,105 @@
+PERGUNTAS PARA PLANEJAMENTO DA COBERTURA ISO 9001
+=================================================
+
+Preencha as respostas abaixo de cada pergunta. Pode responder de forma curta, em texto livre.
+
+
+BLOCO 1: CONTEXTO E LIDERANCA
+-----------------------------
+
+1. Como voce quer registrar o contexto da organizacao?
+Resposta: cadastro dentro das configurações do sistema, essas informações deverão ficar visíveis dentro de um menu escrito organização que descreve este e outros itens. a swot deve ser preenchida no sistema similar como ocorre com matriz de risco, dentro do prazo definidonas configurações o menu de swot fica diposnível para ser preenchido. explique isso dentro da tela padrão do swot, coloque uma grade de planejamento estratégico e sistema de pontuação nessa swot.
+
+2. Como quer controlar partes interessadas?
+Resposta: cadastro dentro das configurações do sistema, essas informações deverão ficar visíveis dentro de um menu escrito organização que descreve este e outros itens
+
+3. Para cada parte interessada, quais campos precisa ter?
+Resposta: crie conforme requisitos da iso
+
+4. O escopo do SGQ deve ser apenas um campo/documento ou precisa ter versao, aprovacao e historico?
+Resposta: apenas um campo cadastro dentro das configurações do sistema, essas informações deverão ficar visíveis dentro de um menu escrito organização que descreve este e outros itens
+
+5. A politica da qualidade deve ser apenas um documento controlado ou uma tela propria com aprovacao, comunicacao e revisao?
+Resposta: documento controlado, a comprovação da comunicação da politica serão os registros de treinamento
+
+6. Como quer evidenciar lideranca?
+Resposta: segundo momento
+
+7. Como quer controlar responsabilidades e autoridades?
+Resposta: segundo momento
+
+
+BLOCO 2: COMUNICACAO, RECURSOS E MUDANCAS
+-----------------------------------------
+
+8. Quer uma matriz de comunicacao do SGQ?
+Resposta: isso será feito dentro de documentos então não
+
+9. Como quer controlar recursos gerais do SGQ?
+Resposta: verifique o que a iso9001 pede  cadastro dentro das configurações do sistema, essas informações deverão ficar visíveis dentro de um menu escrito organização que descreve este e outros itens
+
+10. Infraestrutura e ambiente de trabalho precisam de cadastro/checklist proprio?
+Resposta: verifique o que a iso9001 pede  cadastro dentro das configurações do sistema, essas informações deverão ficar visíveis dentro de um menu escrito organização que descreve este e outros itens
+
+
+11. O controle de mudancas deve tratar quais tipos?
+Resposta: faça conforme a iso9001 pede 
+
+12. Toda mudanca precisa de avaliacao de risco, aprovacao e plano de acao?
+Resposta: sim
+
+13. Quais campos uma mudanca deve ter?
+Resposta: faça conforme a iso9001 pede
+
+
+BLOCO 3: OPERACAO E CLIENTE
+---------------------------
+
+14. O sistema precisa controlar analise critica de pedidos, contratos ou requisitos do cliente?
+Resposta: sim, porem isso sera modelado no fluxo desenvolvido por cada cliente
+
+15. Se sim, quais campos essa analise deve ter?
+Resposta:na
+
+16. Projeto e desenvolvimento se aplica ao publico-alvo do sistema?
+Resposta: sim, acha melhor ter um fluxo fixo para isso ou deixar livre para modelagem nos fluxos? existe uma grande demanda?
+
+17. Se projeto/desenvolvimento se aplicar, quer controlar quais etapas?
+Resposta: se a resposta 16 for sim, crie um processo padrão onde seja possível revisar o fluxo e os formulários
+
+18. Precisa controlar propriedade do cliente ou de fornecedor externo?
+Resposta: isso será controlado por fluxos customizados e documentos
+
+19. Precisa controlar preservacao de produto/servico?
+Resposta: isso será controlado por fluxos customizados e document
+
+20. Precisa controlar atividades pos-entrega?
+Resposta: sera feito com reclamação de cliente e rnc
+
+
+BLOCO 4: ANALISE, DIRECAO E MELHORIA
+------------------------------------
+
+21. Como deve funcionar a analise critica pela direcao?
+Resposta: criar um fluxo similar ao swot que fica disponível apenas dentro de configurações da empresa para ser preenchido avaliado e aprovado
+
+22. Com que frequencia a analise critica pela direcao deve ser feita?
+Resposta: ajustar nas configurações da empresa
+
+23. Quer uma tela consolidada de analise de dados?
+Resposta: sim
+
+24. Melhorias devem continuar dentro de NCs/Planos ou virar uma visao propria de melhoria continua?
+Resposta: alem de nc e planos crie uma guia crativa sobre melhoria continua
+
+25. Quais campos uma melhoria continua deve ter?
+Resposta: seja criativo e crie
+
+26. Quer vincular melhorias, mudancas, auditorias, riscos e reclamacoes a planos de acao no mesmo modulo?
+Resposta: pode ser, porem seria ideal manter os nomes separados nos menus, fazendo referencia direta ao clicar
+
+27. O sistema deve gerar um diagnostico de cobertura ISO mostrando requisitos atendidos, parciais e nao atendidos?
+Resposta: deve gerar
+
+28. Esse diagnostico deve ser automatico, manual ou misto?
+Resposta: automático, será desenvolvido utilizando api de IA posteriormente, verifique se isso pode ser testado de alguma forma grátis nesse momento

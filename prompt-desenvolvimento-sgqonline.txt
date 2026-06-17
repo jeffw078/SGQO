@@ -1,0 +1,680 @@
+PROMPT BASE PARA DESENVOLVIMENTO DO SGQ ONLINE
+==============================================
+
+Use este prompt como base para entender o produto, suas regras de negócio e o escopo dos módulos antes de desenvolver o sistema real com backend e banco de dados.
+
+
+1. VISÃO DO PRODUTO
+-------------------
+
+O SGQ Online é um sistema de gestão da qualidade orientado à ISO 9001:2015. O objetivo é permitir que empresas organizem seu Sistema de Gestão da Qualidade de forma simples, funcional e rastreável, reduzindo uso de planilhas e centralizando documentos, processos, evidências, auditorias, não conformidades, riscos, indicadores e planos de ação.
+
+A premissa principal é simplicidade: o sistema deve ser o mais simples possível sem deixar de ser funcional para manutenção, revisão, auditoria e evolução.
+
+O sistema deve priorizar:
+- rastreabilidade de evidências;
+- clareza operacional;
+- facilidade de manutenção;
+- centralização dos planos de ação;
+- relação entre módulos e requisitos ISO 9001;
+- backend simples, modular e fácil de revisar.
+
+
+2. PREMISSA TÉCNICA
+-------------------
+
+O protótipo atual é feito em HTML, CSS e JavaScript, com persistência em localStorage. No desenvolvimento real, o localStorage deve ser substituído por backend e banco de dados.
+
+Premissas para backend:
+- monólito modular no início;
+- banco relacional;
+- APIs REST simples;
+- controllers finos;
+- regras de negócio em services;
+- repositories/queries simples;
+- isolamento por empresa/tenant;
+- migrations versionadas;
+- auditoria/histórico em entidades críticas;
+- evitar arquitetura excessivamente complexa.
+
+#?# Definir stack oficial do backend: Node.js, PHP/Laravel, Python/Django/FastAPI, Java/Spring ou outra?
+#?# Definir banco: PostgreSQL, MySQL/MariaDB, SQL Server ou outro?
+#?# Definir se haverá SPA/frontend moderno depois ou se o HTML atual será migrado gradualmente.
+
+
+3. REGRAS GLOBAIS DO NEGÓCIO
+----------------------------
+
+Toda empresa deve ter seus dados isolados.
+Todo usuário deve pertencer a uma empresa e ter perfil/permissões.
+Módulos críticos devem permitir cadastro, edição, visualização, filtros, status, evidências e histórico.
+Planos de ação devem ser centralizados e vinculáveis a múltiplas origens.
+Documentos controlados são evidência preferencial para procedimentos, políticas, formulários e registros.
+Diagnóstico ISO deve ser automático no MVP por regras locais, com preparação para futura API de IA.
+
+
+4. MÓDULOS EXISTENTES E REGRAS DE NEGÓCIO
+-----------------------------------------
+
+4.1 Dashboard
+
+Arquivo protótipo: pages/dashboard.html
+
+Função:
+- tela inicial após login;
+- visão geral do SGQ;
+- atalhos para módulos;
+- indicadores rápidos;
+- maturidade ISO;
+- atividades recentes;
+- busca global.
+
+Regras:
+- deve consolidar dados de documentos, NCs, ações, auditorias, riscos, indicadores e treinamentos;
+- deve exibir conformidade/maturidade ISO;
+- deve conter busca global compartilhada;
+- busca deve encontrar documentos, processos em execução, início de processos, módulos e ações.
+
+Busca global:
+- arquivo compartilhado: assets/js/global-search.js
+- tipos de resultado: Documento, Processo em execução, Iniciar processo, Módulo, Ação.
+- placeholder animado com sugestões como iniciar processo, buscar documento, buscar processo em execução e comece digitando código ou nome.
+
+
+4.2 Login e Cadastro
+
+Arquivos:
+- pages/login.html
+- pages/cadastro.html
+
+Função:
+- autenticação;
+- cadastro de empresa;
+- coleta inicial de informações de certificação ISO.
+
+Regras:
+- bloquear ou alertar e-mails pessoais quando necessário;
+- no backend real, autenticação deve ser segura;
+- cadastro deve criar empresa/tenant e usuário administrador;
+- dados de setup inicial devem alimentar módulo Setup SGQ/Organização.
+
+#?# Definir se será exigido e-mail corporativo obrigatoriamente ou apenas recomendado.
+#?# Definir modelo de assinatura, trial e ativação de conta.
+
+
+4.3 Setup SGQ
+
+Arquivo protótipo: pages/setup-sgq.html
+
+Função:
+- diagnóstico inicial guiado da empresa;
+- cadastro de dados essenciais;
+- vínculo de evidências aos requisitos ISO;
+- identificação de lacunas.
+
+Regras:
+- perguntas configuráveis por requisito ISO;
+- respostas podem apontar evidência/documento ou marcar lacuna;
+- deve gerar percentual estimado de atendimento;
+- deve manter histórico de diagnósticos;
+- deve alimentar diagnóstico ISO geral.
+
+Requisitos abordados:
+- 4.3 escopo;
+- 4.4 processos;
+- 5.2 política;
+- 5.3 responsabilidades;
+- 6.1 riscos;
+- 6.2 objetivos;
+- 7.2 competência;
+- 7.5 documentos;
+- 8.2 requisitos do cliente;
+- 8.4 fornecedores;
+- 8.5 produção/serviço;
+- 8.6 liberação;
+- 8.7 saídas não conformes;
+- 9.1 análise;
+- 9.2 auditoria;
+- 9.3 análise crítica;
+- 10.2 NC e ação corretiva;
+- 10.3 melhoria.
+
+
+4.4 Organização
+
+Arquivo protótipo: pages/organizacao.html
+
+Função:
+- centralizar contexto da organização, partes interessadas, escopo, recursos, mudanças, análise crítica, análise de dados e diagnóstico ISO.
+
+Submódulos:
+- Visão geral.
+- Contexto e SWOT.
+- Partes interessadas.
+- Recursos, infraestrutura e ambiente.
+- Controle de mudanças.
+- Projeto e desenvolvimento como referência, com execução em módulo próprio.
+- Análise crítica pela direção.
+- Análise consolidada de dados.
+- Diagnóstico ISO.
+
+Regras:
+- SWOT deve permitir cadastrar, editar e remover itens;
+- item SWOT possui quadrante, título, descrição, impacto, urgência, controle, responsável, ação recomendada e status;
+- score SWOT = impacto + urgência + controle;
+- itens acima do corte devem sugerir risco, plano ou melhoria;
+- partes interessadas devem registrar necessidades, expectativas, requisitos aplicáveis, riscos/oportunidades e monitoramento/evidência;
+- recursos devem registrar requisito ISO, descrição, evidência, critério de aceitação, frequência e status;
+- mudanças devem registrar tipo, motivo, impacto, risco, aprovador, prazo, decisão, evidências, status e plano de ação obrigatório quando aplicável;
+- análise crítica deve registrar pauta ISO, participantes, decisões, ações, aprovador e ata/evidência;
+- diagnóstico ISO deve classificar requisitos como atendido, parcial ou lacuna;
+- diagnóstico possui modo de IA simulada sem API, com score, plano recomendado, ganhos rápidos e atalho para planos de ação.
+
+Requisitos ISO:
+- 4.1 contexto;
+- 4.2 partes interessadas;
+- 4.3 escopo;
+- 5.1 liderança parcial;
+- 5.2 política via documento controlado;
+- 5.3 responsabilidades em segundo momento;
+- 6.3 mudanças;
+- 7.1 recursos;
+- 9.1.3 análise de dados;
+- 9.3 análise crítica.
+
+#?# Liderança e responsabilidades foram marcadas como segundo momento. Definir se haverá matriz RACI, organograma ou responsáveis por requisito ISO.
+
+
+4.5 Controle de Documentos
+
+Arquivo protótipo: pages/documentos.html
+
+Função:
+- GED/controle documental;
+- pastas;
+- categorias;
+- documentos;
+- versões;
+- aprovação;
+- revisão;
+- validade;
+- cópias controladas.
+
+Regras:
+- documentos devem possuir código, título, categoria, versão, data, status, autor e anexos;
+- categorias podem exigir aprovação, validade, campos adicionais e permissão;
+- documentos podem ter anexos em base64 no protótipo;
+- cópias controladas devem registrar emissão, destinatário e validade;
+- documentos controlados são evidência ISO.
+
+Requisito ISO:
+- 7.5 informação documentada.
+
+#?# Definir política de armazenamento real de arquivos: banco, filesystem, S3/compatível ou outro.
+#?# Definir assinatura digital/eletrônica e requisitos legais.
+
+
+4.6 BPM / Processos e Formulários
+
+Arquivo protótipo: pages/bpm.html
+
+Função:
+- criar fluxos;
+- modelar etapas;
+- criar formulários;
+- iniciar instâncias;
+- executar tarefas;
+- transferir tarefas;
+- registrar respostas;
+- usar condicionais;
+- controlar instâncias em andamento e concluídas.
+
+Persistência protótipo:
+- sgq_flows;
+- sgq_forms;
+- sgq_flowInstances.
+
+Regras:
+- fluxo possui etapas, responsáveis, setores, usuários, formulários, ordem e condicional;
+- formulário possui blocos e campos;
+- instância registra respostas por etapa;
+- processos ativos devem aparecer na busca global como Processo em execução e Iniciar processo;
+- clientes podem modelar processos customizados para análise crítica de pedido, propriedade do cliente, preservação e outros requisitos específicos.
+
+Requisitos ISO:
+- 4.4 processos;
+- 8.1 planejamento operacional;
+- suporte a vários requisitos operacionais via modelagem.
+
+#?# Definir até que ponto BPM será motor central de workflow no backend ou apenas módulo independente.
+
+
+4.7 Processo Produtivo
+
+Arquivo protótipo: pages/producao.html
+
+Função:
+- ordens de produção;
+- visão geral produtiva;
+- apontamento;
+- configurações.
+
+Regras:
+- controlar OPs;
+- status de produção;
+- datas de início/conclusão;
+- responsável/operador;
+- integração futura com inspeções, liberação e rastreabilidade.
+
+Requisitos ISO:
+- 8.1 planejamento operacional;
+- 8.5 produção e prestação de serviço.
+
+#?# Definir se processo produtivo será genérico para serviços também ou focado em indústria.
+
+
+4.8 Inspeções e Liberação
+
+Arquivo protótipo: pages/inspecoes.html
+
+Função:
+- inspeção de produto/serviço;
+- inspeções em andamento;
+- inspeções finalizadas;
+- produtos bloqueados;
+- liberação.
+
+Regras:
+- inspeção deve ter checklist, critérios, resultado, defeitos, início/fim;
+- produto bloqueado deve ter disposição/liberação;
+- falhas podem gerar NC/RNC ou plano de ação;
+- integração com produção e saídas não conformes.
+
+Requisitos ISO:
+- 8.5 controle de produção/serviço;
+- 8.6 liberação;
+- 8.7 saídas não conformes.
+
+
+4.9 Não Conformidades, Planos de Ação e Melhorias
+
+Arquivo protótipo: pages/nao-conformidades.html
+
+Função:
+- módulo central de RNCs, planos de ação e melhorias;
+- guia por tipo: RNC, plano, melhoria;
+- 5W2H;
+- status e verificação.
+
+Regras:
+- manter NCs e planos no mesmo backend, mas com menus/atalhos separados;
+- tipo pode ser rnc, plano ou melhoria;
+- plano de ação deve poder existir de forma avulsa ou vinculado a origem;
+- origens possíveis: auditoria, risco, mudança, reclamação, análise crítica, diagnóstico ISO, melhoria, NC;
+- RNC deve permitir causa raiz, correção, ação corretiva e verificação de eficácia;
+- melhoria contínua deve registrar oportunidade, ganho esperado, ações e resultado.
+
+Requisitos ISO:
+- 10.2 não conformidade e ação corretiva;
+- 10.3 melhoria contínua.
+
+#?# Definir se planos de ação terão tarefas independentes com responsáveis diferentes e notificações.
+
+
+4.10 Calibração de Equipamentos
+
+Arquivo protótipo: pages/calibracao.html
+
+Função:
+- instrumentos de medição;
+- histórico de calibração;
+- categorias e critérios;
+- vencimentos.
+
+Regras:
+- instrumento deve ter identificação, categoria, validade, status, certificado e histórico;
+- vencidos/vencendo devem gerar alerta;
+- desativação deve registrar motivo;
+- calibração é evidência de adequação de recursos de monitoramento.
+
+Requisito ISO:
+- 7.1.5 recursos de monitoramento e medição.
+
+
+4.11 Avaliação de Fornecedores
+
+Arquivo protótipo: pages/fornecedores.html
+
+Função:
+- cadastro e avaliação de fornecedores;
+- critérios;
+- score;
+- histórico.
+
+Regras:
+- fornecedor possui dados cadastrais, categoria, contato, produtos/serviços fornecidos;
+- avaliações periódicas geram nota/score;
+- classificação do fornecedor deve refletir desempenho;
+- fornecedores externos são parte interessada e provedor externo.
+
+Requisito ISO:
+- 8.4 controle de processos, produtos e serviços providos externamente.
+
+
+4.12 Pessoas e Treinamentos
+
+Arquivo protótipo: pages/pessoas.html
+
+Função:
+- funções;
+- descrição de cargos;
+- treinamentos;
+- matriz de competências;
+- relatório do colaborador.
+
+Regras:
+- cargo/função define competências e treinamentos requeridos;
+- colaborador deve ter trilha de treinamentos;
+- registros de treinamento evidenciam competência e comunicação da política da qualidade;
+- matriz compara requerido versus realizado.
+
+Requisitos ISO:
+- 7.2 competência;
+- 7.3 conscientização.
+
+
+4.13 Satisfação e Reclamações
+
+Arquivo protótipo: pages/satisfacao.html
+
+Função:
+- clientes;
+- pesquisas NPS;
+- reclamações;
+- configuração.
+
+Regras:
+- reclamação pode gerar NC/RNC ou plano de ação;
+- NPS alimenta indicadores e análise crítica;
+- clientes são parte interessada;
+- pós-entrega será tratado por satisfação/reclamações e RNC quando aplicável.
+
+Requisitos ISO:
+- 8.2.1 comunicação com cliente;
+- 9.1.2 satisfação do cliente.
+
+
+4.14 Auditorias Internas
+
+Arquivo protótipo: pages/auditorias.html
+
+Função:
+- programa/plano de auditoria;
+- checklists por cláusula ISO;
+- resultados;
+- planos de ação de auditoria.
+
+Regras:
+- auditoria possui título, auditor, data, escopo, cláusulas, objetivos, status, conformidades e NCs;
+- checklists devem cobrir cláusulas ISO;
+- achados podem gerar NC/RNC ou planos de ação;
+- auditoria alimenta análise crítica e diagnóstico ISO.
+
+Requisito ISO:
+- 9.2 auditoria interna.
+
+
+4.15 Indicadores e KPIs
+
+Arquivo protótipo: pages/indicadores.html
+
+Função:
+- cadastro de KPIs;
+- lançamento de resultados;
+- metas;
+- direção da meta;
+- análise.
+
+Regras:
+- KPI possui nome, sigla, unidade, frequência, meta, direção, responsável, fonte, cláusula ISO e descrição;
+- resultados devem ser comparados com meta;
+- indicadores alimentam análise de dados e análise crítica pela direção.
+
+Requisitos ISO:
+- 6.2 objetivos da qualidade;
+- 9.1 monitoramento, medição, análise e avaliação.
+
+
+4.16 Gestão de Riscos
+
+Arquivo protótipo: pages/riscos.html
+
+Função:
+- matriz de riscos;
+- lista de riscos;
+- ocorrências;
+- contingências;
+- configurações.
+
+Regras:
+- risco possui categoria, probabilidade, severidade, nível, responsável, ação/tratamento;
+- ocorrência registra materialização do risco;
+- contingência registra resposta planejada;
+- riscos podem gerar plano de ação.
+
+Requisito ISO:
+- 6.1 ações para abordar riscos e oportunidades.
+
+
+4.17 Projeto e Desenvolvimento
+
+Arquivo protótipo: pages/projeto-desenvolvimento.html
+
+Função:
+- processo executável para ISO 9001 requisito 8.3.
+
+Etapas:
+- planejamento;
+- entradas de projeto;
+- análise crítica;
+- saídas de projeto;
+- verificação;
+- validação;
+- mudanças de projeto;
+- liberação final.
+
+Regras:
+- projeto possui nome, cliente/mercado, produto/serviço, responsável, prazo, critério principal de liberação e escopo;
+- cada etapa possui status, responsável, data, evidência, observações e aprovador;
+- progresso é calculado por etapas concluídas;
+- mudanças de projeto devem abrir ou vincular controle de mudanças;
+- processo padrão deve funcionar sem BPM, mas pode ser customizado no BPM.
+
+Requisito ISO:
+- 8.3 projeto e desenvolvimento de produtos e serviços.
+
+
+4.18 Cadastros Gerais
+
+Arquivo protótipo: pages/cadastros.html
+
+Função:
+- produtos;
+- pedidos;
+- tipos de defeito;
+- setores/unidades;
+- categorias de fornecedores;
+- tipos de documento;
+- atalhos para pessoas.
+
+Regras:
+- cadastros são base de outros módulos;
+- produtos/pedidos alimentam produção, inspeção e NC;
+- tipos de defeito alimentam inspeções e NC;
+- setores alimentam permissões, responsáveis e BPM.
+
+
+4.19 Blog e Blog Admin
+
+Arquivos:
+- pages/blog.html;
+- pages/blog-post.html;
+- pages/blog-admin.html.
+
+Função:
+- marketing/conteúdo;
+- artigos sobre ISO 9001 e gestão da qualidade;
+- administração de posts, categorias, mídias, comentários e anúncios.
+
+#?# Definir se blog fará parte do produto final com backend próprio ou se será separado em CMS/marketing.
+
+
+5. DIAGNÓSTICO ISO
+------------------
+
+O diagnóstico ISO deve ser automático no MVP e futuramente usar API de IA.
+
+Hoje a regra local deve:
+- coletar dados dos módulos;
+- classificar requisitos como atendido, parcial ou lacuna;
+- gerar score estimado;
+- gerar prioridades;
+- gerar ganhos rápidos;
+- sugerir planos de ação.
+
+Futuro com IA:
+- ler documentos e evidências;
+- justificar classificação;
+- sugerir lacunas;
+- gerar plano de ação;
+- criar resumo executivo;
+- apontar riscos de auditoria.
+
+#?# Definir provedor de IA futuro e política de privacidade para envio de documentos/evidências.
+
+
+6. BUSCA GLOBAL
+---------------
+
+Arquivo:
+- assets/js/global-search.js
+
+Função:
+- busca em todos os módulos com topbar;
+- placeholder animado;
+- resultados categorizados;
+- atalho para documentos, módulos, ações e processos BPM.
+
+Tipos:
+- Documento;
+- Processo em execução;
+- Iniciar processo;
+- Módulo;
+- Ação.
+
+Regras:
+- busca deve ser compacta em altura;
+- deve aparecer em todos os módulos com topbar;
+- deve mostrar tipo ao lado do resultado;
+- Enter abre o primeiro resultado;
+- Escape fecha o dropdown.
+
+
+7. MODELAGEM DE DADOS INICIAL SUGERIDA
+--------------------------------------
+
+Entidades base:
+- empresas;
+- usuários;
+- perfis/permissões;
+- anexos/evidências;
+- histórico/auditoria;
+- planos de ação;
+- documentos;
+- categorias de documentos;
+- cópias controladas;
+- fluxos BPM;
+- formulários BPM;
+- instâncias de fluxo;
+- produtos;
+- pedidos;
+- inspeções;
+- produtos/saídas não conformes;
+- não conformidades;
+- melhorias;
+- instrumentos de medição;
+- calibrações;
+- fornecedores;
+- avaliações de fornecedores;
+- colaboradores;
+- cargos/funções;
+- treinamentos;
+- clientes;
+- pesquisas de satisfação;
+- reclamações;
+- auditorias;
+- checklists de auditoria;
+- indicadores;
+- resultados de indicadores;
+- riscos;
+- ocorrências de risco;
+- contingências;
+- organização/contexto;
+- swot_items;
+- partes_interessadas;
+- recursos_sgq;
+- mudanças;
+- análises_críticas;
+- diagnósticos_iso;
+- projetos_desenvolvimento;
+- etapas_projeto_desenvolvimento.
+
+
+8. PRINCIPAIS INTEGRAÇÕES ENTRE MÓDULOS
+---------------------------------------
+
+- Reclamação de cliente pode gerar NC ou plano de ação.
+- Auditoria pode gerar NC ou plano de ação.
+- Risco pode gerar plano de ação.
+- Mudança pode exigir avaliação de risco e plano de ação.
+- SWOT pode gerar risco, melhoria ou plano de ação.
+- Diagnóstico ISO pode gerar plano de ação.
+- Indicadores alimentam análise de dados e análise crítica.
+- Treinamentos evidenciam competência e comunicação da política.
+- Documentos controlados evidenciam procedimentos, políticas e registros.
+- BPM executa processos customizados de clientes.
+- Projeto e Desenvolvimento pode acionar controle de mudanças.
+
+
+9. DÚVIDAS PARA VALIDAÇÃO
+-------------------------
+
+#?# Qual stack oficial será usada no backend?
+#?# Qual banco de dados será usado?
+#?# Haverá multiempresa desde o primeiro MVP?
+#?# Quais perfis de usuário existirão inicialmente?
+#?# O sistema terá assinatura/planos/trial no MVP backend?
+#?# O blog fará parte do mesmo backend?
+#?# Os arquivos serão armazenados onde?
+#?# Haverá assinatura eletrônica/digital em documentos?
+#?# Notificações serão por e-mail, WhatsApp, interno ou todos?
+#?# Planos de ação terão tarefas independentes por responsável?
+#?# BPM será motor central de workflow para todos os módulos ou apenas customização?
+#?# Como será feita a integração futura com IA e quais dados poderão ser enviados?
+#?# Quais requisitos de LGPD devem ser considerados desde o início?
+#?# O sistema será focado em indústria ou também serviços de forma equivalente?
+
+
+10. INSTRUÇÃO PARA DESENVOLVIMENTO
+----------------------------------
+
+Ao desenvolver o sistema real:
+
+- manter simplicidade;
+- mapear localStorage para entidades reais;
+- implementar módulos por prioridade;
+- começar por autenticação, empresas, usuários, documentos, planos de ação, organização e diagnóstico ISO;
+- preservar regras de negócio deste prompt;
+- quando houver dúvida, parar e perguntar usando o marcador #?#;
+- evitar criar módulos apenas demonstrativos;
+- todo requisito ISO coberto deve gerar registro, evidência ou vínculo rastreável.

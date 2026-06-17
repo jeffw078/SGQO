@@ -55,14 +55,14 @@
                 <button class="topbar-icon"><i class="fas fa-bell"></i></button>
                 <div class="user-menu" id="userMenu">
                     <button class="user-btn" onclick="toggleUserMenu(event)">
-                        <div class="avatar">JD</div>
-                        <span class="user-btn-name">Jo\u00e3o Demo</span>
+                        <div class="avatar">JW</div>
+                        <span class="user-btn-name">Jefferson Willian</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="user-dropdown">
                         <div class="user-dropdown-header">
-                            <div class="avatar">JD</div>
-                            <div><div class="user-name">Jo\u00e3o Demo</div><div class="user-role">Gestor da Qualidade</div></div>
+                            <div class="avatar">JW</div>
+                            <div><div class="user-name">Jefferson Willian</div><div class="user-role">Gestor da Qualidade</div></div>
                         </div>
                         <div class="user-dropdown-divider"></div>
                         <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
@@ -125,6 +125,8 @@
                     <button class="mod-tab" data-tipo="plano" onclick="setTipoFilter(this,'plano')"><i class="fas fa-list-check"></i> Plano de Ação</button>
                     <button class="mod-tab" data-tipo="melhoria" onclick="setTipoFilter(this,'melhoria')"><i class="fas fa-trending-up"></i> Melhoria</button>
                 </div>
+
+                <div id="tipo-contexto" class="mod-alert info" style="display:none;margin-bottom:16px"></div>
 
                 <div class="mod-filter-bar">
                     <div class="mod-search">
@@ -404,6 +406,17 @@ function setTipoFilter(btn, tipo) {
     renderTodas();
 }
 
+function applyInitialTipoFilter() {
+    const params = new URLSearchParams(window.location.search);
+    const tipo = params.get('tipo');
+    if (!['rnc', 'plano', 'melhoria'].includes(tipo)) return;
+    const tab = document.querySelector(`.mod-tab[data-tipo="${tipo}"]`);
+    if (!tab) return;
+    document.querySelectorAll('.mod-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentTipoFilter = tipo;
+}
+
 function renderTodas() {
     const db = getDB();
     const search = (document.getElementById('searchTodas')?.value || '').toLowerCase();
@@ -428,6 +441,8 @@ function renderTodas() {
     document.getElementById('stat-melhorias').textContent = melhorias;
     document.getElementById('stat-concluidos').textContent = concluidos;
 
+    renderTipoContexto();
+
     const listEl = document.getElementById('lista-todas');
     const emptyEl = document.getElementById('empty-todas');
     if (!items.length) { listEl.innerHTML = ''; emptyEl.style.display = 'flex'; return; }
@@ -451,6 +466,33 @@ function renderTodas() {
             <span class="sbadge ${i.status}">${{aberta:'Aberta',andamento:'Em Andamento',concluida:'Concluída'}[i.status]||i.status}</span>
         </div>`;
     }).join('');
+}
+
+function renderTipoContexto() {
+    const box = document.getElementById('tipo-contexto');
+    if (!box) return;
+    const textos = {
+        plano: {
+            icon: 'fa-list-check',
+            html: '<strong>Planos de ação centralizados.</strong> Esta guia mostra planos avulsos ou originados de auditorias, riscos, mudanças, reclamações e NCs. Use 5W2H, responsáveis, prazos e verificação de eficácia para manter a rastreabilidade.'
+        },
+        melhoria: {
+            icon: 'fa-lightbulb',
+            html: '<strong>Melhoria contínua.</strong> Use esta guia para registrar oportunidades, ganhos esperados, lições aprendidas, ações de melhoria e resultados obtidos. Melhorias podem nascer de dados, riscos, auditorias, reclamações, mudanças ou sugestões internas.'
+        },
+        rnc: {
+            icon: 'fa-bug',
+            html: '<strong>Registro de não conformidade.</strong> Use esta guia para tratar desvios reais, causa raiz, correção, ação corretiva e verificação de eficácia conforme ISO 9001 requisito 10.2.'
+        }
+    };
+    const cfg = textos[currentTipoFilter];
+    if (!cfg) {
+        box.style.display = 'none';
+        box.innerHTML = '';
+        return;
+    }
+    box.style.display = 'flex';
+    box.innerHTML = `<i class="fas ${cfg.icon}"></i><div>${cfg.html}</div>`;
 }
 
 function openDetalhe(id) {
@@ -679,6 +721,7 @@ function showToast(msg, type) {
 document.querySelectorAll('.mod-modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); }));
 
 seedData();
+applyInitialTipoFilter();
 renderTodas();
 </script>
 <script>
@@ -688,6 +731,5 @@ document.addEventListener('click',function(e){var m=document.getElementById('use
 function startModuleTour() {
     alert('Tour deste módulo em breve! ');
 }
-</script></body>
+</script><script src="../assets/js/global-search.js"></script></body>
 </html>
-

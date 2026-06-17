@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto e Desenvolvimento - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .pd-layout { display:grid; grid-template-columns:360px 1fr; gap:18px; align-items:start; }
+        .pd-list { display:flex; flex-direction:column; gap:10px; }
+        .pd-item { display:grid; grid-template-columns:44px 1fr; gap:12px; padding:13px; border-radius:10px; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.035); cursor:pointer; transition:all .18s; }
+        .pd-item:hover, .pd-item.active { background:rgba(15,117,189,.12); border-color:rgba(96,165,250,.28); }
+        .pd-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:rgba(15,117,189,.12); color:#60a5fa; }
+        .pd-title { color:#fff; font-size:.9rem; font-weight:800; line-height:1.35; }
+        .pd-meta { color:rgba(255,255,255,.42); font-size:.74rem; margin-top:3px; }
+        .pd-detail-head { display:grid; grid-template-columns:1fr auto; gap:16px; align-items:start; padding:18px; border:1px solid rgba(255,255,255,.08); background:linear-gradient(135deg,rgba(15,117,189,.18),rgba(139,92,246,.08)); border-radius:12px; margin-bottom:16px; }
+        .pd-detail-head h3 { color:#fff; margin:0 0 7px; font-size:1.25rem; }
+        .pd-detail-head p { color:rgba(255,255,255,.58); margin:0; font-size:.87rem; line-height:1.5; }
+        .pd-progress { min-width:150px; text-align:center; padding:13px; border-radius:10px; background:rgba(255,255,255,.07); }
+        .pd-progress strong { display:block; color:#fff; font-size:2rem; line-height:1; }
+        .pd-progress span { color:rgba(255,255,255,.42); font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; }
+        .pd-stage-grid { display:grid; gap:12px; }
+        .pd-stage { border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.035); border-radius:12px; overflow:hidden; }
+        .pd-stage-head { display:grid; grid-template-columns:46px 1fr auto; gap:12px; align-items:center; padding:14px; border-bottom:1px solid rgba(255,255,255,.06); }
+        .pd-stage-num { width:46px; height:46px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; background:var(--primary); }
+        .pd-stage-title { color:#fff; font-weight:850; }
+        .pd-stage-desc { color:rgba(255,255,255,.42); font-size:.78rem; margin-top:3px; }
+        .pd-stage-body { padding:14px; }
+        .pd-stage-fields { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .pd-actions-row { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+        .pd-chip-row { display:flex; flex-wrap:wrap; gap:7px; }
+        .pd-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.07); color:rgba(255,255,255,.62); font-size:.72rem; font-weight:750; }
+        .analysis-note { border-left:3px solid var(--primary); background:rgba(15,117,189,.1); padding:13px 14px; border-radius:9px; color:rgba(255,255,255,.68); font-size:.84rem; line-height:1.55; }
+        .pd-empty { min-height:420px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:rgba(255,255,255,.4); text-align:center; border:1px dashed rgba(255,255,255,.12); border-radius:12px; }
+        .pd-empty i { font-size:3rem; margin-bottom:14px; color:rgba(255,255,255,.25); }
+        @media (max-width: 1100px) {
+            .pd-layout { grid-template-columns:1fr; }
+            .pd-stage-fields { grid-template-columns:1fr; }
+            .pd-detail-head { grid-template-columns:1fr; }
+            .pd-progress { width:100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-layout mod-page">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section" style="padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
+                    <i class="fas fa-pen-ruler" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
+                    <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Projeto e Desenvolvimento</span>
+                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
+                </div>
+            </div>
+            <div class="nav-section">
+                <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Processo ISO 8.3</div>
+                <a href="#" class="nav-item active" onclick="showList();return false"><i class="fas fa-folder-open"></i> Projetos</a>
+                <a href="#" class="nav-item" onclick="openNovoProjetoModal();return false"><i class="fas fa-plus-circle"></i> Novo Projeto</a>
+                <a href="organizacao.html?view=mudancas" class="nav-item"><i class="fas fa-repeat"></i> Mudanças de Projeto</a>
+                <a href="nao-conformidades.html?tipo=plano" class="nav-item"><i class="fas fa-list-check"></i> Planos de Ação</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Customização</div>
+                <a href="bpm.html" class="nav-item"><i class="fas fa-diagram-project"></i> Modelar no BPM</a>
+                <a href="organizacao.html?view=diagnostico" class="nav-item"><i class="fas fa-shield-halved"></i> Diagnóstico ISO</a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-search"><i class="fas fa-search"></i><input id="searchProjetos" type="text" placeholder="Buscar projeto, cliente, responsável..." oninput="renderProjetos()"></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon" title="Notificações"><i class="fas fa-bell"></i></button>
+                <button class="mod-btn primary" onclick="openNovoProjetoModal()"><i class="fas fa-plus"></i> Novo Projeto</button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)">
+                        <div class="avatar">JW</div>
+                        <span class="user-btn-name">Jefferson Willian</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="avatar">JW</div>
+                            <div><div class="user-name">Jefferson Willian</div><div class="user-role">Gestor da Qualidade</div></div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="javascript:void(0)" class="user-dropdown-item"><i class="fas fa-user"></i> Meu Perfil</a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div class="mod-header">
+                <div>
+                    <h2><i class="fas fa-pen-ruler" style="color:var(--primary);margin-right:10px"></i>Projeto e Desenvolvimento</h2>
+                    <p>Processo executável para planejar, revisar, verificar, validar, controlar mudanças e liberar projetos conforme ISO 9001 requisito 8.3.</p>
+                </div>
+                <div class="mod-actions">
+                    <button class="mod-btn primary" onclick="openNovoProjetoModal()"><i class="fas fa-plus"></i> Novo Projeto</button>
+                    <a href="bpm.html" class="mod-btn ghost"><i class="fas fa-diagram-project"></i> Customizar no BPM</a>
+                </div>
+            </div>
+
+            <div class="mod-stats">
+                <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)"><i class="fas fa-folder-open"></i></div></div><div class="stat-value" id="stat-total">0</div><div class="stat-label">Projetos cadastrados</div></div>
+                <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fas fa-spinner"></i></div></div><div class="stat-value" id="stat-andamento">0</div><div class="stat-label">Em desenvolvimento</div></div>
+                <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(139,92,246,.1);color:var(--purple)"><i class="fas fa-magnifying-glass-chart"></i></div></div><div class="stat-value" id="stat-validacao">0</div><div class="stat-label">Em validação</div></div>
+                <div class="stat-card"><div class="stat-card-header"><div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fas fa-check-double"></i></div></div><div class="stat-value" id="stat-liberados">0</div><div class="stat-label">Liberados</div></div>
+            </div>
+
+            <div class="pd-layout">
+                <div>
+                    <div class="mod-filter-bar">
+                        <select class="mod-select" id="filterStatus" onchange="renderProjetos()">
+                            <option value="">Todos os status</option>
+                            <option value="planejamento">Planejamento</option>
+                            <option value="desenvolvimento">Desenvolvimento</option>
+                            <option value="validacao">Validação</option>
+                            <option value="liberado">Liberado</option>
+                        </select>
+                    </div>
+                    <div class="pd-list" id="projetosList"></div>
+                </div>
+                <div id="projetoDetail" class="pd-empty">
+                    <i class="fas fa-folder-open"></i>
+                    <h3>Selecione um projeto</h3>
+                    <p>Abra um projeto para executar as etapas de planejamento, entradas, saídas, verificação, validação e liberação.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mod-modal-overlay" id="modalNovoProjeto">
+    <div class="mod-modal lg">
+        <div class="mod-modal-header">
+            <h3><i class="fas fa-plus-circle"></i> Novo Projeto e Desenvolvimento</h3>
+            <button class="mod-modal-close" onclick="closeModal('modalNovoProjeto')">&times;</button>
+        </div>
+        <div class="mod-modal-body">
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Nome do projeto <span>*</span></label><input class="mod-input" id="np-nome" placeholder="Ex: Novo componente Linha A"></div>
+                <div class="mod-form-group"><label>Cliente / mercado</label><input class="mod-input" id="np-cliente" placeholder="Cliente, segmento ou uso interno"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Produto ou serviço <span>*</span></label><input class="mod-input" id="np-produto" placeholder="Produto, serviço ou processo desenvolvido"></div>
+                <div class="mod-form-group"><label>Responsável <span>*</span></label><input class="mod-input" id="np-responsavel" placeholder="Responsável técnico"></div>
+            </div>
+            <div class="mod-form-row">
+                <div class="mod-form-group"><label>Prazo previsto</label><input class="mod-input" type="date" id="np-prazo"></div>
+                <div class="mod-form-group"><label>Critério principal de liberação</label><input class="mod-input" id="np-criterio" placeholder="Ex: validação aprovada pelo cliente"></div>
+            </div>
+            <div class="mod-form-group"><label>Objetivo e escopo</label><textarea class="mod-textarea" id="np-escopo" rows="3" placeholder="Descreva o objetivo, limites do projeto e resultado esperado"></textarea></div>
+        </div>
+        <div class="mod-modal-footer">
+            <button class="mod-btn ghost" onclick="closeModal('modalNovoProjeto')">Cancelar</button>
+            <button class="mod-btn primary" onclick="saveNovoProjeto()"><i class="fas fa-save"></i> Criar Projeto</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const PD_KEY = 'sgq_projeto_desenvolvimento';
+let currentProjectId = null;
+
+const stageDefs = [
+    {key:'planejamento', title:'Planejamento', iso:'8.3.2', icon:'fa-clipboard-list', desc:'Defina etapas, responsáveis, controles, interfaces, recursos, riscos, critérios de aceite e registros.'},
+    {key:'entradas', title:'Entradas de projeto', iso:'8.3.3', icon:'fa-inbox', desc:'Registre requisitos do cliente, requisitos legais, funcionais, desempenho esperado, lições aprendidas e riscos.'},
+    {key:'analise', title:'Análise crítica', iso:'8.3.4', icon:'fa-comments', desc:'Revise planejamento e entradas, registre parecer, pendências, aprovador e ações necessárias.'},
+    {key:'saidas', title:'Saídas de projeto', iso:'8.3.5', icon:'fa-file-circle-check', desc:'Documente especificações, desenhos, instruções, critérios de aceitação e informações para operação.'},
+    {key:'verificacao', title:'Verificação', iso:'8.3.4', icon:'fa-check-to-slot', desc:'Confirme se as saídas atendem às entradas por revisão técnica, ensaio, checklist ou cálculo.'},
+    {key:'validacao', title:'Validação', iso:'8.3.4', icon:'fa-award', desc:'Confirme se o resultado atende ao uso pretendido por lote piloto, teste em campo, homologação ou aprovação do cliente.'},
+    {key:'mudancas', title:'Mudanças de projeto', iso:'8.3.6', icon:'fa-repeat', desc:'Registre mudanças, impacto, risco, aprovação e vínculo com plano de ação quando aplicável.'},
+    {key:'liberacao', title:'Liberação final', iso:'8.3.5', icon:'fa-rocket', desc:'Aprove a liberação do projeto com evidências, responsáveis, pendências fechadas e histórico.'}
+];
+
+function defaultStageData() {
+    const data = {};
+    stageDefs.forEach(s => {
+        data[s.key] = {status:'pendente', responsavel:'', evidencia:'', observacoes:'', aprovadoPor:'', data:''};
+    });
+    return data;
+}
+
+function defaultDB() {
+    return {
+        projetos: [{
+            id: 1,
+            nome: 'Desenvolvimento de componente com rastreabilidade ampliada',
+            cliente: 'Mercado automotivo',
+            produto: 'Componente Linha A',
+            responsavel: 'Ana Carvalho',
+            prazo: '2026-08-30',
+            criterio: 'Validação do lote piloto e aprovação do cliente',
+            escopo: 'Desenvolver componente com requisitos de rastreabilidade, controle dimensional e documentação para produção seriada.',
+            status: 'desenvolvimento',
+            criadoEm: '2026-06-10',
+            stages: Object.assign(defaultStageData(), {
+                planejamento: {status:'concluida', responsavel:'Ana Carvalho', evidencia:'Plano PD-001 aprovado', observacoes:'Etapas e recursos definidos.', aprovadoPor:'Gerente da Qualidade', data:'2026-06-12'},
+                entradas: {status:'concluida', responsavel:'Engenharia', evidencia:'Requisitos do cliente e norma técnica anexados', observacoes:'Entradas revisadas e completas.', aprovadoPor:'Engenharia', data:'2026-06-14'},
+                analise: {status:'andamento', responsavel:'Comitê técnico', evidencia:'Ata de revisão em elaboração', observacoes:'Pendência em critério de teste dimensional.', aprovadoPor:'', data:'2026-06-18'}
+            })
+        }]
+    };
+}
+
+function getDB() {
+    try { return JSON.parse(localStorage.getItem(PD_KEY)) || defaultDB(); }
+    catch(e) { return defaultDB(); }
+}
+
+function saveDB(db) {
+    localStorage.setItem(PD_KEY, JSON.stringify(db));
+}
+
+function esc(value) {
+    const span = document.createElement('span');
+    span.textContent = value == null ? '' : String(value);
+    return span.innerHTML;
+}
+
+function stageStatusLabel(status) {
+    return {pendente:'Pendente', andamento:'Em andamento', concluida:'Concluída', reprovada:'Reprovada'}[status] || status;
+}
+
+function projectProgress(project) {
+    const stages = Object.values(project.stages || {});
+    const done = stages.filter(s => s.status === 'concluida').length;
+    return Math.round((done / stageDefs.length) * 100);
+}
+
+function inferProjectStatus(project) {
+    const p = projectProgress(project);
+    if (project.stages.liberacao?.status === 'concluida') return 'liberado';
+    if (project.stages.validacao?.status === 'andamento' || project.stages.validacao?.status === 'concluida') return 'validacao';
+    if (p > 12) return 'desenvolvimento';
+    return 'planejamento';
+}
+
+function renderStats(projects) {
+    document.getElementById('stat-total').textContent = projects.length;
+    document.getElementById('stat-andamento').textContent = projects.filter(p => inferProjectStatus(p) === 'desenvolvimento').length;
+    document.getElementById('stat-validacao').textContent = projects.filter(p => inferProjectStatus(p) === 'validacao').length;
+    document.getElementById('stat-liberados').textContent = projects.filter(p => inferProjectStatus(p) === 'liberado').length;
+}
+
+function renderProjetos() {
+    const db = getDB();
+    const search = (document.getElementById('searchProjetos')?.value || '').toLowerCase();
+    const status = document.getElementById('filterStatus')?.value || '';
+    let projetos = db.projetos.map(p => Object.assign({}, p, {status: inferProjectStatus(p)}));
+    renderStats(projetos);
+    projetos = projetos.filter(p => {
+        if (status && p.status !== status) return false;
+        if (search && ![p.nome, p.cliente, p.produto, p.responsavel].join(' ').toLowerCase().includes(search)) return false;
+        return true;
+    });
+    document.getElementById('projetosList').innerHTML = projetos.map(p => `
+        <div class="pd-item ${p.id === currentProjectId ? 'active' : ''}" onclick="selectProjeto(${p.id})">
+            <div class="pd-icon"><i class="fas fa-pen-ruler"></i></div>
+            <div>
+                <div class="pd-title">${esc(p.nome)}</div>
+                <div class="pd-meta">${esc(p.produto)} • ${esc(p.responsavel)}</div>
+                <div class="pd-chip-row" style="margin-top:8px">
+                    <span class="sbadge ${p.status === 'liberado' ? 'concluida' : p.status === 'validacao' ? 'agendada' : 'andamento'}">${p.status === 'liberado' ? 'Liberado' : p.status === 'validacao' ? 'Validação' : p.status === 'desenvolvimento' ? 'Desenvolvimento' : 'Planejamento'}</span>
+                    <span class="pd-chip">${projectProgress(p)}%</span>
+                </div>
+            </div>
+        </div>
+    `).join('') || `<div class="mod-empty"><i class="fas fa-folder-open"></i><h3>Nenhum projeto encontrado</h3></div>`;
+}
+
+function selectProjeto(id) {
+    currentProjectId = id;
+    renderProjetos();
+    renderDetail();
+}
+
+function renderDetail() {
+    const db = getDB();
+    const project = db.projetos.find(p => p.id === currentProjectId);
+    const detail = document.getElementById('projetoDetail');
+    if (!project) return;
+    const progress = projectProgress(project);
+    detail.className = '';
+    detail.innerHTML = `
+        <div class="pd-detail-head">
+            <div>
+                <h3>${esc(project.nome)}</h3>
+                <p>${esc(project.escopo || 'Sem escopo informado.')}</p>
+                <div class="pd-chip-row" style="margin-top:12px">
+                    <span class="pd-chip"><i class="fas fa-user"></i>${esc(project.responsavel)}</span>
+                    <span class="pd-chip"><i class="fas fa-building"></i>${esc(project.cliente || 'Sem cliente')}</span>
+                    <span class="pd-chip"><i class="fas fa-calendar"></i>${formatDate(project.prazo)}</span>
+                    <span class="pd-chip"><i class="fas fa-flag-checkered"></i>${esc(project.criterio || 'Critério não definido')}</span>
+                </div>
+            </div>
+            <div class="pd-progress"><strong>${progress}%</strong><span>Etapas concluídas</span></div>
+        </div>
+        <div class="pd-stage-grid">
+            ${stageDefs.map((stage, index) => renderStage(project, stage, index)).join('')}
+        </div>
+    `;
+}
+
+function renderStage(project, stage, index) {
+    const data = project.stages[stage.key] || {status:'pendente'};
+    return `
+        <div class="pd-stage">
+            <div class="pd-stage-head">
+                <div class="pd-stage-num">${index + 1}</div>
+                <div>
+                    <div class="pd-stage-title"><i class="fas ${stage.icon}" style="color:var(--primary);margin-right:7px"></i>${stage.title}</div>
+                    <div class="pd-stage-desc">${stage.iso} • ${stage.desc}</div>
+                </div>
+                <span class="sbadge ${data.status === 'concluida' ? 'concluida' : data.status === 'reprovada' ? 'reprovado' : data.status === 'andamento' ? 'andamento' : 'pendente'}">${stageStatusLabel(data.status)}</span>
+            </div>
+            <div class="pd-stage-body">
+                <div class="pd-stage-fields">
+                    <div class="mod-form-group">
+                        <label>Responsável</label>
+                        <input class="mod-input" id="${stage.key}-responsavel" value="${esc(data.responsavel || '')}" placeholder="Responsável pela etapa">
+                    </div>
+                    <div class="mod-form-group">
+                        <label>Data de conclusão / revisão</label>
+                        <input class="mod-input" id="${stage.key}-data" type="date" value="${esc(data.data || '')}">
+                    </div>
+                    <div class="mod-form-group">
+                        <label>Evidência / registro</label>
+                        <textarea class="mod-textarea" id="${stage.key}-evidencia" rows="3" placeholder="Documento, teste, ata, aprovação ou link de evidência">${esc(data.evidencia || '')}</textarea>
+                    </div>
+                    <div class="mod-form-group">
+                        <label>Observações e pendências</label>
+                        <textarea class="mod-textarea" id="${stage.key}-observacoes" rows="3" placeholder="Decisões, pendências, riscos ou comentários">${esc(data.observacoes || '')}</textarea>
+                    </div>
+                </div>
+                <div class="pd-actions-row">
+                    <div class="mod-form-group" style="min-width:220px">
+                        <label>Aprovado / revisado por</label>
+                        <input class="mod-input" id="${stage.key}-aprovadoPor" value="${esc(data.aprovadoPor || '')}" placeholder="Nome do aprovador">
+                    </div>
+                    <div class="mod-actions">
+                        <button class="mod-btn ghost" onclick="saveStage('${stage.key}', 'andamento')"><i class="fas fa-spinner"></i> Em andamento</button>
+                        <button class="mod-btn accent" onclick="saveStage('${stage.key}', 'concluida')"><i class="fas fa-check"></i> Concluir etapa</button>
+                        <button class="mod-btn danger" onclick="saveStage('${stage.key}', 'reprovada')"><i class="fas fa-xmark"></i> Reprovar</button>
+                    </div>
+                </div>
+                ${stage.key === 'mudancas' ? `<div class="analysis-note" style="margin-top:12px"><a href="organizacao.html?view=mudancas" style="color:#93c5fd;font-weight:700">Abrir controle de mudanças</a> para avaliar risco, aprovação e plano de ação da alteração.</div>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function saveStage(key, status) {
+    const db = getDB();
+    const project = db.projetos.find(p => p.id === currentProjectId);
+    if (!project) return;
+    project.stages[key] = {
+        status,
+        responsavel: document.getElementById(`${key}-responsavel`).value,
+        data: document.getElementById(`${key}-data`).value || new Date().toISOString().slice(0, 10),
+        evidencia: document.getElementById(`${key}-evidencia`).value,
+        observacoes: document.getElementById(`${key}-observacoes`).value,
+        aprovadoPor: document.getElementById(`${key}-aprovadoPor`).value
+    };
+    project.status = inferProjectStatus(project);
+    saveDB(db);
+    renderProjetos();
+    renderDetail();
+    showToast('Etapa atualizada.', 'success');
+}
+
+function openNovoProjetoModal() {
+    document.getElementById('np-prazo').value = new Date().toISOString().slice(0, 10);
+    openModal('modalNovoProjeto');
+}
+
+function saveNovoProjeto() {
+    const nome = document.getElementById('np-nome').value.trim();
+    const produto = document.getElementById('np-produto').value.trim();
+    const responsavel = document.getElementById('np-responsavel').value.trim();
+    if (!nome || !produto || !responsavel) return alert('Informe nome, produto/serviço e responsável.');
+    const db = getDB();
+    const id = Math.max(0, ...db.projetos.map(p => p.id || 0)) + 1;
+    db.projetos.push({
+        id,
+        nome,
+        cliente: document.getElementById('np-cliente').value,
+        produto,
+        responsavel,
+        prazo: document.getElementById('np-prazo').value,
+        criterio: document.getElementById('np-criterio').value,
+        escopo: document.getElementById('np-escopo').value,
+        status: 'planejamento',
+        criadoEm: new Date().toISOString().slice(0, 10),
+        stages: defaultStageData()
+    });
+    saveDB(db);
+    closeModal('modalNovoProjeto');
+    currentProjectId = id;
+    renderProjetos();
+    renderDetail();
+    showToast('Projeto criado. Inicie pela etapa de planejamento.', 'success');
+}
+
+function showList() {
+    renderProjetos();
+}
+
+function formatDate(str) {
+    if (!str) return '-';
+    const d = new Date(str + (str.length === 10 ? 'T00:00' : ''));
+    return d.toLocaleDateString('pt-BR');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:10px;font-weight:600;font-size:.88rem;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);background:${type==='success'?'rgba(16,185,129,.9)':'rgba(239,68,68,.9)'};color:#fff`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
+document.addEventListener('click',function(e){var m=document.getElementById('userMenu');if(m&&!m.contains(e.target))m.classList.remove('open');});
+document.querySelectorAll('.mod-modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); }));
+function startModuleTour() { alert('Execute o projeto etapa por etapa: planejamento, entradas, análise crítica, saídas, verificação, validação, mudanças e liberação final.'); }
+
+if (!localStorage.getItem(PD_KEY)) saveDB(defaultDB());
+const initial = getDB().projetos[0];
+if (initial) currentProjectId = initial.id;
+renderProjetos();
+if (currentProjectId) renderDetail();
+</script>
+<script src="../assets/js/global-search.js"></script></body>
+</html>

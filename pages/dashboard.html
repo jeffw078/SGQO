@@ -58,6 +58,9 @@
                     <a href="nao-conformidades.html" class="nav-item">
                         <i class="fas fa-bug"></i> Não Conformidades e NCs
                     </a>
+                    <a href="nao-conformidades.html?tipo=plano" class="nav-item">
+                        <i class="fas fa-list-check"></i> Planos de Ação
+                    </a>
                     <a href="calibracao.html" class="nav-item">
                         <i class="fas fa-ruler-combined"></i> Calibração de Instrumentos
                     </a>
@@ -66,6 +69,9 @@
                 <!-- Gestão -->
                 <div class="nav-section">
                     <div class="nav-section-title">Gestão</div>
+                    <a href="organizacao.html" class="nav-item">
+                        <i class="fas fa-building-shield"></i> Organização
+                    </a>
                     <a href="fornecedores.html" class="nav-item">
                         <i class="fas fa-handshake"></i> Avaliação de Fornecedores
                     </a>
@@ -83,11 +89,29 @@
                     <a href="auditorias.html" class="nav-item">
                         <i class="fas fa-magnifying-glass-chart"></i> Auditorias Internas
                     </a>
+                    <a href="organizacao.html?view=analise" class="nav-item">
+                        <i class="fas fa-people-roof"></i> Análise Crítica
+                    </a>
                     <a href="indicadores.html" class="nav-item">
                         <i class="fas fa-chart-line"></i> Indicadores / KPIs
                     </a>
+                    <a href="organizacao.html?view=dados" class="nav-item">
+                        <i class="fas fa-chart-simple"></i> Análise de Dados
+                    </a>
+                    <a href="projeto-desenvolvimento.html" class="nav-item">
+                        <i class="fas fa-pen-ruler"></i> Projeto e Desenvolvimento
+                    </a>
                     <a href="riscos.html" class="nav-item">
                         <i class="fas fa-shield-halved"></i> Gestão de Riscos
+                    </a>
+                    <a href="organizacao.html?view=mudancas" class="nav-item">
+                        <i class="fas fa-repeat"></i> Controle de Mudanças
+                    </a>
+                    <a href="nao-conformidades.html?tipo=melhoria" class="nav-item">
+                        <i class="fas fa-lightbulb"></i> Melhoria Contínua
+                    </a>
+                    <a href="organizacao.html?view=diagnostico" class="nav-item">
+                        <i class="fas fa-shield-halved"></i> Diagnóstico ISO
                     </a>
                 </div>
 
@@ -108,9 +132,11 @@
             <!-- Topbar -->
             <header class="topbar">
                 <div class="topbar-left">
-                    <div class="topbar-search">
+                    <div class="topbar-search global-search" id="globalSearchBox">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Buscar módulos, documentos, NCs...">
+                        <input type="text" id="globalSearchInput" autocomplete="off" placeholder="Comece digitando um código ou nome">
+                        <button class="global-search-btn" id="globalSearchBtn" type="button" title="Buscar"><i class="fas fa-arrow-right"></i></button>
+                        <div class="global-search-results" id="globalSearchResults"></div>
                     </div>
                 </div>
                 <div class="topbar-right">
@@ -203,6 +229,22 @@
                         <div class="stat-label">Ações em Andamento</div>
                     </div>
                 </div>
+
+                <!-- Setup SGQ -->
+                <a href="setup-sgq.html" class="setup-sgq-card" style="text-decoration:none;color:inherit">
+                    <div class="setup-sgq-icon">
+                        <i class="fas fa-gears"></i>
+                    </div>
+                    <div class="setup-sgq-content">
+                        <div class="setup-sgq-kicker">Configuração inicial</div>
+                        <h3>Setup da Empresa e Diagnóstico Inicial do SGQ</h3>
+                        <p>Cadastre as informações principais da empresa, vincule evidências aos requisitos ISO 9001 e gere o diagnóstico de lacunas.</p>
+                    </div>
+                    <div class="setup-sgq-action">
+                        <span>Abrir setup</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
 
                 <!-- Quick Actions -->
                 <div class="quick-actions">
@@ -788,6 +830,194 @@
             color: 'var(--primary)'
         }));
 
+        // ===== Busca Global do Dashboard =====
+        const globalSearchInput = document.getElementById('globalSearchInput');
+        const globalSearchBox = document.getElementById('globalSearchBox');
+        const globalSearchResults = document.getElementById('globalSearchResults');
+        const searchPhrases = [
+            'Iniciar processo',
+            'Buscar documento',
+            'Buscar processo em execução',
+            'Comece digitando um código ou nome',
+            'Abrir plano de ação',
+            'Localizar requisito ISO',
+            'Encontrar auditoria ou NC'
+        ];
+        let phraseIdx = 0;
+        let charIdx = 0;
+        let deletingPhrase = false;
+        let placeholderTimer = null;
+
+        const moduleSearchItems = [
+            {title:'Controle de Documentos', meta:'GED, revisões, aprovações e registros', type:'Módulo', icon:'fa-file-lines', color:'var(--primary)', url:'documentos.html', keywords:'documento documentos ged revisão aprovacao registro pq it fq'},
+            {title:'BPM & Modelagem de Processos', meta:'Fluxos, formulários e processos em execução', type:'Módulo', icon:'fa-diagram-project', color:'var(--accent)', url:'bpm.html', keywords:'processo processos bpm workflow fluxo formulario iniciar'},
+            {title:'Projeto e Desenvolvimento', meta:'ISO 9001 requisito 8.3', type:'Módulo', icon:'fa-pen-ruler', color:'var(--purple)', url:'projeto-desenvolvimento.html', keywords:'projeto desenvolvimento 8.3 validacao verificacao'},
+            {title:'NCs + Planos de Ação', meta:'Não conformidades, planos 5W2H e eficácia', type:'Módulo', icon:'fa-list-check', color:'var(--warning)', url:'nao-conformidades.html', keywords:'nc nao conformidade plano ação acao 5w2h eficacia'},
+            {title:'Planos de Ação', meta:'Abrir guia filtrada de planos', type:'Ação', icon:'fa-list-check', color:'var(--warning)', url:'nao-conformidades.html?tipo=plano', keywords:'plano planos ação acao tarefas responsáveis prazos'},
+            {title:'Melhoria Contínua', meta:'Abrir guia de melhorias', type:'Ação', icon:'fa-lightbulb', color:'var(--accent)', url:'nao-conformidades.html?tipo=melhoria', keywords:'melhoria continua melhoria contínua oportunidade'},
+            {title:'Gestão de Riscos', meta:'Matriz de riscos e oportunidades', type:'Módulo', icon:'fa-shield-halved', color:'var(--danger)', url:'riscos.html', keywords:'risco riscos oportunidades matriz 6.1'},
+            {title:'Organização', meta:'Contexto, SWOT, partes interessadas e diagnóstico ISO', type:'Módulo', icon:'fa-building-shield', color:'var(--primary)', url:'organizacao.html', keywords:'organizacao organização swot contexto partes interessadas escopo'},
+            {title:'Diagnóstico ISO', meta:'Cobertura automática e IA simulada', type:'Ação', icon:'fa-brain', color:'var(--primary)', url:'organizacao.html?view=diagnostico', keywords:'diagnostico diagnóstico iso ia cobertura requisitos'},
+            {title:'Auditorias Internas', meta:'Planejamento e resultados de auditoria', type:'Módulo', icon:'fa-magnifying-glass-chart', color:'var(--danger)', url:'auditorias.html', keywords:'auditoria auditorias checklist 9.2'},
+            {title:'Indicadores / KPIs', meta:'Metas, resultados e análise de dados', type:'Módulo', icon:'fa-chart-line', color:'var(--accent)', url:'indicadores.html', keywords:'indicador indicadores kpi meta metas dados'},
+            {title:'Satisfação do Cliente', meta:'NPS, reclamações e feedback', type:'Módulo', icon:'fa-face-smile', color:'var(--orange)', url:'satisfacao.html', keywords:'satisfacao satisfação cliente reclamacao reclamação nps'},
+            {title:'Fornecedores', meta:'Avaliação e qualificação de provedores externos', type:'Módulo', icon:'fa-handshake', color:'var(--purple)', url:'fornecedores.html', keywords:'fornecedor fornecedores compra provedor 8.4'},
+            {title:'Calibração de Instrumentos', meta:'Instrumentos, certificados e vencimentos', type:'Módulo', icon:'fa-ruler-combined', color:'var(--primary)', url:'calibracao.html', keywords:'calibracao calibração instrumento medicao medição certificado'},
+            {title:'Pessoas e Treinamentos', meta:'Competência, treinamento e conscientização', type:'Módulo', icon:'fa-user-graduate', color:'var(--accent)', url:'pessoas.html', keywords:'pessoas treinamento competência competencia colaboradores'},
+            {title:'Inspeções e Liberação', meta:'Checklists, liberação e produto bloqueado', type:'Módulo', icon:'fa-clipboard-check', color:'var(--accent)', url:'inspecoes.html', keywords:'inspecao inspeção liberação liberacao checklist produto bloqueado'},
+            {title:'Processo Produtivo', meta:'Ordens de produção e apontamentos', type:'Módulo', icon:'fa-industry', color:'var(--primary)', url:'producao.html', keywords:'produção producao ordem op apontamento'}
+        ];
+
+        const documentSearchItems = [
+            {title:'PQ-001 - Controle de Documentos e Registros', meta:'Procedimento controlado', type:'Documento', icon:'fa-file-lines', color:'var(--primary)', url:'documentos.html', keywords:'pq-001 controle documentos registros procedimento'},
+            {title:'PQ-002 - Auditorias Internas', meta:'Procedimento de auditoria', type:'Documento', icon:'fa-file-lines', color:'var(--primary)', url:'documentos.html', keywords:'pq-002 auditorias internas procedimento'},
+            {title:'PQ-003 - Controle de Produto Não Conforme', meta:'Procedimento de NC e saídas não conformes', type:'Documento', icon:'fa-file-lines', color:'var(--primary)', url:'documentos.html', keywords:'pq-003 produto nao não conforme nc'},
+            {title:'FQ-001 - Registro de Não Conformidade', meta:'Formulário de RNC', type:'Documento', icon:'fa-file-signature', color:'var(--warning)', url:'documentos.html', keywords:'fq-001 registro nao não conformidade rnc formulario formulário'},
+            {title:'FQ-002 - Checklist de Auditoria', meta:'Formulário de auditoria interna', type:'Documento', icon:'fa-file-signature', color:'var(--warning)', url:'documentos.html', keywords:'fq-002 checklist auditoria formulario formulário'},
+            {title:'MQ-001 - Manual da Qualidade', meta:'Manual e política da qualidade', type:'Documento', icon:'fa-book', color:'var(--purple)', url:'documentos.html', keywords:'mq-001 manual qualidade politica política escopo'}
+        ];
+
+        function buildGlobalSearchItems() {
+            const startFlowItems = processos.map(p => ({
+                title: `Iniciar processo: ${p.name}`,
+                meta: `${p.category} - ${p.steps} etapas`,
+                type: 'Iniciar processo',
+                icon: 'fa-play',
+                color: 'var(--accent)',
+                url: `bpm.html?startFlow=${p.id}`,
+                keywords: `${p.name} ${p.category} iniciar processo fluxo bpm`
+            }));
+
+            const runningItems = activeFlows.map(f => ({
+                title: f.name,
+                meta: `${f.steps ? f.steps.length : 0} etapas configuradas`,
+                type: 'Processo em execução',
+                icon: 'fa-diagram-project',
+                color: 'var(--primary)',
+                url: 'bpm.html',
+                keywords: `${f.name} execução execucao andamento bpm processo`
+            }));
+
+            return moduleSearchItems.concat(documentSearchItems, runningItems, startFlowItems);
+        }
+
+        function normalizeSearch(value) {
+            return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        }
+
+        function escapeHtml(value) {
+            const span = document.createElement('span');
+            span.textContent = value == null ? '' : String(value);
+            return span.innerHTML;
+        }
+
+        function scoreSearchItem(item, q) {
+            const hay = normalizeSearch([item.title, item.meta, item.type, item.keywords].join(' '));
+            const title = normalizeSearch(item.title);
+            if (!q) return 1;
+            let score = 0;
+            q.split(/\s+/).filter(Boolean).forEach(term => {
+                if (title.startsWith(term)) score += 8;
+                else if (title.includes(term)) score += 5;
+                else if (hay.includes(term)) score += 2;
+            });
+            return score;
+        }
+
+        function getGlobalResults(query) {
+            const q = normalizeSearch(query.trim());
+            const items = buildGlobalSearchItems();
+            if (!q) {
+                return items.filter(i => ['Iniciar processo', 'Documento', 'Processo em execução', 'Ação'].includes(i.type)).slice(0, 8);
+            }
+            return items
+                .map(item => Object.assign({}, item, {score: scoreSearchItem(item, q)}))
+                .filter(item => item.score > 0)
+                .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
+                .slice(0, 10);
+        }
+
+        function renderGlobalResults() {
+            const q = globalSearchInput.value;
+            const results = getGlobalResults(q);
+            globalSearchBox.classList.add('open');
+            if (!results.length) {
+                globalSearchResults.innerHTML = `<div class="global-search-empty">Nenhum resultado encontrado. Tente um código, nome de documento, processo ou módulo.</div>`;
+                return;
+            }
+            const groups = [];
+            results.forEach(item => {
+                let group = groups.find(g => g.type === item.type);
+                if (!group) {
+                    group = {type: item.type, items: []};
+                    groups.push(group);
+                }
+                group.items.push(item);
+            });
+            globalSearchResults.innerHTML = groups.map(group => `
+                <div class="global-search-section">${group.type}</div>
+                ${group.items.map((item, idx) => `
+                    <div class="global-result ${idx === 0 && group === groups[0] ? 'active' : ''}" onclick="openGlobalResult('${item.url.replace(/'/g, '%27')}')">
+                        <div class="global-result-icon" style="background:rgba(255,255,255,.06);color:${item.color}"><i class="fas ${item.icon}"></i></div>
+                        <div>
+                            <div class="global-result-title">${escapeHtml(item.title)}</div>
+                            <div class="global-result-meta">${escapeHtml(item.meta)}</div>
+                        </div>
+                        <span class="global-result-type">${escapeHtml(item.type)}</span>
+                    </div>
+                `).join('')}
+            `).join('');
+        }
+
+        function openGlobalResult(url) {
+            if (!url) return;
+            window.location.href = url;
+        }
+
+        function openFirstGlobalResult() {
+            const first = getGlobalResults(globalSearchInput.value)[0];
+            if (first) openGlobalResult(first.url);
+        }
+
+        function animateSearchPlaceholder() {
+            if (!globalSearchInput || document.activeElement === globalSearchInput || globalSearchInput.value) {
+                placeholderTimer = setTimeout(animateSearchPlaceholder, 400);
+                return;
+            }
+            const phrase = searchPhrases[phraseIdx];
+            if (!deletingPhrase) {
+                charIdx += 1;
+                globalSearchInput.placeholder = phrase.slice(0, charIdx);
+                if (charIdx >= phrase.length) {
+                    deletingPhrase = true;
+                    placeholderTimer = setTimeout(animateSearchPlaceholder, 1300);
+                    return;
+                }
+            } else {
+                charIdx -= 1;
+                globalSearchInput.placeholder = phrase.slice(0, charIdx);
+                if (charIdx <= 0) {
+                    deletingPhrase = false;
+                    phraseIdx = (phraseIdx + 1) % searchPhrases.length;
+                }
+            }
+            placeholderTimer = setTimeout(animateSearchPlaceholder, deletingPhrase ? 28 : 58);
+        }
+
+        if (globalSearchInput) {
+            globalSearchInput.addEventListener('focus', renderGlobalResults);
+            globalSearchInput.addEventListener('input', renderGlobalResults);
+            globalSearchInput.addEventListener('keydown', e => {
+                if (e.key === 'Enter') openFirstGlobalResult();
+                if (e.key === 'Escape') globalSearchBox.classList.remove('open');
+            });
+            document.getElementById('globalSearchBtn')?.addEventListener('click', openFirstGlobalResult);
+            document.addEventListener('click', e => {
+                if (!globalSearchBox.contains(e.target)) globalSearchBox.classList.remove('open');
+            });
+            animateSearchPlaceholder();
+        }
+
         function renderProcessos(list) {
             const container = document.getElementById('processosList');
             const empty = document.getElementById('processosEmpty');
@@ -824,7 +1054,7 @@
         function iniciarProcesso(id) {
             const p = processos.find(x => x.id === id);
             if (!p) return;
-            // Redireciona para a página BPM passando o fluxo como par�metro
+            // Redireciona para a página BPM passando o fluxo como parâmetro
             window.location.href = 'bpm.html?startFlow=' + id;
         }
 
@@ -833,4 +1063,3 @@
     </script>
 </body>
 </html>
-
