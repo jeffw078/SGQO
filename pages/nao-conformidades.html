@@ -22,7 +22,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-triangle-exclamation" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Não Conformidades</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -368,11 +367,13 @@
     </div>
 </div>
 
+<script src="../assets/js/sgq-core.js"></script>
 <script>
 //  DATA 
 const DB_KEY = 'sgq_nc';
 let currentTipoFilter = '';
 let currentNcId = null;
+let linkedActionDraft = null;
 
 function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"items":[]}'); }
 function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
@@ -382,7 +383,7 @@ function seedData() {
     if (db.items.length) return;
     db.items = [
         { id:1, tipo:'rnc', titulo:'Parafusos com rosca fora do especificado', descricao:'Lote recebido do fornecedor ABC com rosca M8 fora da tolerância de ±0,05mm. 12% do lote afetado.', criticidade:'alta', responsavel:'Ana Carvalho - Qualidade', status:'andamento', pedido:'PED-2026-0152', setor:'Qualidade', prazo:'2026-06-20', acoes:[{o:'Segregar lote','q':'100% das peças',r:'Carlos Ferreira',m:'Inspeção visual',q2:'Caixas vermelhas',h:'2026-06-05'}], abertaEm:'2026-06-02T14:00' },
-        { id:2, tipo:'plano', titulo:'Reduzir tempo de setup da linha de solda', descricao:'An?lise de produtividade identificou tempo de setup acima de 45 min. Meta: reduzir para 20 min.', criticidade:'media', responsavel:'Carlos Ferreira - Produção', status:'aberta', pedido:'', setor:'Produção', prazo:'2026-07-01', acoes:[], abertaEm:'2026-06-01T10:00' },
+        { id:2, tipo:'plano', titulo:'Reduzir tempo de setup da linha de solda', descricao:'Análise de produtividade identificou tempo de setup acima de 45 min. Meta: reduzir para 20 min.', criticidade:'media', responsavel:'Carlos Ferreira - Produção', status:'aberta', pedido:'', setor:'Produção', prazo:'2026-07-01', acoes:[], abertaEm:'2026-06-01T10:00' },
         { id:3, tipo:'melhoria', titulo:'Digitalizar processo de inspeção de entrada', descricao:'Substituir planilhas manuais pelo módulo de inspeções do SGQ Online para ganho de rastreabilidade.', criticidade:'baixa', responsavel:'João Teste - Qualidade', status:'concluida', pedido:'', setor:'Qualidade', prazo:'2026-05-30', acoes:[], abertaEm:'2026-05-01T09:00', concluidaEm:'2026-05-28T16:00' },
         { id:4, tipo:'rnc', titulo:'Documento PQ-003 desatualizado utilizado na produção', descricao:'Colaborador utilizou revisão 01 do PQ-003 sendo que revisão 02 estava vigente. Risco de não conformidade do produto.', criticidade:'critica', responsavel:'João Teste - Qualidade', status:'aberta', pedido:'PED-2026-0153', setor:'Produção', prazo:'2026-06-10', acoes:[], abertaEm:'2026-06-03T08:30' },
     ];
@@ -424,7 +425,7 @@ function renderTodas() {
     const critF = document.getElementById('criticidadeFilter')?.value || '';
 
     const total30 = new Date(); total30.setDate(total30.getDate() + 30);
-    let items = db.items.filter(i => {
+    let items = SGQCore.filterRecords(db.items,'nc').filter(i => {
         if (currentTipoFilter && i.tipo !== currentTipoFilter) return false;
         if (statusF && i.status !== statusF) return false;
         if (critF && i.criticidade !== critF) return false;
@@ -461,7 +462,8 @@ function renderTodas() {
                     ${i.pedido ? `<span style="font-size:.72rem;color:rgba(255,255,255,.35)"><i class="fas fa-hashtag" style="margin-right:2px"></i>${i.pedido}</span>` : ''}
                 </div>
                 <div style="font-size:.95rem;font-weight:700;color:#fff;margin-bottom:4px">${i.titulo}</div>
-                <div style="font-size:.78rem;color:rgba(255,255,255,.4)">${i.responsavel} � Prazo: ${formatDate(i.prazo)} � ${i.setor}</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.4)">${i.responsavel} • Prazo: ${formatDate(i.prazo)} • ${i.setor}</div>
+                ${i.origemTipo ? `<div style="font-size:.72rem;color:var(--primary-light);margin-top:4px"><i class="fas fa-link"></i> Origem: ${i.origemTipo} #${i.origemId} ${i.origemTitulo ? '— ' + i.origemTitulo : ''}</div>` : ''}
             </div>
             <span class="sbadge ${i.status}">${{aberta:'Aberta',andamento:'Em Andamento',concluida:'Concluída'}[i.status]||i.status}</span>
         </div>`;
@@ -522,8 +524,9 @@ function openDetalhe(id) {
         </div>
         <div class="mod-form-section-title">Descrição</div>
         <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:14px;margin-bottom:16px;font-size:.87rem;color:rgba(255,255,255,.7);line-height:1.6">${item.descricao}</div>
+        ${item.origemTipo ? `<div style="background:rgba(15,117,189,.08);border:1px solid rgba(15,117,189,.2);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:.8rem;color:var(--primary-light)"><i class="fas fa-link"></i> Originado em ${item.origemTipo} #${item.origemId}${item.origemTitulo ? ' — ' + item.origemTitulo : ''}</div>` : ''}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">RESPONS?VEL</div><div style="font-weight:600;color:#fff">${item.responsavel}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">RESPONSÁVEL</div><div style="font-weight:600;color:#fff">${item.responsavel}</div></div>
             <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">SETOR</div><div style="font-weight:600;color:#fff">${item.setor||'-'}</div></div>
         </div>
         ${w5html}
@@ -539,7 +542,7 @@ function openDetalhe(id) {
             </div>
         </div>
         <div class="mod-form-group" style="margin-top:10px">
-            <label>Coment?rio / Evid?ncia</label>
+            <label>Comentário / Evidência</label>
             <textarea class="mod-textarea" id="update-comentario" placeholder="Descreva as ações tomadas ou evidências da conclusão..." rows="3"></textarea>
         </div>
     `;
@@ -582,9 +585,9 @@ function switchCausaMethod() {
 
 function renderIshikawa() {
     const categories = [
-        {id:'m1', name:'M?todo', icon:'fa-cogs'},
+        {id:'m1', name:'Método', icon:'fa-cogs'},
         {id:'m2', name:'Mão de Obra', icon:'fa-users'},
-        {id:'m3', name:'M?quina', icon:'fa-industry'},
+        {id:'m3', name:'Máquina', icon:'fa-industry'},
         {id:'m4', name:'Material', icon:'fa-boxes-stacked'},
         {id:'m5', name:'Medição', icon:'fa-ruler'},
         {id:'m6', name:'Meio Ambiente', icon:'fa-leaf'},
@@ -617,9 +620,9 @@ function render5Pqs() {
         const div = document.createElement('div');
         div.style.cssText = 'display:flex;gap:10px;align-items:flex-start';
         div.innerHTML = `
-            <div style="width:28px;height:28px;border-radius:50%;background:rgba(15,117,189,.2);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:var(--primary-light);flex-shrink:0;margin-top:7px">${i}�</div>
+            <div style="width:28px;height:28px;border-radius:50%;background:rgba(15,117,189,.2);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:var(--primary-light);flex-shrink:0;margin-top:7px">${i}º</div>
             <div style="flex:1">
-                <div style="font-size:.75rem;color:rgba(255,255,255,.35);margin-bottom:4px">Por quê ${i > 1 ? '(responda � causa anterior)' : '(o problema ocorreu)?'}</div>
+                <div style="font-size:.75rem;color:rgba(255,255,255,.35);margin-bottom:4px">Por quê ${i > 1 ? '(responda à causa anterior)' : '(o problema ocorreu)?'}</div>
                 <input class="mod-input" placeholder="Por quê...">
             </div>
         `;
@@ -646,7 +649,7 @@ function addAcao5W2H() {
             <div class="mod-form-group"><label>Onde? (local)</label><input class="mod-input acao-w" placeholder="Local de execução..."></div>
         </div>
         <div class="mod-form-row">
-            <div class="mod-form-group"><label>Como? (m?todo)</label><input class="mod-input acao-m" placeholder="Como ser? executado..."></div>
+            <div class="mod-form-group"><label>Como? (método)</label><input class="mod-input acao-m" placeholder="Como será executado..."></div>
             <div class="mod-form-group"><label>Quanto? (custo estimado)</label><input class="mod-input acao-q2" placeholder="R$ 0,00 ou sem custo..."></div>
         </div>
     `;
@@ -660,25 +663,33 @@ function salvarNC() {
     const responsavel = document.getElementById('nc-responsavel').value;
     const prazo = document.getElementById('nc-prazo').value;
     if (!tipo) return alert('Selecione o tipo.');
-    if (!titulo) return alert('Informe o t?tulo.');
+    if (!titulo) return alert('Informe o título.');
     if (!responsavel) return alert('Selecione o responsável.');
 
     const acoes = [];
     document.querySelectorAll('#w5h2-acoes > div').forEach(row => {
         const o = row.querySelector('.acao-o')?.value;
-        if (o) acoes.push({ o, r: row.querySelector('.acao-r')?.value, h: row.querySelector('.acao-h')?.value, m: row.querySelector('.acao-m')?.value, q2: row.querySelector('.acao-q2')?.value });
+        if (o) acoes.push({ id:`acao_${Date.now()}_${acoes.length}`,o,pq:row.querySelector('.acao-pq')?.value,r:row.querySelector('.acao-r')?.value,h:row.querySelector('.acao-h')?.value,w:row.querySelector('.acao-w')?.value,m:row.querySelector('.acao-m')?.value,q2:row.querySelector('.acao-q2')?.value,status:'pendente',createdAt:new Date().toISOString() });
     });
 
     const db = getDB();
     const newId = db.items.length ? Math.max(...db.items.map(i => i.id)) + 1 : 1;
-    db.items.push({
-        id: newId, tipo, titulo, descricao, responsavel, prazo, acoes,
+    const item = {
+        id: newId, tipo, titulo, descricao, responsavel, prazo, acoes,createdById:SGQCore.currentUser()?.id,createdBy:SGQCore.currentUser()?.name,
         criticidade: document.getElementById('nc-criticidade').value,
         pedido: document.getElementById('nc-pedido').value,
         setor: document.getElementById('nc-setor').value,
-        status: 'aberta', abertaEm: new Date().toISOString()
-    });
+        status: 'aberta', abertaEm: new Date().toISOString(),
+        origemTipo: linkedActionDraft?.origemTipo || '',
+        origemId: linkedActionDraft?.origemId || '',
+        origemTitulo: linkedActionDraft?.origemTitulo || '',
+        historico: [{ acao:'Registro criado', data:new Date().toISOString(), usuario:'Usuário atual' }]
+    };
+    db.items.push(item);
     saveDB(db);
+    acoes.forEach(acao=>SGQCore.notify({title:`Nova ação: ${acao.o}`,message:`Responsável: ${acao.r||'Não definido'} · prazo ${formatDate(acao.h)}`,module:'NCs',url:'nao-conformidades.html'}));
+    SGQCore.audit('Não conformidades', 'criou', tipo, newId, item.origemTipo ? `Origem: ${item.origemTipo} #${item.origemId}` : 'Registro avulso');
+    linkedActionDraft = null;
     closeModal('modalNovo');
     switchView('todas');
     showToast('NC/Plano criado com sucesso!', 'success');
@@ -698,6 +709,22 @@ function openNovoModal() {
     document.getElementById('cinco-pqs-section').style.display = 'none';
     addAcao5W2H();
     openModal('modalNovo');
+}
+
+function applyLinkedActionDraft() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('novo') !== '1') return;
+    linkedActionDraft = SGQCore.consumeLinkedAction();
+    if (!linkedActionDraft) return;
+    openNovoModal();
+    document.getElementById('nc-tipo').value = linkedActionDraft.tipo || 'plano';
+    document.getElementById('nc-titulo').value = linkedActionDraft.titulo || '';
+    document.getElementById('nc-descricao').value = linkedActionDraft.descricao || '';
+    document.getElementById('nc-criticidade').value = linkedActionDraft.criticidade || 'media';
+    document.getElementById('nc-responsavel').value = linkedActionDraft.responsavel || '';
+    document.getElementById('nc-setor').value = linkedActionDraft.setor || '';
+    document.getElementById('nc-prazo').value = linkedActionDraft.prazo || '';
+    showToast(`Novo ${linkedActionDraft.tipo === 'rnc' ? 'RNC' : linkedActionDraft.tipo === 'melhoria' ? 'registro de melhoria' : 'plano'} vinculado à origem.`, 'success');
 }
 
 //  HELPERS 
@@ -723,6 +750,7 @@ document.querySelectorAll('.mod-modal-overlay').forEach(o => o.addEventListener(
 seedData();
 applyInitialTipoFilter();
 renderTodas();
+applyLinkedActionDraft();
 </script>
 <script>
 function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
@@ -731,5 +759,5 @@ document.addEventListener('click',function(e){var m=document.getElementById('use
 function startModuleTour() {
     alert('Tour deste módulo em breve! ');
 }
-</script><script src="../assets/js/global-search.js"></script></body>
+</script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>

@@ -18,7 +18,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-truck" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Avaliação de Fornecedores</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -44,7 +43,7 @@
                 <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar fornecedor..."></div>
             </div>
             <div class="topbar-right">
-                <button class="topbar-icon"><i class="fas fa-bell"></i></button>
+                <button class="topbar-icon" title="Notificações" aria-label="Abrir notificações"><i class="fas fa-bell"></i></button>
                 <div class="user-menu" id="userMenu">
                     <button class="user-btn" onclick="toggleUserMenu(event)">
                         <div class="avatar">JW</div>
@@ -146,7 +145,7 @@
                                 </select>
                             </div>
                             <div class="mod-form-group">
-                                <label>Perãodo de Referência</label>
+                                <label>Período de Referência</label>
                                 <select class="mod-select-inp" id="aval-periodo">
                                     <option>1º Trimestre 2026</option>
                                     <option>2º Trimestre 2026</option>
@@ -156,56 +155,9 @@
                             </div>
                         </div>
                         <hr class="mod-divider">
-                        <div class="mod-form-section-title">Critários de Avaliação</div>
+                        <div class="mod-form-section-title">Critérios de Avaliação</div>
 
-                        <div id="criterios-list">
-                            <div class="criterio-item" style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)">
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                                    <div style="font-size:.9rem;font-weight:600;color:#fff">Qualidade dos Produtos / Serviços</div>
-                                    <span style="font-size:.75rem;color:rgba(255,255,255,.35)">Peso: 30%</span>
-                                </div>
-                                <div style="display:flex;gap:8px">
-                                    ${[1,2,3,4,5].map(n=>`<button class="nota-btn" data-criterio="qualidade" data-nota="${n}" onclick="selecionarNota('qualidade',${n},this)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-weight:700">${n}</button>`).join('')}
-                                </div>
-                                <div style="display:flex;justify-content:space-between;font-size:.72rem;color:rgba(255,255,255,.25);margin-top:4px"><span>Péssimo</span><span>Excelente</span></div>
-                            </div>
-                            <div class="criterio-item" style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)">
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                                    <div style="font-size:.9rem;font-weight:600;color:#fff">Prazo de Entrega</div>
-                                    <span style="font-size:.75rem;color:rgba(255,255,255,.35)">Peso: 25%</span>
-                                </div>
-                                <div style="display:flex;gap:8px">
-                                    ${[1,2,3,4,5].map(n=>`<button class="nota-btn" data-criterio="prazo" data-nota="${n}" onclick="selecionarNota('prazo',${n},this)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-weight:700">${n}</button>`).join('')}
-                                </div>
-                            </div>
-                            <div class="criterio-item" style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)">
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                                    <div style="font-size:.9rem;font-weight:600;color:#fff">Atendimento e Suporte</div>
-                                    <span style="font-size:.75rem;color:rgba(255,255,255,.35)">Peso: 20%</span>
-                                </div>
-                                <div style="display:flex;gap:8px">
-                                    ${[1,2,3,4,5].map(n=>`<button class="nota-btn" data-criterio="atendimento" data-nota="${n}" onclick="selecionarNota('atendimento',${n},this)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-weight:700">${n}</button>`).join('')}
-                                </div>
-                            </div>
-                            <div class="criterio-item" style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)">
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                                    <div style="font-size:.9rem;font-weight:600;color:#fff">Preão / Competitividade</div>
-                                    <span style="font-size:.75rem;color:rgba(255,255,255,.35)">Peso: 15%</span>
-                                </div>
-                                <div style="display:flex;gap:8px">
-                                    ${[1,2,3,4,5].map(n=>`<button class="nota-btn" data-criterio="preco" data-nota="${n}" onclick="selecionarNota('preco',${n},this)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-weight:700">${n}</button>`).join('')}
-                                </div>
-                            </div>
-                            <div class="criterio-item" style="padding:14px 0">
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                                    <div style="font-size:.9rem;font-weight:600;color:#fff">Documentação e Conformidade</div>
-                                    <span style="font-size:.75rem;color:rgba(255,255,255,.35)">Peso: 10%</span>
-                                </div>
-                                <div style="display:flex;gap:8px">
-                                    ${[1,2,3,4,5].map(n=>`<button class="nota-btn" data-criterio="doc" data-nota="${n}" onclick="selecionarNota('doc',${n},this)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-weight:700">${n}</button>`).join('')}
-                                </div>
-                            </div>
-                        </div>
+                        <div id="criterios-list"></div>
 
                         <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;margin-top:16px;display:flex;align-items:center;gap:16px">
                             <div style="text-align:center">
@@ -233,18 +185,20 @@
             <div id="view-config" class="mod-view" style="display:none">
                 <div class="mod-header"><div><h2>Configurações de Fornecedores</h2></div></div>
                 <div class="card">
-                    <div class="card-header"><h4>Critários e Pesos de Avaliação</h4></div>
+                    <div class="card-header"><h4>Critérios e Pesos de Avaliação</h4></div>
                     <div class="card-body">
-                        <p style="font-size:.85rem;color:rgba(255,255,255,.45);margin-bottom:16px">Configure os critários e seus respectivos pesos para a avaliação de fornecedores. Total deve ser 100%.</p>
-                        <div style="display:flex;flex-direction:column;gap:8px">
+                        <p style="font-size:.85rem;color:rgba(255,255,255,.45);margin-bottom:16px">Configure os critérios e seus respectivos pesos para a avaliação de fornecedores. O total deve ser 100%.</p>
+                        <div id="criteria-config-list" style="display:flex;flex-direction:column;gap:8px">
                             <div style="display:flex;gap:10px;align-items:center"><input class="mod-input" value="Qualidade dos Produtos / Serviços" style="flex:1"><input class="mod-input" type="number" value="30" style="width:80px"> <span style="color:rgba(255,255,255,.4);font-size:.85rem">%</span></div>
                             <div style="display:flex;gap:10px;align-items:center"><input class="mod-input" value="Prazo de Entrega" style="flex:1"><input class="mod-input" type="number" value="25" style="width:80px"> <span style="color:rgba(255,255,255,.4);font-size:.85rem">%</span></div>
                             <div style="display:flex;gap:10px;align-items:center"><input class="mod-input" value="Atendimento e Suporte" style="flex:1"><input class="mod-input" type="number" value="20" style="width:80px"> <span style="color:rgba(255,255,255,.4);font-size:.85rem">%</span></div>
-                            <div style="display:flex;gap:10px;align-items:center"><input class="mod-input" value="Preão / Competitividade" style="flex:1"><input class="mod-input" type="number" value="15" style="width:80px"> <span style="color:rgba(255,255,255,.4);font-size:.85rem">%</span></div>
+                            <div style="display:flex;gap:10px;align-items:center"><input class="mod-input" value="Preço / Competitividade" style="flex:1"><input class="mod-input" type="number" value="15" style="width:80px"> <span style="color:rgba(255,255,255,.4);font-size:.85rem">%</span></div>
                             <div style="display:flex;gap:10px;align-items:center"><input class="mod-input" value="Documentação e Conformidade" style="flex:1"><input class="mod-input" type="number" value="10" style="width:80px"> <span style="color:rgba(255,255,255,.4);font-size:.85rem">%</span></div>
                         </div>
                         <div style="display:flex;justify-content:flex-end;margin-top:16px">
-                            <button class="mod-btn primary"><i class="fas fa-save"></i> Salvar</button>
+                            <button class="mod-btn ghost" onclick="resetSupplierCriteria()"><i class="fas fa-rotate"></i> Restaurar padrão ISO</button>
+                            <button class="mod-btn ghost" onclick="addSupplierCriterion()"><i class="fas fa-plus"></i> Critério</button>
+                            <button class="mod-btn primary" onclick="saveSupplierCriteria()"><i class="fas fa-save"></i> Salvar</button>
                         </div>
                     </div>
                 </div>
@@ -257,7 +211,7 @@
 <div class="mod-modal-overlay" id="modalNovo">
     <div class="mod-modal md">
         <div class="mod-modal-header">
-            <h3><i class="fas fa-plus-circle" style="color:var(--purple)"></i> Cadastrar Fornecedor</h3>
+            <h3 id="modalNovoTitle"><i class="fas fa-plus-circle" style="color:var(--purple)"></i> Cadastrar Fornecedor</h3>
             <button class="mod-modal-close" onclick="closeModal('modalNovo')">&times;</button>
         </div>
         <div class="mod-modal-body">
@@ -303,14 +257,18 @@
         <div class="mod-modal-body" id="detalhe-forn-body"></div>
         <div class="mod-modal-footer">
             <button class="mod-btn ghost" onclick="closeModal('modalDetalhe')">Fechar</button>
+            <button class="mod-btn danger" onclick="deactivateFornecedor()"><i class="fas fa-ban"></i> Desativar</button>
+            <button class="mod-btn ghost" onclick="editFornecedor()"><i class="fas fa-pen"></i> Editar</button>
             <button class="mod-btn primary" onclick="irAvaliar()"><i class="fas fa-star"></i> Avaliar Agora</button>
         </div>
     </div>
 </div>
 
+<script src="../assets/js/sgq-core.js"></script>
 <script>
 const DB_KEY = 'sgq_fornecedores';
 let currentFornId = null;
+let editingFornId = null;
 const notas = {};
 
 function sanitize(str) {
@@ -319,29 +277,30 @@ function sanitize(str) {
 
 function fixText(str) {
     return String(str || '')
-        .replaceAll('Aços', 'Aços')
-        .replaceAll('Aço', 'Aço')
-        .replaceAll('Matéria', 'Matéria')
         .replaceAll('Logàstica', 'Logística')
-        .replaceAll('Manutenção', 'Manutenção')
-        .replaceAll('Serviços', 'Serviços')
+        .replaceAll('Log?stica', 'Logística')
         .replaceAll('Ind?stria', 'Indústria')
-        .replaceAll('avaliação', 'avaliação')
-        .replaceAll('Avaliação', 'Avaliação')
-        .replaceAll('CLASSIFICAÇÃO', 'CLASSIFICAÇÃO')
-        .replaceAll('Histórico', 'Histórico')
-        .replaceAll('médio', 'médio')
-        .replaceAll('critérios', 'critérios');
+        .replaceAll('Mat?ria-Prima', 'Matéria-Prima');
 }
 
 function normalizeFornecedor(f) {
     ['razao','categoria','contato','email','tel','produtos'].forEach(k => f[k] = fixText(f[k]));
     if (Array.isArray(f.avaliacoes)) f.avaliacoes.forEach(a => { a.periodo = fixText(a.periodo); a.obs = fixText(a.obs); });
+    if (f.score !== null && f.score !== undefined && Number.isFinite(Number(f.score))) {
+        f.score = Number(f.score);
+        f.classif = f.score >= 4.5 ? 'A' : f.score >= 3.5 ? 'B' : f.score >= 2.5 ? 'C' : 'D';
+    } else {
+        f.score = null;
+        f.classif = null;
+    }
     return f;
 }
 
 function getDB() {
-    const db = JSON.parse(localStorage.getItem(DB_KEY) || '{"fornecedores":[]}');
+    let db;
+    try { db = JSON.parse(localStorage.getItem(DB_KEY) || '{"fornecedores":[]}'); }
+    catch (error) { console.warn('[Fornecedores] Base local inválida; uma nova estrutura será utilizada.', error); db = {fornecedores:[]}; }
+    if (!db || typeof db !== 'object') db = {fornecedores:[]};
     db.fornecedores = (db.fornecedores || []).map(normalizeFornecedor);
     return db;
 }
@@ -352,55 +311,60 @@ function seedData() {
     if (db.fornecedores.length) return;
     db.fornecedores = [
         { id:1, razao:'Aços Brasil Ltda', cnpj:'12.345.678/0001-90', categoria:'Matéria-Prima', contato:'Paulo Souza', email:'paulo@acosbrasil.com', tel:'(11) 98765-4321', produtos:'Aço inox, chapa galvanizada', score:4.2, classif:'A', avaliacoes:[{periodo:'Semestral 2025', nota:4.2, obs:'Excelente qualidade'}] },
-        { id:2, razao:'LogiTrans Express', cnpj:'98.765.432/0001-10', categoria:'Logàstica', contato:'Joana Lima', email:'jlima@logitrans.com', tel:'(11) 3333-4444', produtos:'Transporte e entrega', score:3.5, classif:'B', avaliacoes:[] },
+        { id:2, razao:'LogiTrans Express', cnpj:'98.765.432/0001-10', categoria:'Logística', contato:'Joana Lima', email:'jlima@logitrans.com', tel:'(11) 3333-4444', produtos:'Transporte e entrega', score:3.5, classif:'B', avaliacoes:[] },
         { id:3, razao:'TecService Manutenção', cnpj:'55.444.333/0001-22', categoria:'Serviços', contato:'Ricardo Gomes', email:'rg@tecservice.com', tel:'(11) 91234-5678', produtos:'Manutenção preventiva e corretiva', score:2.8, classif:'C', avaliacoes:[] },
-        { id:4, razao:'Parafusos ABC Ind?stria', cnpj:'44.333.222/0001-55', categoria:'Componentes', contato:'Sandra Nunes', email:'sandra@parafusosabc.com', tel:'(11) 2222-3333', produtos:'Parafusos, porcas, arruelas', score:1.6, classif:'D', avaliacoes:[] },
+        { id:4, razao:'Parafusos ABC Indústria', cnpj:'44.333.222/0001-55', categoria:'Componentes', contato:'Sandra Nunes', email:'sandra@parafusosabc.com', tel:'(11) 2222-3333', produtos:'Parafusos, porcas, arruelas', score:1.6, classif:'D', avaliacoes:[] },
     ];
     saveDB(db);
 }
 
 function switchView(v) {
+    const target = document.getElementById('view-'+v);
+    if (!target) return;
     document.querySelectorAll('.mod-view').forEach(el => el.style.display='none');
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    document.getElementById('view-'+v).style.display='block';
+    target.style.display='block';
     const nav = document.getElementById('nav-'+v);
     if (nav) nav.classList.add('active');
     if (v==='lista') renderFornecedores();
-    if (v==='avaliar') populateFornecedorSelect();
+    if (v==='avaliar') { populateFornecedorSelect(); renderEvaluationCriteria(); resetEvaluationForm(); }
+    if (v==='config') renderSupplierCriteriaConfig();
 }
 
 function populateFornecedorSelect() {
     const db = getDB();
     const sel = document.getElementById('aval-fornecedor');
-    sel.innerHTML = '<option value="">Selecione...</option>' + db.fornecedores.map(f => `<option value="${f.id}">${f.razao}</option>`).join('');
+    sel.innerHTML = '<option value="">Selecione...</option>' + SGQCore.filterRecords(db.fornecedores,'fornecedores').filter(f=>f.ativo!==false&&!f.deletedAt).map(f => `<option value="${f.id}">${sanitize(f.razao)}</option>`).join('');
 }
 
 function renderFornecedores() {
     const db = getDB();
-    const search = (document.getElementById('searchForn')?.value||'').toLowerCase();
+    const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    const search = normalize(document.getElementById('searchForn')?.value);
     const cf = document.getElementById('filterClassif')?.value||'';
     const catf = document.getElementById('filterCategForn')?.value||'';
-    const items = db.fornecedores.filter(f => {
-        if (search && !f.razao.toLowerCase().includes(search)) return false;
+    const available = SGQCore.filterRecords(db.fornecedores,'fornecedores').filter(f => f.ativo!==false&&!f.deletedAt);
+    const items = available.filter(f => {
+        if (search && !normalize([f.razao,f.cnpj,f.categoria,f.contato,f.email,f.produtos].join(' ')).includes(search)) return false;
         if (cf && f.classif !== cf) return false;
         if (catf && f.categoria !== catf) return false;
         return true;
     });
 
-    document.getElementById('stat-a').textContent = db.fornecedores.filter(f=>f.classif==='A').length;
-    document.getElementById('stat-b').textContent = db.fornecedores.filter(f=>f.classif==='B').length;
-    document.getElementById('stat-c').textContent = db.fornecedores.filter(f=>f.classif==='C').length;
-    document.getElementById('stat-d').textContent = db.fornecedores.filter(f=>f.classif==='D').length;
+    document.getElementById('stat-a').textContent = available.filter(f=>f.classif==='A').length;
+    document.getElementById('stat-b').textContent = available.filter(f=>f.classif==='B').length;
+    document.getElementById('stat-c').textContent = available.filter(f=>f.classif==='C').length;
+    document.getElementById('stat-d').textContent = available.filter(f=>f.classif==='D').length;
 
     const listEl = document.getElementById('lista-fornecedores');
     const emptyEl = document.getElementById('empty-fornecedores');
-    if (!items.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    if (!items.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; emptyEl.querySelector('h3').textContent=available.length?'Nenhum fornecedor encontrado':'Nenhum fornecedor cadastrado';emptyEl.querySelector('p').textContent=available.length?'Ajuste a busca ou os filtros aplicados.':'Cadastre seus fornecedores para iniciar avaliações.';return; }
     emptyEl.style.display='none';
 
     const classifColors = {A:'a',B:'b',C:'c',D:'d'};
     listEl.innerHTML = items.map(f => `
         <div style="display:flex;align-items:center;gap:16px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all .2s" onmouseenter="this.style.background='rgba(255,255,255,.06)'" onmouseleave="this.style.background='rgba(255,255,255,.03)'" onclick="openDetalhe(${f.id})">
-            <div class="score-circle ${classifColors[f.classif]||'b'}">${sanitize(f.classif)}</div>
+            <div class="score-circle ${classifColors[f.classif]||'b'}">${sanitize(f.classif||'-')}</div>
             <div style="flex:1">
                 <div style="font-size:.95rem;font-weight:700;color:#fff;margin-bottom:3px">${sanitize(f.razao)}</div>
                 <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:rgba(255,255,255,.4)">
@@ -410,7 +374,7 @@ function renderFornecedores() {
                 </div>
             </div>
             <div style="text-align:right">
-                <div style="font-size:1.5rem;font-weight:800;color:#fff">${f.score?f.score.toFixed(1):'-'}</div>
+                <div style="font-size:1.5rem;font-weight:800;color:#fff">${Number.isFinite(Number(f.score))?Number(f.score).toFixed(1):'-'}</div>
                 <div style="font-size:.72rem;color:rgba(255,255,255,.35)">Score médio</div>
                 <div class="score-bar" style="width:80px;margin-top:4px"><div class="score-fill ${f.score>=4?'':f.score>=3?'warn':'danger'}" style="width:${(f.score||0)*20}%"></div></div>
             </div>
@@ -428,8 +392,8 @@ function openDetalhe(id) {
     const avalHtml = f.avaliacoes && f.avaliacoes.length ? f.avaliacoes.map(a => `
         <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);align-items:center">
             <div style="font-size:.85rem;color:rgba(255,255,255,.6);flex:1">${sanitize(a.periodo)}</div>
-            <div style="font-size:1.2rem;font-weight:800;color:#fff">${a.nota.toFixed(1)}</div>
-            <span class="score-circle ${f.score>=4?'a':f.score>=3?'b':f.score>=2?'c':'d'}" style="width:32px;height:32px;font-size:.85rem">${sanitize(f.classif)}</span>
+            <div style="font-size:1.2rem;font-weight:800;color:#fff">${Number(a.nota).toFixed(1)}</div>
+            <span class="score-circle ${Number(a.nota)>=4.5?'a':Number(a.nota)>=3.5?'b':Number(a.nota)>=2.5?'c':'d'}" style="width:32px;height:32px;font-size:.85rem">${Number(a.nota)>=4.5?'A':Number(a.nota)>=3.5?'B':Number(a.nota)>=2.5?'C':'D'}</span>
         </div>
     `).join('') : '<div style="color:rgba(255,255,255,.3);font-size:.85rem">Nenhuma avaliação registrada</div>';
 
@@ -437,7 +401,7 @@ function openDetalhe(id) {
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
             <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">CNPJ</div><div style="font-weight:600;color:#fff">${sanitize(f.cnpj||'-')}</div></div>
             <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">CATEGORIA</div><div style="font-weight:600;color:#fff">${sanitize(f.categoria)}</div></div>
-            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">CLASSIFICAÇÃO</div><div class="score-circle ${classifColors[f.classif]||'b'}" style="display:inline-flex;width:36px;height:36px;font-size:1rem">${sanitize(f.classif)}</div></div>
+            <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">CLASSIFICAÇÃO</div><div class="score-circle ${classifColors[f.classif]||'b'}" style="display:inline-flex;width:36px;height:36px;font-size:1rem">${sanitize(f.classif||'-')}</div></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
             <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px"><div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:4px">CONTATO</div><div style="font-weight:600;color:#fff">${sanitize(f.contato)}</div></div>
@@ -458,7 +422,73 @@ function irAvaliar() {
     }, 100);
 }
 
-const pesos = { qualidade:0.3, prazo:0.25, atendimento:0.2, preco:0.15, doc:0.1 };
+const DEFAULT_CRITERIA = [
+    {id:'qualidade',nome:'Os produtos ou serviços atendem consistentemente às especificações?',peso:20},
+    {id:'conformidade',nome:'O fornecedor apresenta documentos, certificados e evidências de conformidade?',peso:15},
+    {id:'prazo',nome:'As entregas são realizadas nos prazos e quantidades acordados?',peso:15},
+    {id:'rastreabilidade',nome:'Existe identificação e rastreabilidade adequada dos fornecimentos?',peso:10},
+    {id:'legal',nome:'O fornecedor atende aos requisitos legais, regulatórios e contratuais aplicáveis?',peso:10},
+    {id:'mudancas',nome:'Mudanças que podem afetar o fornecimento são comunicadas previamente?',peso:10},
+    {id:'nc',nome:'Não conformidades e reclamações recebem resposta e ação eficaz?',peso:10},
+    {id:'atendimento',nome:'O atendimento técnico e comercial é ágil e eficaz?',peso:10}
+];
+let pesos = {};
+
+function getSupplierCriteria() {
+    const criteria = JSON.parse(localStorage.getItem('sgq_supplier_criteria') || 'null') || DEFAULT_CRITERIA;
+    pesos = Object.fromEntries(criteria.map(item => [item.id, Number(item.peso) / 100]));
+    return criteria;
+}
+
+function renderEvaluationCriteria() {
+    const criteria = getSupplierCriteria();
+    document.getElementById('criterios-list').innerHTML = criteria.map(item => `
+        <div class="criterio-item" style="padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:.9rem;font-weight:600;color:#fff">${sanitize(item.nome)}</div><span style="font-size:.75rem;color:rgba(255,255,255,.35)">Peso: ${item.peso}%</span></div>
+            <div style="display:flex;gap:8px">${[1,2,3,4,5].map(n=>`<button class="nota-btn" data-criterio="${item.id}" data-nota="${n}" onclick="selecionarNota('${item.id}',${n},this)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;font-weight:700">${n}</button>`).join('')}</div>
+        </div>`).join('');
+}
+
+function resetEvaluationForm() {
+    Object.keys(notas).forEach(key => delete notas[key]);
+    document.querySelectorAll('.nota-btn').forEach(button => {
+        button.style.background='rgba(255,255,255,.04)';
+        button.style.color='rgba(255,255,255,.5)';
+        button.style.borderColor='rgba(255,255,255,.1)';
+    });
+    document.getElementById('nota-final').textContent='-';
+    document.getElementById('classif-result').textContent='-';
+    document.getElementById('aval-obs').value='';
+}
+
+function renderSupplierCriteriaConfig() {
+    document.getElementById('criteria-config-list').innerHTML = getSupplierCriteria().map((item,index) => `<div class="supplier-criterion-config" data-id="${item.id}" style="display:flex;gap:10px;align-items:center"><input class="mod-input criterion-name" value="${sanitize(item.nome)}" style="flex:1"><input class="mod-input criterion-weight" type="number" min="1" max="100" value="${item.peso}" style="width:80px"><span>%</span><button class="mod-btn danger" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button></div>`).join('');
+}
+
+function addSupplierCriterion() {
+    const row = document.createElement('div');
+    row.className = 'supplier-criterion-config'; row.dataset.id = `criterio_${Date.now()}`;
+    row.style.cssText = 'display:flex;gap:10px;align-items:center';
+    row.innerHTML = '<input class="mod-input criterion-name" placeholder="Novo critério" style="flex:1"><input class="mod-input criterion-weight" type="number" min="1" max="100" value="10" style="width:80px"><span>%</span><button class="mod-btn danger" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>';
+    document.getElementById('criteria-config-list').appendChild(row);
+}
+
+function saveSupplierCriteria() {
+    const criteria = [...document.querySelectorAll('.supplier-criterion-config')].map(row => ({id:row.dataset.id,nome:row.querySelector('.criterion-name').value.trim(),peso:Number(row.querySelector('.criterion-weight').value)})).filter(item => item.nome && item.peso > 0);
+    const total = criteria.reduce((sum,item) => sum + item.peso, 0);
+    if (!criteria.length) return alert('Cadastre ao menos um critério.');
+    if (total !== 100) return alert(`A soma dos pesos deve ser 100%. Total atual: ${total}%.`);
+    localStorage.setItem('sgq_supplier_criteria', JSON.stringify(criteria));
+    pesos = Object.fromEntries(criteria.map(item => [item.id,item.peso/100]));
+    showToast('Critérios e pesos salvos!', 'success');
+}
+
+function resetSupplierCriteria() {
+    if (!confirm('Restaurar as perguntas e pesos recomendados?')) return;
+    localStorage.setItem('sgq_supplier_criteria', JSON.stringify(DEFAULT_CRITERIA));
+    renderSupplierCriteriaConfig();
+    showToast('Modelo padrão restaurado.', 'success');
+}
 
 function selecionarNota(criterio, nota, btn) {
     notas[criterio] = nota;
@@ -478,7 +508,7 @@ function calcNotaFinal() {
     for (const [k, peso] of Object.entries(pesos)) {
         if (notas[k]) { total += notas[k] * peso; pesoTotal += peso; }
     }
-    if (!pesoTotal) return;
+    if (!pesoTotal) { document.getElementById('nota-final').textContent='-';document.getElementById('classif-result').textContent='-';return; }
     const nota = (total / pesoTotal).toFixed(1);
     const classif = nota >= 4.5 ? 'A' : nota >= 3.5 ? 'B' : nota >= 2.5 ? 'C' : 'D';
     const colors = {A:'#34d399',B:'#3b9fe2',C:'#fbbf24',D:'#f87171'};
@@ -489,8 +519,9 @@ function calcNotaFinal() {
 function salvarAvaliacao() {
     const fornId = parseInt(document.getElementById('aval-fornecedor').value);
     const periodo = document.getElementById('aval-periodo').value;
+    const criteria = getSupplierCriteria();
     if (!fornId) return alert('Selecione o fornecedor.');
-    if (Object.keys(notas).length < 3) return alert('Avalie pelo menos 3 crit?rios.');
+    if (!criteria.every(item => Number.isFinite(notas[item.id]))) return alert('Avalie todos os critérios antes de registrar.');
 
     let total = 0, pesoTotal = 0;
     for (const [k, peso] of Object.entries(pesos)) {
@@ -503,13 +534,14 @@ function salvarAvaliacao() {
     const forn = db.fornecedores.find(f=>f.id===fornId);
     if (!forn) return;
     if (!forn.avaliacoes) forn.avaliacoes = [];
-    forn.avaliacoes.push({ periodo, nota, obs:document.getElementById('aval-obs').value, data:new Date().toISOString() });
-    forn.score = nota;
-    forn.classif = classif;
+    forn.avaliacoes.push({ periodo, nota, classif, obs:document.getElementById('aval-obs').value.trim(), data:new Date().toISOString(), respostas:Object.assign({},notas), criterios:JSON.parse(JSON.stringify(criteria)) });
+    forn.score = Number((forn.avaliacoes.reduce((sum,item)=>sum+Number(item.nota||0),0)/forn.avaliacoes.length).toFixed(1));
+    forn.classif = forn.score >= 4.5 ? 'A' : forn.score >= 3.5 ? 'B' : forn.score >= 2.5 ? 'C' : 'D';
     saveDB(db);
+    SGQCore.audit('Fornecedores','avaliou','Fornecedor',forn.id,`${periodo}: nota ${nota.toFixed(1)}`);
     switchView('lista');
-    showToast('Avaliao registrada com sucesso!', 'success');
-    Object.keys(notas).forEach(k => delete notas[k]);
+    showToast('Avaliação registrada com sucesso!', 'success');
+    resetEvaluationForm();
 }
 
 function salvarFornecedor() {
@@ -517,15 +549,22 @@ function salvarFornecedor() {
     const categoria = document.getElementById('nf-categoria').value;
     if (!razao || !categoria) return alert('Preencha razão social e categoria.');
     const db = getDB();
-    const newId = db.fornecedores.length ? Math.max(...db.fornecedores.map(f=>f.id))+1 : 1;
-    db.fornecedores.push({ id:newId, razao, cnpj:document.getElementById('nf-cnpj').value, categoria, contato:document.getElementById('nf-contato').value, email:document.getElementById('nf-email').value, tel:document.getElementById('nf-tel').value, produtos:document.getElementById('nf-produtos').value, score:null, classif:'B', avaliacoes:[] });
+    const current=db.fornecedores.find(item=>item.id===editingFornId);
+    const cnpj=document.getElementById('nf-cnpj').value.trim();
+    const email=document.getElementById('nf-email').value.trim().toLowerCase();
+    const cnpjDigits=cnpj.replace(/\D/g,'');
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('Informe um e-mail válido.');
+    if (cnpjDigits && db.fornecedores.some(item=>item.id!==current?.id&&item.ativo!==false&&String(item.cnpj||'').replace(/\D/g,'')===cnpjDigits)) return alert('Já existe um fornecedor ativo com este CNPJ/CPF.');
+    const record={id:current?.id||(db.fornecedores.length ? Math.max(...db.fornecedores.map(f=>Number(f.id)||0))+1 : 1),razao,cnpj,categoria,contato:document.getElementById('nf-contato').value.trim(),email,tel:document.getElementById('nf-tel').value.trim(),produtos:document.getElementById('nf-produtos').value.trim(),score:current?.score??null,classif:current?.classif||null,avaliacoes:current?.avaliacoes||[],ativo:true,createdById:current?.createdById||SGQCore.currentUser()?.id,createdBy:current?.createdBy||SGQCore.currentUser()?.name,createdAt:current?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};if(current)Object.assign(current,record);else db.fornecedores.push(record);
     saveDB(db);
     closeModal('modalNovo');
     renderFornecedores();
-    showToast('Fornecedor cadastrado!', 'success');
+    SGQCore.audit('Fornecedores',current?'editou':'criou','Fornecedor',record.id,record.razao);editingFornId=null;showToast(current?'Fornecedor atualizado!':'Fornecedor cadastrado!', 'success');
 }
 
-function openNovoModal() { openModal('modalNovo'); }
+function editFornecedor(){const item=getDB().fornecedores.find(entry=>entry.id===currentFornId);if(!item)return;editingFornId=item.id;['razao','cnpj','categoria','contato','email','tel','produtos'].forEach(key=>document.getElementById('nf-'+key).value=item[key]||'');document.getElementById('modalNovoTitle').innerHTML='<i class="fas fa-pen" style="color:var(--purple)"></i> Editar Fornecedor';closeModal('modalDetalhe');openModal('modalNovo');}
+function deactivateFornecedor(){const reason=prompt('Motivo da desativação do fornecedor:');if(!reason)return;const db=getDB();SGQCore.softDeactivate(db.fornecedores,currentFornId,{module:'Fornecedores',entityType:'Fornecedor',reason});saveDB(db);closeModal('modalDetalhe');renderFornecedores();showToast('Fornecedor desativado.','success');}
+function openNovoModal() { editingFornId=null;['razao','cnpj','contato','email','tel','produtos'].forEach(key=>document.getElementById('nf-'+key).value='');document.getElementById('nf-categoria').value='';document.getElementById('modalNovoTitle').innerHTML='<i class="fas fa-plus-circle" style="color:var(--purple)"></i> Cadastrar Fornecedor';openModal('modalNovo'); }
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 function showToast(msg, type) {
@@ -539,6 +578,8 @@ function showToast(msg, type) {
 document.querySelectorAll('.mod-modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('active'); }));
 seedData();
 renderFornecedores();
+renderEvaluationCriteria();
+renderSupplierCriteriaConfig();
 </script>
 <script>
 function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
@@ -547,5 +588,5 @@ document.addEventListener('click',function(e){var m=document.getElementById('use
 function startModuleTour() {
     alert('Tour deste módulo em breve! ');
 }
-</script><script src="../assets/js/global-search.js"></script></body>
+</script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>

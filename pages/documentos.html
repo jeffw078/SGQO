@@ -25,7 +25,6 @@
                 <div style="display:flex;align-items:center;justify-content:center">
                     
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Gestão de Documentos</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
                 
             </div>
@@ -43,7 +42,7 @@
             <div class="doc-tree-scroll" id="docTreeContainer"></div>
             <div class="nav-section" style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px;margin-top:auto;flex-shrink:0">
                 <div class="nav-section-title">Administração</div>
-                <a href="#" class="nav-item" id="navCategories" onclick="showView('categories');return false"><i class="fas fa-tags"></i> Categorias</a>
+                <a href="#" class="nav-item" id="navCategories" onclick="showView('categories');return false"><i class="fas fa-cog"></i> Configuração de Categorias</a>
             </div>
         </nav>
     </aside>
@@ -55,8 +54,13 @@
 
                 <div class="topbar-search">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Buscar documentos..." id="docSearch" oninput="filterDocuments()">
+                    <input type="text" placeholder='Buscar documentos, texto, "frase exata" ou /regex/' id="docSearch" oninput="filterDocuments()" title='Termo simples busca por palavras. Use "frase exata" para sequência literal ou /regex/ para padrão avançado.'>
                 </div>
+                <button class="doc-my-pending-btn" id="myPendingDocumentsBtn" type="button" onclick="showMyApprovalPending()" title="Documentos que aguardam sua aprovação">
+                    <i class="fas fa-inbox"></i>
+                    <span>Minhas pendências</span>
+                    <strong id="myPendingDocumentsCount">0</strong>
+                </button>
             </div>
             <div class="topbar-right">
                 <button class="topbar-icon" title="Notificações"><i class="fas fa-bell"></i></button>
@@ -108,7 +112,7 @@
                     <div class="doc-empty">
                         <i class="fas fa-folder-open"></i>
                         <p>Selecione uma pasta no menu lateral</p>
-                        <small>Navegue pelos setores para visualizar os documentos</small>
+                        <small>Navegue pelos setores para visualizar os documentos ou pesquise no campo acima</small>
                     </div>
                 </div>
             </div>
@@ -462,7 +466,7 @@
                 <input class="doc-form-input" id="ccDestinatarioOutro" placeholder="Digite o nome do destinat?rio" style="display:none;margin-top:8px">
             </div>
             <div class="doc-form-group">
-                <label class="doc-form-label">Data de Emiss?o</label>
+                <label class="doc-form-label">Data de Emissão</label>
                 <input type="date" class="doc-form-input" id="ccDataEmissao">
             </div>
             <div class="doc-form-group">
@@ -471,26 +475,26 @@
                 <p class="doc-form-hint" style="margin-top:4px">Deixe em branco para prazo indeterminado</p>
             </div>
             <div class="doc-form-group">
-                <label class="doc-form-label">Posi??o da marca de c?pia</label>
+                <label class="doc-form-label">Posição da marca de cópia</label>
                 <select class="doc-form-input" id="ccPosicao">
-                    <option value="rodape">Rodap?</option>
+                    <option value="rodape">Rodapé</option>
                     <option value="cabecalho">Cabe?alho</option>
                     <option value="lateral-direita">Lateral direita</option>
                     <option value="lateral-esquerda">Lateral esquerda</option>
                 </select>
             </div>
             <div class="doc-form-group">
-                <label class="doc-form-label">Informa??es na marca</label>
+                <label class="doc-form-label">Informações na marca</label>
                 <div class="cc-field-grid">
                     <label><input type="checkbox" id="ccInfoValidade" checked> Data de validade</label>
-                    <label><input type="checkbox" id="ccInfoEmissao" checked> Data de emiss?o</label>
-                    <label><input type="checkbox" id="ccInfoDestinatario" checked> Destinat?rio</label>
+                    <label><input type="checkbox" id="ccInfoEmissao" checked> Data de emissão</label>
+                    <label><input type="checkbox" id="ccInfoDestinatario" checked> Destinatário</label>
                     <label><input type="checkbox" id="ccInfoEmissor" checked> Emissor</label>
                 </div>
             </div>
             <div class="doc-form-group">
-                <label class="doc-form-label">Observa??es</label>
-                <textarea class="doc-form-input" id="ccObs" rows="2" placeholder="Finalidade, localiza??o f?sica, etc..."></textarea>
+                <label class="doc-form-label">Observações</label>
+                <textarea class="doc-form-input" id="ccObs" rows="2" placeholder="Finalidade, localização física, etc..."></textarea>
             </div>
 
             <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:8px;padding:12px 14px;font-size:.78rem;color:rgba(255,255,255,.5)">
@@ -506,18 +510,18 @@
 </div>
 
 <!-- ============================================================
-     MODAL: GERENCIAR C?PIAS
+     MODAL: GERENCIAR CópiaS
      ============================================================ -->
 <div class="cc-modal-overlay" id="manageCCModal">
     <div class="cc-modal">
         <div class="doc-modal-header" style="padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06)">
-            <h3 style="color:#fff;font-size:.95rem;font-weight:700;margin:0;display:flex;align-items:center;gap:8px"><i class="fas fa-list-check" style="color:var(--primary)"></i> C?pias Controladas</h3>
+            <h3 style="color:#fff;font-size:.95rem;font-weight:700;margin:0;display:flex;align-items:center;gap:8px"><i class="fas fa-list-check" style="color:var(--primary)"></i> Cópias Controladas</h3>
             <button class="doc-modal-close" onclick="document.getElementById('manageCCModal').classList.remove('open')">&times;</button>
         </div>
         <div class="doc-modal-body" style="padding:24px;flex:1;overflow-y:auto">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-                <span style="font-size:.82rem;color:rgba(255,255,255,.4)">C?pias ativas do documento atual</span>
-                <button class="doc-btn primary small" onclick="openCopiaControlada()"><i class="fas fa-plus"></i> Nova C?pia</button>
+                <span style="font-size:.82rem;color:rgba(255,255,255,.4)">Cópias ativas do documento atual</span>
+                <button class="doc-btn primary small" onclick="openCopiaControlada()"><i class="fas fa-plus"></i> Nova Cópia</button>
             </div>
             <div id="manageCCList"></div>
         </div>
@@ -611,7 +615,18 @@
 // ============================================================
 // DATA
 // ============================================================
-const currentUser = 'João Teste';
+function getDocumentCurrentUser() {
+    try {
+        const session = JSON.parse(localStorage.getItem('sgq_user_session') || 'null');
+        const users = JSON.parse(localStorage.getItem('sgq_system_users') || '[]');
+        return users.find(user => String(user.id) === String(session?.userId) && user.status !== 'inativo') || {id:null,name:'João Teste',email:'',role:'user',roleLabel:'Usuário',sectorName:''};
+    } catch (error) {
+        return {id:null,name:'João Teste',email:'',role:'user',roleLabel:'Usuário',sectorName:''};
+    }
+}
+
+const currentDocumentUser = getDocumentCurrentUser();
+const currentUser = currentDocumentUser.name;
 
 let docFolders = JSON.parse(localStorage.getItem('sgq_docFolders')) || null;
 if (!docFolders) {
@@ -780,6 +795,7 @@ if (!docCategories) {
 function persistData() {
     localStorage.setItem('sgq_docFolders', JSON.stringify(docFolders));
     localStorage.setItem('sgq_docCategories', JSON.stringify(docCategories));
+    updateMyApprovalPendingCount();
 }
 
 function assignValidationPdfUrls(folders) {
@@ -794,7 +810,39 @@ function assignValidationPdfUrls(folders) {
     });
 }
 
+function seedDocumentSearchText(folders) {
+    const samples = {
+        1001: 'Procedimento para controle de documentos e registros. Inclui teste de fase, teste de caso, revisão, aprovação, distribuição e retenção de informação documentada.',
+        1002: 'Programa de auditorias internas, critérios, escopo, auditores, evidências e teste de conformidade do processo.',
+        1003: 'Controle de produto não conforme, identificação, segregação, disposição, causa raiz e plano de ação.',
+        1004: 'Instrução para inspeção de recebimento de matéria-prima, critérios de aceitação, amostragem e teste dimensional.',
+        1005: 'Calibração de instrumentos, rastreabilidade metrológica, certificados, frequência e teste de verificação intermediária.',
+        1006: 'Formulário para registro de não conformidade, descrição, causa, correção, ação corretiva e verificação de eficácia.',
+        1007: 'Checklist de auditoria com perguntas por requisito ISO 9001, evidências esperadas e teste de aderência.',
+        1008: 'Manual da qualidade com escopo do SGQ, contexto da organização, política da qualidade e processos principais.',
+        2001: 'Processo de montagem linha A com sequência operacional, parâmetros, pontos de controle e teste de fase.',
+        2002: 'Processo de embalagem, identificação, proteção, expedição e teste de caso para embalagem crítica.',
+        2003: 'Procedimento de segurança para EPI, responsabilidades, uso obrigatório e inspeção periódica.',
+        3001: 'Especificação técnica do produto X, requisitos de projeto, validação, verificação e critérios de teste.',
+        3002: 'Desenho técnico da peça A-100 com tolerâncias dimensionais e identificação de revisão.',
+        3003: 'Desenho conjunto montagem B com lista de componentes, encaixes e instruções de montagem.',
+        4001: 'Plano anual de treinamentos 2026, competências, matriz de treinamento e avaliação de eficácia.',
+        4002: 'Política de integração de novos colaboradores, comunicação interna, responsabilidades e registros.',
+        5001: 'Plano de manutenção preventiva, periodicidade, ativos críticos, checklist e histórico de execução.',
+        5002: 'Registro de manutenção corretiva, falha, causa, ação executada, responsável e retorno à operação.',
+        6001: 'Procedimento de expedição, conferência, rastreabilidade, separação, carregamento e entrega ao cliente.',
+        6002: 'Controle de estoque, política de inventário, endereçamento, acuracidade e movimentação de materiais.'
+    };
+    folders.forEach(folder => {
+        (folder.documents || []).forEach(doc => {
+            if (!doc.extractedText && samples[doc.id]) doc.extractedText = samples[doc.id];
+        });
+        seedDocumentSearchText(folder.children || []);
+    });
+}
+
 assignValidationPdfUrls(docFolders);
+seedDocumentSearchText(docFolders);
 persistData();
 
 function sanitize(str) {
@@ -838,6 +886,7 @@ function showView(view) {
 
     // Update sidebar active - use IDs for reliability
     document.getElementById('navCategories').classList.toggle('active', view === 'categories');
+    if (view !== 'folders') setMyPendingButtonActive(false);
 }
 
 // ============================================================
@@ -916,6 +965,7 @@ function getFolderPath(folders, id, path = []) {
 }
 
 function selectFolder(id) {
+    setMyPendingButtonActive(false);
     selectedFolderId = id;
     const path = getFolderPath(docFolders, id);
     if (path) path.forEach(p => expandedFolders.add(p.id));
@@ -966,11 +1016,11 @@ function renderFolderContent(id) {
     document.getElementById('tabNInativos').textContent  = inativos.length;
 
     const tabMap = { ativos, pendentes, inativos };
-    const q = document.getElementById('docSearch').value.toLowerCase().trim();
+    const q = document.getElementById('docSearch').value.trim();
+    const matcher = createDocumentSearchMatcher(q);
     let docs = tabMap[currentDocTab] || ativos;
     if (q) {
-        docs = docs.filter(d => [d.title, d.code, d.category, d.version, d.status]
-            .some(v => String(v || '').toLowerCase().includes(q)));
+        docs = docs.filter(d => matcher.test(buildDocumentSearchText(d, [folder.name])));
     }
 
     const body = document.getElementById('docContentBody');
@@ -1052,6 +1102,7 @@ function renderFolderContent(id) {
 }
 
 function clearFolderSelection() {
+    setMyPendingButtonActive(false);
     selectedFolderId = null;
     renderDocTree();
     document.getElementById('docBreadcrumb').innerHTML = '<span class="current"><i class="fas fa-home" style="margin-right:4px"></i> Documentos</span>';
@@ -1060,12 +1111,270 @@ function clearFolderSelection() {
         <div class="doc-empty">
             <i class="fas fa-folder-open"></i>
             <p>Selecione uma pasta no menu lateral</p>
-            <small>Navegue pelos setores para visualizar os documentos</small>
+            <small>Navegue pelos setores para visualizar os documentos ou pesquise no campo acima</small>
         </div>`;
 }
 
 function filterDocuments() {
-    if (selectedFolderId) renderFolderContent(selectedFolderId);
+    setMyPendingButtonActive(false);
+    if (selectedFolderId) {
+        renderFolderContent(selectedFolderId);
+        return;
+    }
+
+    const q = document.getElementById('docSearch').value.trim();
+    if (!q) {
+        clearFolderSelection();
+        return;
+    }
+
+    const matcher = createDocumentSearchMatcher(q);
+    const matches = collectDocumentSearchResults(docFolders, [], matcher);
+    document.getElementById('docBreadcrumb').innerHTML = '<span class="current"><i class="fas fa-search" style="margin-right:4px"></i> Busca de documentos</span>';
+    document.getElementById('docContentActions').style.display = 'none';
+    document.getElementById('docFilterTabs').style.display = 'none';
+    document.getElementById('docContentBody').innerHTML = renderDocumentSearchResults(matches, q);
+}
+
+function collectDocumentSearchResults(folders, path, matcher) {
+    let results = [];
+    (folders || []).forEach(folder => {
+        const currentPath = path.concat(folder.name);
+        (folder.documents || []).forEach(doc => {
+            const metadataText = buildDocumentSearchText(doc, currentPath, false);
+            const fullText = buildDocumentSearchText(doc, currentPath, true);
+            if (matcher.test(fullText)) {
+                results.push({
+                    doc,
+                    folderId: folder.id,
+                    path: currentPath,
+                    source: matcher.test(metadataText) ? 'metadados' : 'texto interno'
+                });
+            }
+        });
+        if (folder.children) {
+            results = results.concat(collectDocumentSearchResults(folder.children, currentPath, matcher));
+        }
+    });
+    return results;
+}
+
+function normalizeApprover(value) {
+    return normalizeSearchText(typeof value === 'object' ? (value.name || value.email || value.role || value.id || '') : value);
+}
+
+function getDocumentApprovalPolicy(doc) {
+    const category = docCategories.find(item => String(item.id) === String(doc.categoryId)) || docCategories.find(item => item.name === doc.category) || {};
+    const snapshot = doc.approvalPolicy || {};
+    return {
+        type: snapshot.type || category.approvalType || 'qualquer',
+        minApprovals: Number(snapshot.minApprovals || category.minApprovers || 1),
+        approvers: snapshot.approvers || doc.pendingApprovers || doc.approvers || category.approvers || []
+    };
+}
+
+function hasCurrentUserApproved(doc) {
+    return (doc.approvals || []).some(approval => approval.action === 'aprovado' && (
+        String(approval.userId || '') === String(currentDocumentUser.id || '') ||
+        normalizeSearchText(approval.email) === normalizeSearchText(currentDocumentUser.email) ||
+        normalizeSearchText(approval.user) === normalizeSearchText(currentDocumentUser.name)
+    ));
+}
+
+function currentUserMatchesApprover(approver) {
+    const expected = normalizeApprover(approver);
+    if (!expected) return false;
+    return [currentDocumentUser.name,currentDocumentUser.email,currentDocumentUser.role,currentDocumentUser.roleLabel,currentDocumentUser.sectorName]
+        .map(normalizeSearchText)
+        .filter(Boolean)
+        .includes(expected);
+}
+
+function isDocumentPendingForCurrentUser(doc) {
+    if (!['pendente','revisao'].includes(doc.status) || hasCurrentUserApproved(doc)) return false;
+    if (currentDocumentUser.role === 'super_admin' && currentDocumentUser.developmentOnly) return true;
+    const policy = getDocumentApprovalPolicy(doc);
+    if (!policy.approvers.length) return false;
+    if (['sequencial','alcada'].includes(policy.type)) {
+        const approvedNames = (doc.approvals || []).filter(item => item.action === 'aprovado').map(item => normalizeSearchText(item.approver || item.user));
+        const nextApprover = policy.approvers.find(approver => !approvedNames.includes(normalizeApprover(approver)));
+        return currentUserMatchesApprover(nextApprover);
+    }
+    return policy.approvers.some(currentUserMatchesApprover);
+}
+
+function collectMyApprovalPending(folders, path = []) {
+    let results = [];
+    (folders || []).forEach(folder => {
+        const currentPath = path.concat(folder.name);
+        (folder.documents || []).forEach(doc => {
+            if (isDocumentPendingForCurrentUser(doc)) results.push({doc,folderId:folder.id,path:currentPath});
+        });
+        results = results.concat(collectMyApprovalPending(folder.children || [], currentPath));
+    });
+    return results.sort((a,b) => String(a.doc.date || '').localeCompare(String(b.doc.date || '')));
+}
+
+function setMyPendingButtonActive(active) {
+    document.getElementById('myPendingDocumentsBtn')?.classList.toggle('active', Boolean(active));
+}
+
+function updateMyApprovalPendingCount() {
+    const count = collectMyApprovalPending(docFolders).length;
+    const badge = document.getElementById('myPendingDocumentsCount');
+    if (badge) {
+        badge.textContent = String(count);
+        badge.classList.toggle('empty', count === 0);
+    }
+    return count;
+}
+
+function showMyApprovalPending() {
+    showView('folders');
+    selectedFolderId = null;
+    document.getElementById('docSearch').value = '';
+    renderDocTree();
+    setMyPendingButtonActive(true);
+    const results = collectMyApprovalPending(docFolders);
+    document.getElementById('docBreadcrumb').innerHTML = '<span class="current"><i class="fas fa-inbox" style="margin-right:6px"></i> Minhas pendências de aprovação</span>';
+    document.getElementById('docContentActions').style.display = 'none';
+    document.getElementById('docFilterTabs').style.display = 'none';
+    document.getElementById('docContentBody').innerHTML = renderMyApprovalPending(results);
+}
+
+function renderMyApprovalPending(results) {
+    if (!results.length) return `<div class="doc-empty doc-pending-empty"><i class="fas fa-circle-check"></i><p>Nenhum documento aguardando sua aprovação</p><small>Quando você for selecionado como aprovador, os documentos aparecerão automaticamente nesta lista.</small></div>`;
+    const iconMap = {pdf:'fa-file-pdf',doc:'fa-file-word',xls:'fa-file-excel',img:'fa-file-image',default:'fa-file'};
+    let html = `<div class="doc-pending-summary"><div><strong>${results.length}</strong><span>documento(s) aguardando sua decisão</span></div><small>Abra um documento para revisar seu conteúdo antes de aprovar.</small></div>`;
+    html += '<div class="doc-list-header"><div></div><div>Documento</div><div>Categoria</div><div>Pasta</div><div>Enviado em</div><div></div></div>';
+    results.forEach(item => {
+        const doc = item.doc;
+        html += `<div class="doc-list-row" onclick="openDocViewer(${doc.id})"><div class="doc-icon ${doc.type || 'default'}"><i class="fas ${iconMap[doc.type] || iconMap.default}"></i></div><div><div class="doc-name">${sanitize(doc.title)}</div><div class="doc-code">${sanitize(doc.code)} - v${sanitize(doc.version || '1.0')}</div></div><div><span class="doc-category-tag">${sanitize(doc.category)}</span></div><div class="doc-date">${sanitize(item.path.join(' / '))}</div><div class="doc-date">${doc.date ? new Date(doc.date + 'T00:00:00').toLocaleDateString('pt-BR') : '-'}</div><div class="doc-actions-cell" onclick="event.stopPropagation()"><button title="Revisar documento" onclick="openDocViewer(${doc.id})"><i class="fas fa-eye"></i></button></div></div>`;
+    });
+    return html;
+}
+
+function createDocumentSearchMatcher(rawQuery) {
+    const query = String(rawQuery || '').trim();
+
+    if (/^\/.+\/[a-z]*$/i.test(query)) {
+        const lastSlash = query.lastIndexOf('/');
+        const pattern = query.slice(1, lastSlash);
+        const flags = query.slice(lastSlash + 1) || 'i';
+        try {
+            const cleanFlags = Array.from(new Set((flags + 'i').replace(/[gy]/g, '').split(''))).join('');
+            const regex = new RegExp(pattern, cleanFlags);
+            return {
+                mode: 'regex',
+                test: text => {
+                    regex.lastIndex = 0;
+                    return regex.test(String(text || ''));
+                }
+            };
+        } catch (e) {
+            return { mode: 'invalid-regex', test: () => false };
+        }
+    }
+
+    const phrase = query.match(/^"(.+)"$/);
+    if (phrase) {
+        const exact = normalizeSearchText(phrase[1]);
+        return { mode: 'phrase', test: text => normalizeSearchText(text).includes(exact) };
+    }
+
+    const terms = normalizeSearchText(query).split(/\s+/).filter(Boolean);
+    return {
+        mode: 'terms',
+        test: text => {
+            const normalized = normalizeSearchText(text);
+            return terms.every(term => normalized.includes(term));
+        }
+    };
+}
+
+function normalizeSearchText(value) {
+    return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+}
+
+function buildDocumentSearchText(doc, path, includeExtractedText = true) {
+    const values = [
+        doc.title,
+        doc.code,
+        doc.category,
+        doc.version,
+        doc.status,
+        doc.author,
+        doc.approvedBy,
+        doc.date,
+        path.join(' ')
+    ];
+
+    if (doc.customFields && typeof doc.customFields === 'object') {
+        values.push(...Object.values(doc.customFields));
+    }
+
+    if (includeExtractedText) {
+        values.push(
+            doc.extractedText,
+            doc.searchText,
+            doc.contentText,
+            readStoredPlainText(doc)
+        );
+    }
+
+    return values.flat().filter(Boolean).join(' ');
+}
+
+function readStoredPlainText(doc) {
+    try {
+        const stored = localStorage.getItem('sgq_docfile_' + doc.id);
+        if (!stored || !/^data:text\//i.test(stored)) return '';
+        const payload = stored.split(',')[1] || '';
+        const binary = atob(payload);
+        const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+        return new TextDecoder('utf-8').decode(bytes);
+    } catch (e) {
+        return '';
+    }
+}
+
+function renderDocumentSearchResults(results, query) {
+    if (!results.length) {
+        return `<div class="doc-empty" style="padding:40px 20px">
+            <i class="fas fa-file-circle-question"></i>
+            <p>Nenhum documento encontrado</p>
+            <small>Nenhum metadado ou texto interno indexado corresponde a "${sanitize(query)}".</small>
+        </div>`;
+    }
+
+    const iconMap = { pdf: 'fa-file-pdf', doc: 'fa-file-word', xls: 'fa-file-excel', img: 'fa-file-image', default: 'fa-file' };
+    const statusLabels = { ativo: 'Publicado', pendente: 'Pendente', revisao: 'Revisão', inativo: 'Inativo', obsoleto: 'Obsoleto' };
+    let html = `<div class="doc-section-label">Documentos encontrados - ${results.length} resultado(s)</div>`;
+    html += `<div class="doc-list-header"><div></div><div>Nome</div><div>Categoria</div><div>Pasta</div><div>Status</div><div></div></div>`;
+    results.forEach(item => {
+        const d = item.doc;
+        const st = d.status || 'ativo';
+        html += `
+            <div class="doc-list-row" onclick="openDocViewer(${d.id})">
+                <div class="doc-icon ${d.type || 'default'}"><i class="fas ${iconMap[d.type] || iconMap.default}"></i></div>
+                <div>
+                    <div class="doc-name">${sanitize(d.title)}</div>
+                    <div class="doc-code">${sanitize(d.code)} - v${sanitize(d.version)} · ${sanitize(item.source)}</div>
+                </div>
+                <div><span class="doc-category-tag">${sanitize(d.category)}</span></div>
+                <div class="doc-date">${sanitize(item.path.join(' / '))}</div>
+                <div><span class="doc-status ${st}">${statusLabels[st] || st}</span></div>
+                <div class="doc-actions-cell" onclick="event.stopPropagation()">
+                    <button title="Abrir pasta" onclick="selectFolder(${item.folderId})"><i class="fas fa-folder-open"></i></button>
+                    <button title="Visualizar" onclick="openDocViewer(${d.id})"><i class="fas fa-eye"></i></button>
+                    <button title="Baixar" onclick="downloadDoc(${d.id})"><i class="fas fa-download"></i></button>
+                </div>
+            </div>`;
+    });
+    return html;
 }
 
 // --- New Folder ---
@@ -1106,7 +1415,7 @@ function confirmNewFolder() {
 // ============================================================
 function renderCategoryList() {
     const container = document.getElementById('catListContainer');
-    if (docCategories.length === 0) {
+    const activeCategories=docCategories.filter(category=>category.ativo!==false&&!category.deletedAt);if (activeCategories.length === 0) {
         container.innerHTML = `
             <div class="doc-empty">
                 <i class="fas fa-tags"></i>
@@ -1117,7 +1426,7 @@ function renderCategoryList() {
     }
     const approvalLabels = { alcada: 'Alçada', consenso: 'Consenso', maioria: 'Maioria', qualquer: 'Qualquer Um', sequencial: 'Sequencial' };
     let html = '<div class="cat-list">';
-    docCategories.forEach(cat => {
+    activeCategories.forEach(cat => {
         html += `
             <div class="cat-card" onclick="editCategory(${cat.id})">
                 <div class="cat-card-info">
@@ -1143,11 +1452,10 @@ function renderCategoryList() {
 }
 
 function deleteCategory(id) {
-    if (!confirm('Deseja excluir esta categoria?')) return;
-    docCategories = docCategories.filter(c => c.id !== id);
+    const reason=prompt('Motivo da desativação da categoria:');if(!reason)return;const category=docCategories.find(item=>item.id===id);if(!category)return;category.ativo=false;category.deletedAt=new Date().toISOString();category.deletedBy=SGQCore.currentUser()?.name;category.deactivationReason=reason;SGQCore.audit('Documentos','desativou','Categoria',id,reason);
     persistData();
     renderCategoryList();
-    showNotification('Categoria exclu?da.');
+    showNotification('Categoria desativada. Documentos e histórico foram preservados.');
 }
 
 // ============================================================
@@ -1627,6 +1935,7 @@ async function saveNewDocument() {
         status: needsApproval ? 'pendente' : 'ativo',
         author: currentUser,
         approvals: [],
+        approvalPolicy: needsApproval ? {type:cat.approvalType,minApprovals:Number(cat.minApprovers || 1),approvers:[...cat.approvers]} : null,
         copias: [],
         multipleAttachments: cat.multipleAttachments || false
     };
@@ -1732,7 +2041,7 @@ function openDocViewer(docId) {
     var approveBtn = document.getElementById('dv-approve-btn');
     var ccBtn      = document.getElementById('dv-cc-btn');
     if (reviewBtn)  reviewBtn.style.display  = (st === 'ativo') ? '' : 'none';
-    if (approveBtn) approveBtn.style.display = (st === 'pendente' || st === 'revisao') ? '' : 'none';
+    if (approveBtn) approveBtn.style.display = isDocumentPendingForCurrentUser(doc) && (!window.SGQCore || SGQCore.permission('documentos','approve')) ? '' : 'none';
     if (ccBtn)      ccBtn.style.display      = (st === 'ativo') ? '' : 'none';
 
     // Watermark
@@ -1912,13 +2221,22 @@ function findDocInFolders(folders, id) {
 
 function approveDocument() {
     if (!currentViewerDoc) return;
-    if (!confirm('Aprovar o documento "' + currentViewerDoc.title + '"? Isso ir? public?-lo.')) return;
-    currentViewerDoc.status = 'ativo';
+    if (!isDocumentPendingForCurrentUser(currentViewerDoc)) return alert('Este documento não está pendente de aprovação para o seu usuário.');
+    if (window.SGQCore && !SGQCore.permission('documentos','approve')) return alert('Seu usuário não possui permissão para aprovar documentos.');
+    if (!confirm('Aprovar o documento "' + currentViewerDoc.title + '"?')) return;
     if (!currentViewerDoc.approvals) currentViewerDoc.approvals = [];
-    currentViewerDoc.approvals.push({ user: currentUser, date: new Date().toISOString(), action: 'aprovado' });
+    const policy = getDocumentApprovalPolicy(currentViewerDoc);
+    const matchedApprover = policy.approvers.find(currentUserMatchesApprover);
+    currentViewerDoc.approvals.push({user:currentUser,userId:currentDocumentUser.id,email:currentDocumentUser.email,approver:typeof matchedApprover === 'object' ? (matchedApprover.name || matchedApprover.email || '') : (matchedApprover || currentUser),date:new Date().toISOString(),action:'aprovado'});
+    const approvalCount = currentViewerDoc.approvals.filter(item => item.action === 'aprovado').length;
+    const totalApprovers = Math.max(1, policy.approvers.length);
+    const required = policy.type === 'qualquer' ? 1 : policy.type === 'maioria' ? Math.floor(totalApprovers / 2) + 1 : ['consenso','sequencial'].includes(policy.type) ? totalApprovers : Math.min(totalApprovers, Math.max(1, policy.minApprovals));
+    const published = approvalCount >= required;
+    currentViewerDoc.status = published ? 'ativo' : 'pendente';
     persistData();
-    showNotification('Documento aprovado e publicado!');
+    showNotification(published ? 'Documento aprovado e publicado!' : `Sua aprovação foi registrada. Faltam ${required - approvalCount} aprovação(ões).`);
     if (selectedFolderId) renderFolderContent(selectedFolderId);
+    else if (document.getElementById('myPendingDocumentsBtn')?.classList.contains('active')) showMyApprovalPending();
     openDocViewer(currentViewerDoc.id);
 }
 
@@ -2367,6 +2685,7 @@ document.addEventListener('keydown', function(e) {
 // INIT
 // ============================================================
 renderDocTree();
+updateMyApprovalPendingCount();
 </script>
 
 <!-- ================================================================
@@ -2403,5 +2722,5 @@ renderDocTree();
 function startModuleTour() {
     alert('Tour deste módulo em breve! ');
 }
-</script><script src="../assets/js/global-search.js"></script></body>
+</script><script src="../assets/js/sgq-core.js"></script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>

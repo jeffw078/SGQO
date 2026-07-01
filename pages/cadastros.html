@@ -18,7 +18,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-database" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Cadastros</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -276,6 +275,8 @@
 
 <script>
 const DB_KEY = 'sgq_cadastros';
+let editingPedidoId = null;
+let editingProdutoId = null;
 let csvData = null;
 
 function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"pedidos":[],"produtos":[],"defeitos":[],"setores":[],"catFornecedor":[],"tiposDoc":[]}'); }
@@ -340,9 +341,9 @@ function switchView(v) {
 
 function updateStats() {
     const db = getDB();
-    document.getElementById('stat-pedidos').textContent = db.pedidos.length;
-    document.getElementById('stat-produtos').textContent = db.produtos.length;
-    document.getElementById('stat-setores').textContent = db.setores.length;
+    document.getElementById('stat-pedidos').textContent = db.pedidos.filter(item=>item.ativo!==false&&!item.deletedAt).length;
+    document.getElementById('stat-produtos').textContent = db.produtos.filter(item=>item.ativo!==false&&!item.deletedAt).length;
+    document.getElementById('stat-setores').textContent = db.setores.filter(item=>item.ativo!==false&&!item.deletedAt).length;
     document.getElementById('stat-colaboradores-cad').textContent = JSON.parse(localStorage.getItem('sgq_pessoas')||'{"colaboradores":[]}').colaboradores.filter(c=>c.ativo).length;
 }
 
@@ -351,6 +352,7 @@ function renderPedidos() {
     const search = (document.getElementById('searchPedido')?.value||'').toLowerCase();
     const sf = document.getElementById('filterStatus')?.value||'';
     const items = db.pedidos.filter(p => {
+        if (p.ativo===false || p.deletedAt) return false;
         if (search && !p.num.toLowerCase().includes(search) && !p.cliente.toLowerCase().includes(search) && !p.produto.toLowerCase().includes(search)) return false;
         if (sf && p.status !== sf) return false;
         return true;
@@ -372,7 +374,7 @@ function renderPedidos() {
         <td style="font-weight:700;color:var(--accent)">R$ ${p.valor.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
         <td><span class="sbadge ${statusBadge[p.status]}">${statusLabel[p.status]}</span></td>
         <td class="col-actions">
-            <button class="tbl-btn accent" onclick="changeStatus(${p.id})"><i class="fas fa-edit"></i></button>
+            <button class="tbl-btn accent" onclick="editPedido(${p.id})"><i class="fas fa-edit"></i></button>
             <button class="tbl-btn danger" onclick="deletePedido(${p.id})"><i class="fas fa-trash"></i></button>
         </td>
     </tr>`).join('');
@@ -384,11 +386,12 @@ function renderProdutos() {
     const db = getDB();
     const search = (document.getElementById('searchProduto')?.value||'').toLowerCase();
     const cat = document.getElementById('filterCategoria')?.value||'';
-    const cats = [...new Set(db.produtos.map(p=>p.cat))];
+    const cats = [...new Set(db.produtos.filter(p=>p.ativo!==false&&!p.deletedAt).map(p=>p.cat))];
     const sel = document.getElementById('filterCategoria');
     if (sel.options.length <= 1) { cats.forEach(c => { const o = new Option(c,c); sel.add(o); }); }
 
     const items = db.produtos.filter(p => {
+        if (p.ativo===false || p.deletedAt) return false;
         if (search && !p.cod.toLowerCase().includes(search) && !p.nome.toLowerCase().includes(search)) return false;
         if (cat && p.cat !== cat) return false;
         return true;
@@ -404,6 +407,7 @@ function renderProdutos() {
         <td style="text-align:center">${p.unidade}</td>
         <td style="font-size:.78rem;color:rgba(255,255,255,.4);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.spec||'-'}</td>
         <td class="col-actions">
+            <button class="tbl-btn accent" onclick="editProduto(${p.id})"><i class="fas fa-edit"></i></button>
             <button class="tbl-btn danger" onclick="deleteProduto(${p.id})"><i class="fas fa-trash"></i></button>
         </td>
     </tr>`).join('');
@@ -413,9 +417,9 @@ function renderDefeitos() {
     const db = getDB();
     const listEl = document.getElementById('lista-defeitos');
     const emptyEl = document.getElementById('empty-defeitos');
-    if (!db.defeitos.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    const items=db.defeitos.filter(item=>item.ativo!==false&&!item.deletedAt);if (!items.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
     emptyEl.style.display='none';
-    listEl.innerHTML = db.defeitos.map(d => `
+    listEl.innerHTML = items.map(d => `
         <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
             <div style="width:40px;height:40px;border-radius:9px;background:rgba(249,115,22,.1);display:flex;align-items:center;justify-content:center;color:var(--orange);flex-shrink:0"><i class="fas fa-bug"></i></div>
             <div style="flex:1"><div style="font-weight:700;color:#fff;margin-bottom:3px">${d.nome}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${d.categoria} � ${d.desc}</div></div>
@@ -429,9 +433,9 @@ function renderSetores() {
     const db = getDB();
     const listEl = document.getElementById('lista-setores');
     const emptyEl = document.getElementById('empty-setores');
-    if (!db.setores.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    const items=db.setores.filter(item=>item.ativo!==false&&!item.deletedAt);if (!items.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
     emptyEl.style.display='none';
-    listEl.innerHTML = db.setores.map(s => `
+    listEl.innerHTML = items.map(s => `
         <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
             <div style="width:40px;height:40px;border-radius:9px;background:rgba(15,117,189,.1);display:flex;align-items:center;justify-content:center;color:var(--primary-light);flex-shrink:0"><i class="fas fa-building"></i></div>
             <div style="flex:1">
@@ -456,9 +460,9 @@ function renderCatForn() {
     const db = getDB();
     const listEl = document.getElementById('lista-cat-forn');
     const emptyEl = document.getElementById('empty-cat-forn');
-    if (!db.catFornecedor.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    const items=db.catFornecedor.filter(item=>item.ativo!==false&&!item.deletedAt);if (!items.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
     emptyEl.style.display='none';
-    listEl.innerHTML = db.catFornecedor.map(c => `
+    listEl.innerHTML = items.map(c => `
         <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
             <div style="flex:1"><div style="font-weight:700;color:#fff;margin-bottom:3px">${c.nome} ${c.critico?'<span style="font-size:.72rem;background:rgba(239,68,68,.12);color:#f87171;padding:2px 7px;border-radius:4px;margin-left:6px">Crítico</span>':''}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${c.desc}</div></div>
             <button class="mod-btn danger" style="padding:6px 10px;font-size:.78rem" onclick="deleteItem('catFornecedor',${c.id})"><i class="fas fa-trash"></i></button>
@@ -470,9 +474,9 @@ function renderTiposDoc() {
     const db = getDB();
     const listEl = document.getElementById('lista-tipos-doc');
     const emptyEl = document.getElementById('empty-tipos-doc');
-    if (!db.tiposDoc.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    const items=db.tiposDoc.filter(item=>item.ativo!==false&&!item.deletedAt);if (!items.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
     emptyEl.style.display='none';
-    listEl.innerHTML = db.tiposDoc.map(t => `
+    listEl.innerHTML = items.map(t => `
         <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
             <div style="width:44px;height:44px;border-radius:9px;background:rgba(15,117,189,.1);display:flex;align-items:center;justify-content:center;color:var(--primary-light);font-size:.75rem;font-weight:800;flex-shrink:0">${t.sigla}</div>
             <div style="flex:1"><div style="font-weight:700;color:#fff;margin-bottom:3px">${t.nome}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${t.descricao}</div></div>
@@ -572,13 +576,13 @@ function salvarPedido() {
     const qtde = parseInt(document.getElementById('ped-qtde').value);
     if (!cliente || !produto || !qtde) return alert('Preencha cliente, produto e quantidade.');
     const db = getDB();
-    const newId = db.pedidos.length ? Math.max(...db.pedidos.map(p=>p.id))+1 : 1;
-    db.pedidos.push({ id:newId, num, cliente, produto, qtde, prazo:document.getElementById('ped-prazo').value, valor:parseFloat(document.getElementById('ped-valor').value)||0, status:document.getElementById('ped-status').value, oc:document.getElementById('ped-oc').value, obs:document.getElementById('ped-obs').value, criado:new Date().toISOString().slice(0,10) });
+    const current=db.pedidos.find(item=>item.id===editingPedidoId);const record={ id:current?.id||(db.pedidos.length ? Math.max(...db.pedidos.map(p=>p.id))+1 : 1), num, cliente, produto, qtde, prazo:document.getElementById('ped-prazo').value, valor:parseFloat(document.getElementById('ped-valor').value)||0, status:document.getElementById('ped-status').value, oc:document.getElementById('ped-oc').value, obs:document.getElementById('ped-obs').value, criado:current?.criado||new Date().toISOString().slice(0,10),updatedAt:new Date().toISOString(),ativo:true };
+    if(current)Object.assign(current,record);else db.pedidos.push(record);
     saveDB(db);
     closeModal('modalPedido');
     renderPedidos();
     updateStats();
-    showToast('Pedido criado!','success');
+    SGQCore.audit('Cadastros',current?'editou':'criou','Pedido',record.id,record.num);editingPedidoId=null;showToast(current?'Pedido atualizado!':'Pedido criado!','success');
 }
 
 function salvarProduto() {
@@ -587,14 +591,17 @@ function salvarProduto() {
     const cat = document.getElementById('prod-cat').value.trim();
     if (!cod || !nome || !cat) return alert('Preencha c?digo, nome e categoria.');
     const db = getDB();
-    const newId = db.produtos.length ? Math.max(...db.produtos.map(p=>p.id))+1 : 1;
-    db.produtos.push({ id:newId, cod, nome, cat, unidade:document.getElementById('prod-unidade').value, spec:document.getElementById('prod-spec').value, peso:parseFloat(document.getElementById('prod-peso').value)||0, familia:document.getElementById('prod-familia').value });
+    const current=db.produtos.find(item=>item.id===editingProdutoId);const record={ id:current?.id||(db.produtos.length ? Math.max(...db.produtos.map(p=>p.id))+1 : 1), cod, nome, cat, unidade:document.getElementById('prod-unidade').value, spec:document.getElementById('prod-spec').value, peso:parseFloat(document.getElementById('prod-peso').value)||0, familia:document.getElementById('prod-familia').value,ativo:true,updatedAt:new Date().toISOString() };
+    if(current)Object.assign(current,record);else db.produtos.push(record);
     saveDB(db);
     closeModal('modalProduto');
     renderProdutos();
     updateStats();
-    showToast('Produto cadastrado!','success');
+    SGQCore.audit('Cadastros',current?'editou':'criou','Produto',record.id,record.cod);editingProdutoId=null;showToast(current?'Produto atualizado!':'Produto cadastrado!','success');
 }
+
+function editPedido(id){const db=getDB(),item=db.pedidos.find(entry=>entry.id===id);if(!item)return;editingPedidoId=id;populateProdutosSelect();['num','cliente','produto','qtde','prazo','valor','status','oc','obs'].forEach(key=>{const element=document.getElementById('ped-'+key);if(element)element.value=item[key]??'';});openModal('modalPedido');}
+function editProduto(id){const db=getDB(),item=db.produtos.find(entry=>entry.id===id);if(!item)return;editingProdutoId=id;['cod','nome','cat','unidade','spec','peso','familia'].forEach(key=>{const element=document.getElementById('prod-'+key);if(element)element.value=item[key]??'';});openModal('modalProduto');}
 
 function changeStatus(id) {
     const db = getDB();
@@ -609,23 +616,23 @@ function changeStatus(id) {
 }
 
 function deletePedido(id) {
-    if (!confirm('Excluir este pedido?')) return;
-    const db = getDB(); db.pedidos = db.pedidos.filter(p=>p.id!==id); saveDB(db); renderPedidos(); updateStats();
+    const reason=prompt('Motivo da desativação do pedido:');if(!reason)return;
+    const db = getDB();SGQCore.softDeactivate(db.pedidos,id,{module:'Cadastros',entityType:'Pedido',reason});saveDB(db); renderPedidos(); updateStats();
 }
 
 function deleteProduto(id) {
-    if (!confirm('Excluir este produto?')) return;
-    const db = getDB(); db.produtos = db.produtos.filter(p=>p.id!==id); saveDB(db); renderProdutos(); updateStats();
+    const reason=prompt('Motivo da desativação do produto:');if(!reason)return;
+    const db = getDB();SGQCore.softDeactivate(db.produtos,id,{module:'Cadastros',entityType:'Produto',reason});saveDB(db); renderProdutos(); updateStats();
 }
 
 function deleteItem(arr, id) {
-    if (!confirm('Excluir este item?')) return;
-    const db = getDB(); db[arr] = db[arr].filter(x=>x.id!==id); saveDB(db);
+    const reason=prompt('Motivo da desativação:');if(!reason)return;
+    const db = getDB();SGQCore.softDeactivate(db[arr],id,{module:'Cadastros',entityType:arr,reason});saveDB(db);
     if (arr==='defeitos') renderDefeitos();
     if (arr==='setores') renderSetores();
     if (arr==='catFornecedor') renderCatForn();
     if (arr==='tiposDoc') renderTiposDoc();
-    showToast('Item removido.','success');
+    showToast('Item desativado.','success');
 }
 
 // CSV Import for Produtos
@@ -693,6 +700,5 @@ document.addEventListener('click',function(e){var m=document.getElementById('use
 function startModuleTour() {
     alert('Tour deste módulo em breve! ');
 }
-</script><script src="../assets/js/global-search.js"></script></body>
+</script><script src="../assets/js/sgq-core.js"></script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>
-

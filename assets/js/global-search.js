@@ -11,6 +11,7 @@
 
     const modules = [
         ['Controle de Documentos', 'GED, revisões, aprovações e registros', 'Módulo', 'fa-file-lines', 'var(--primary)', 'documentos.html', 'documento documentos ged revisão aprovacao registro pq it fq'],
+        ['Assistente IA', 'Prompts, tarefas padr?o, cr?ditos e an?lises do SGQ', 'M?dulo', 'fa-brain', 'var(--primary)', 'assistente-ia.html', 'assistente ia intelig?ncia artificial prompt cr?ditos creditos analise an?lise bpm iso plano a??o risco auditoria'],
         ['BPM & Modelagem de Processos', 'Fluxos, formulários e processos em execução', 'Módulo', 'fa-diagram-project', 'var(--accent)', 'bpm.html', 'processo processos bpm workflow fluxo formulario iniciar'],
         ['Projeto e Desenvolvimento', 'ISO 9001 requisito 8.3', 'Módulo', 'fa-pen-ruler', 'var(--purple)', 'projeto-desenvolvimento.html', 'projeto desenvolvimento 8.3 validacao verificacao'],
         ['NCs + Planos de Ação', 'Não conformidades, planos 5W2H e eficácia', 'Módulo', 'fa-list-check', 'var(--warning)', 'nao-conformidades.html', 'nc nao conformidade plano ação acao 5w2h eficacia'],
@@ -27,8 +28,14 @@
         ['Pessoas e Treinamentos', 'Competência, treinamento e conscientização', 'Módulo', 'fa-user-graduate', 'var(--accent)', 'pessoas.html', 'pessoas treinamento competência competencia colaboradores'],
         ['Inspeções e Liberação', 'Checklists, liberação e produto bloqueado', 'Módulo', 'fa-clipboard-check', 'var(--accent)', 'inspecoes.html', 'inspecao inspeção liberação liberacao checklist produto bloqueado'],
         ['Processo Produtivo', 'Ordens de produção e apontamentos', 'Módulo', 'fa-industry', 'var(--primary)', 'producao.html', 'produção producao ordem op apontamento'],
-        ['Setup SGQ', 'Diagnóstico inicial e evidências ISO', 'Módulo', 'fa-gears', 'var(--primary)', 'setup-sgq.html', 'setup diagnostico diagnóstico evidencias evidências iso']
-    ].map(toItem);
+        ['Setup da Empresa', 'Empresa, setores, usuários, módulos, permissões e responsáveis', 'Módulo', 'fa-gears', 'var(--primary)', 'setup-sgq.html', 'setup empresa setores usuarios usuários modulos módulos permissoes permissões responsáveis implantação onboarding'],
+        ['Configurações Gerais', 'Módulos, trial, arquivos e permissões', 'Módulo', 'fa-gears', 'var(--primary)', 'configuracoes.html', 'configuracoes configurações modulos módulos trial arquivos permissoes permissões']
+    ].map(toItem).filter(item => {
+        if (!window.SGQCore) return true;
+        const fileToModule = { 'documentos.html':'documentos','bpm.html':'bpm','projeto-desenvolvimento.html':'projetos','nao-conformidades.html':'nc','riscos.html':'riscos','organizacao.html':'organizacao','auditorias.html':'auditorias','indicadores.html':'indicadores','satisfacao.html':'satisfacao','fornecedores.html':'fornecedores','calibracao.html':'calibracao','pessoas.html':'pessoas','inspecoes.html':'inspecoes','producao.html':'producao','cadastros.html':'cadastros' };
+        const moduleId = fileToModule[item.url.split('?')[0]];
+        return !moduleId || SGQCore.moduleEnabled(moduleId);
+    });
 
     const docs = [
         ['PQ-001 - Controle de Documentos e Registros', 'Procedimento controlado', 'Documento', 'fa-file-lines', 'var(--primary)', 'documentos.html', 'pq-001 controle documentos registros procedimento'],

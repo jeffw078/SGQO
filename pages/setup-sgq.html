@@ -89,16 +89,20 @@
                 <a href="dashboard.html" class="nav-item nav-item-back"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
             </div>
             <div class="nav-section">
-                <div class="nav-section-title">Setup SGQ</div>
+                <div class="nav-section-title">Setup da empresa</div>
                 <a href="#" class="nav-item active" onclick="showSetupView('empresa');return false"><i class="fas fa-building"></i> Empresa</a>
-                <a href="#" class="nav-item" onclick="showSetupView('diagnostico');return false"><i class="fas fa-list-check"></i> Diagnóstico Inicial</a>
-                <a href="#" class="nav-item" onclick="showSetupView('resultado');return false"><i class="fas fa-chart-simple"></i> Resultado</a>
-                <a href="#" class="nav-item" onclick="showSetupView('historico');return false"><i class="fas fa-clock-rotate-left"></i> Histórico</a>
-                <a href="#" class="nav-item" onclick="showSetupView('perguntas');return false"><i class="fas fa-sliders"></i> Perguntas</a>
+                <a href="#" class="nav-item" onclick="showSetupView('setores');return false"><i class="fas fa-sitemap"></i> Setores</a>
+                <a href="#" class="nav-item" onclick="showSetupView('usuarios');return false"><i class="fas fa-users"></i> Usuários</a>
+                <a href="#" class="nav-item" onclick="showSetupView('maquinas');return false"><i class="fas fa-gears"></i> Máquinas</a>
+                <a href="#" class="nav-item" onclick="showSetupView('modulos');return false"><i class="fas fa-cubes"></i> Módulos</a>
+                <a href="#" class="nav-item" onclick="showSetupView('permissoes');return false"><i class="fas fa-user-shield"></i> Permissões</a>
+                <a href="#" class="nav-item" onclick="showSetupView('responsaveis');return false"><i class="fas fa-user-check"></i> Responsáveis</a>
+                <a href="#" class="nav-item" onclick="showSetupView('revisao');return false"><i class="fas fa-clipboard-check"></i> Revisão</a>
             </div>
             <div class="nav-section">
-                <div class="nav-section-title">Integrações</div>
-                <a href="documentos.html" class="nav-item"><i class="fas fa-file-lines"></i> Documentos</a>
+                <div class="nav-section-title">Complementar</div>
+                <a href="organizacao.html?view=diagnostico" class="nav-item"><i class="fas fa-brain"></i> Diagnóstico ISO</a>
+                <a href="configuracoes.html" class="nav-item"><i class="fas fa-sliders"></i> Configurações</a>
                 <a href="cadastros.html" class="nav-item"><i class="fas fa-box-archive"></i> Cadastros</a>
             </div>
         </nav>
@@ -107,10 +111,10 @@
     <div class="main-content">
         <header class="topbar">
             <div class="topbar-left">
-                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar perguntas, documentos ou requisitos..." oninput="handleSetupSearch(this.value)"></div>
+                <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Buscar setor, usuário, módulo ou responsável..." oninput="handleSetupSearch(this.value)"></div>
             </div>
             <div class="topbar-right">
-                <button class="topbar-icon" title="Análise por IA" onclick="runAiAnalysis('manual')"><i class="fas fa-brain"></i></button>
+                <a class="topbar-icon" title="Diagnóstico ISO" href="organizacao.html?view=diagnostico"><i class="fas fa-brain"></i></a>
                 <div class="user-menu" id="userMenu">
                     <button class="user-btn" onclick="toggleUserMenu(event)"><div class="avatar">JW</div><span class="user-btn-name">Jefferson Willian</span><i class="fas fa-chevron-down"></i></button>
                     <div class="user-dropdown">
@@ -126,25 +130,31 @@
             <div class="setup-hero">
                 <div class="setup-hero-icon"><i class="fas fa-gears"></i></div>
                 <div>
-                    <h2>Setup da Empresa e Diagnóstico Inicial do SGQ</h2>
-                    <p>Fluxo guiado para cadastrar dados essenciais da empresa, apontar evidências documentais e gerar uma visão inicial das lacunas ISO 9001.</p>
+                    <h2>Setup inicial da empresa</h2>
+                    <p>Fluxo guiado para preparar a operação: cadastro da empresa, setores, usuários, máquinas, módulos ativos, permissões e responsáveis. O diagnóstico ISO fica no módulo Organização, quando já houver contexto e registros para avaliar.</p>
                 </div>
-                <div class="setup-score"><span>Atendimento</span><strong id="heroPercent">0%</strong></div>
+                <div class="setup-score"><span>Conclusão</span><strong id="heroPercent">0%</strong></div>
             </div>
 
             <div class="setup-tabs">
                 <button class="setup-tab active" onclick="showSetupView('empresa')"><i class="fas fa-building"></i> Empresa</button>
-                <button class="setup-tab" onclick="showSetupView('diagnostico')"><i class="fas fa-list-check"></i> Diagnóstico</button>
-                <button class="setup-tab" onclick="showSetupView('resultado')"><i class="fas fa-chart-simple"></i> Resultado</button>
-                <button class="setup-tab" onclick="showSetupView('historico')"><i class="fas fa-clock-rotate-left"></i> Histórico</button>
-                <button class="setup-tab" onclick="showSetupView('perguntas')"><i class="fas fa-sliders"></i> Perguntas</button>
+                <button class="setup-tab" onclick="showSetupView('setores')"><i class="fas fa-sitemap"></i> Setores</button>
+                <button class="setup-tab" onclick="showSetupView('usuarios')"><i class="fas fa-users"></i> Usuários</button>
+                <button class="setup-tab" onclick="showSetupView('maquinas')"><i class="fas fa-gears"></i> Máquinas</button>
+                <button class="setup-tab" onclick="showSetupView('modulos')"><i class="fas fa-cubes"></i> Módulos</button>
+                <button class="setup-tab" onclick="showSetupView('permissoes')"><i class="fas fa-user-shield"></i> Permissões</button>
+                <button class="setup-tab" onclick="showSetupView('responsaveis')"><i class="fas fa-user-check"></i> Responsáveis</button>
+                <button class="setup-tab" onclick="showSetupView('revisao')"><i class="fas fa-clipboard-check"></i> Revisão</button>
             </div>
 
             <section id="view-empresa" class="setup-view active"></section>
-            <section id="view-diagnostico" class="setup-view"></section>
-            <section id="view-resultado" class="setup-view"></section>
-            <section id="view-historico" class="setup-view"></section>
-            <section id="view-perguntas" class="setup-view"></section>
+            <section id="view-setores" class="setup-view"></section>
+            <section id="view-usuarios" class="setup-view"></section>
+            <section id="view-maquinas" class="setup-view"></section>
+            <section id="view-modulos" class="setup-view"></section>
+            <section id="view-permissoes" class="setup-view"></section>
+            <section id="view-responsaveis" class="setup-view"></section>
+            <section id="view-revisao" class="setup-view"></section>
         </div>
     </div>
 </div>
@@ -157,6 +167,24 @@ const HISTORY_KEY = 'sgq_sgq_analysis_history';
 const DIAG_KEY = 'sgq_sgq_current_diagnostic';
 const currentUser = 'Jefferson Willian';
 let searchTerm = '';
+let permissionUserFilter = '';
+const SETUP_MODULES = [
+    ['documentos','Controle de Documentos','Documentos, revisões, aprovações e pendências'],
+    ['bpm','BPM','Fluxos, aprovações e automações operacionais'],
+    ['nc','Não Conformidades e CAPA','RNC, causa, ação corretiva e eficácia'],
+    ['riscos','Riscos e oportunidades','Matriz, planos e controles'],
+    ['auditorias','Auditorias','Programas, planos, achados e ações'],
+    ['indicadores','Indicadores','Metas, medições e análise de desempenho'],
+    ['fornecedores','Fornecedores','Homologação, avaliação e reavaliação'],
+    ['satisfacao','Satisfação de clientes','NPS, reclamações e retorno do cliente'],
+    ['calibracao','Calibração','Instrumentos, certificados e vencimentos'],
+    ['pessoas','Pessoas e competências','Treinamentos, cargos e matriz de competência'],
+    ['projetos','Projeto e Desenvolvimento','Processo ISO 9001 requisito 8.3'],
+    ['producao','Produção e inspeções','OP, liberação, rastreabilidade e chão de fábrica'],
+    ['organizacao','Organização e Diagnóstico','Contexto, partes interessadas, escopo e diagnóstico ISO'],
+    ['cadastros','Cadastros Gerais','Setores, produtos, pedidos e domínios']
+];
+const SETUP_ACTIONS = ['view','create','edit','delete','approve'];
 
 const defaultQuestions = [
 {id:1,etapa:1,prioridade:'obrigatorio',requisito_iso:'4.3',titulo:'Escopo do SGQ',pergunta:'Onde está definido o escopo do Sistema de Gestão da Qualidade?',descricao_apoio:'Documento de escopo do SGQ, manual do SGQ ou documento equivalente.',tipo_evidencia_esperada:'Escopo ou manual do SGQ',obrigatoria:true,ordem:1,ativa:true},
@@ -233,6 +261,7 @@ function findDocument(id) {
 function renderCompany() {
     const c = readJSON(COMPANY_KEY, {});
     document.getElementById('view-empresa').innerHTML = `
+        ${setupLaterNotice('empresa')}
         <div class="setup-grid">
             <div class="setup-form-card">
                 <h3><i class="fas fa-building" style="color:var(--primary)"></i> Dados da empresa</h3>
@@ -617,26 +646,413 @@ function resetQuestions() {
     toast('Perguntas padrão restauradas.');
 }
 
+function getCadastrosSetup() {
+    const data = readJSON('sgq_cadastros', {setores:[], maquinas:[]});
+    data.setores = data.setores || [];
+    data.maquinas = data.maquinas || [];
+    return data;
+}
+function saveCadastrosSetup(data) { writeJSON('sgq_cadastros', data); }
+function getSetupUsers() { return readJSON('sgq_system_users', []); }
+function saveSetupUsers(users) { writeJSON('sgq_system_users', users); }
+function getSetupSettings() {
+    const settings = readJSON('sgq_system_settings', {});
+    settings.modules = settings.modules || Object.fromEntries(SETUP_MODULES.map(m => [m[0], true]));
+    settings.permissions = settings.permissions || {};
+    return settings;
+}
+function saveSetupSettings(settings) { writeJSON('sgq_system_settings', settings); }
+function filteredSetup(items, keys) {
+    if (!searchTerm) return items;
+    return items.filter(item => keys.map(k => item[k] || '').join(' ').toLowerCase().includes(searchTerm));
+}
+function setupSelectOptions(items, selected, emptyLabel) {
+    return `<option value="">${emptyLabel}</option>` + items.map(item => `<option value="${sanitize(item.id)}" ${String(item.id)===String(selected)?'selected':''}>${sanitize(item.nome || item.name)}</option>`).join('');
+}
+function getSetupLater() {
+    const setup = readJSON(COMPANY_KEY, {});
+    setup.configurarDepois = setup.configurarDepois || {};
+    return setup.configurarDepois;
+}
+function setupLaterButton(step, nextView) {
+    return `<button class="setup-btn" onclick="markSetupLater('${step}','${nextView || ''}')"><i class="fas fa-clock"></i> Configurar depois</button>`;
+}
+function setupLaterNotice(step) {
+    const later = getSetupLater()[step];
+    return later ? `<div class="badge-soft pending" style="margin-bottom:12px"><i class="fas fa-clock"></i> Esta etapa foi marcada para configurar depois</div>` : '';
+}
+function markSetupLater(step, nextView) {
+    const setup = readJSON(COMPANY_KEY, {});
+    setup.configurarDepois = setup.configurarDepois || {};
+    setup.configurarDepois[step] = {at:new Date().toISOString(), by:currentUser};
+    writeJSON(COMPANY_KEY, setup);
+    updateSummary();
+    toast('Etapa marcada para configurar depois.');
+    if (nextView) showSetupView(nextView);
+}
+function isSetupDeferred(step) {
+    return Boolean(getSetupLater()[step]);
+}
+function clearSetupLater(step) {
+    const setup = readJSON(COMPANY_KEY, {});
+    if (setup.configurarDepois && setup.configurarDepois[step]) {
+        delete setup.configurarDepois[step];
+        writeJSON(COMPANY_KEY, setup);
+    }
+}
+function renderCompany() {
+    const c = readJSON(COMPANY_KEY, {});
+    document.getElementById('view-empresa').innerHTML = `
+        <div class="setup-grid">
+            <div class="setup-form-card">
+                <h3><i class="fas fa-building" style="color:var(--primary)"></i> Dados cadastrais</h3>
+                ${field('Razão social','razaoSocial',c.razaoSocial)}
+                ${field('Nome fantasia','nomeFantasia',c.nomeFantasia)}
+                <div class="setup-grid" style="gap:10px">${field('CNPJ','cnpj',c.cnpj)}${field('Unidade / planta principal','unidade',c.unidade)}</div>
+                ${field('Endereço','endereco',c.endereco)}
+                <div class="setup-grid" style="gap:10px">${field('Cidade','cidade',c.cidade)}${field('Estado','estado',c.estado)}</div>
+            </div>
+            <div class="setup-form-card">
+                <h3><i class="fas fa-compass" style="color:var(--accent)"></i> Contexto operacional</h3>
+                ${textarea('Escopo inicial da empresa','escopo',c.escopo)}
+                ${textarea('Produtos ou serviços principais','produtosServicos',c.produtosServicos)}
+                ${textarea('Processos principais conhecidos','processos',c.processos)}
+                <div class="setup-grid" style="gap:10px">${field('Timezone','timezone',c.timezone || 'America/Sao_Paulo')}${select('Situação ISO 9001','certificacao',c.certificacao || 'Em implantação',['Não certificada','Em implantação','Certificada','Recertificação em andamento'])}</div>
+            </div>
+            <div class="setup-form-card">
+                <h3><i class="fas fa-user-tie" style="color:var(--warning)"></i> Administração inicial</h3>
+                ${field('Admin da empresa','adminNome',c.adminNome || 'Administrador Demo')}
+                ${field('E-mail do admin','adminEmail',c.adminEmail || 'admin@empresa.com.br','email')}
+                ${field('Representante da direção / SGQ','representante',c.representante)}
+                ${textarea('Observações de implantação','setupNotas',c.setupNotas)}
+                <div class="setup-actions">
+                    <button class="setup-btn primary" onclick="saveCompany()"><i class="fas fa-floppy-disk"></i> Salvar empresa</button>
+                    <button class="setup-btn" onclick="showSetupView('setores')"><i class="fas fa-arrow-right"></i> Próximo: setores</button>
+                    ${setupLaterButton('empresa','setores')}
+                </div>
+            </div>
+            <div class="setup-panel">
+                <h3><i class="fas fa-brain" style="color:#93c5fd"></i> Diagnóstico ISO separado</h3>
+                <p style="color:rgba(255,255,255,.58);line-height:1.55;margin-top:0">A validação de documentos e evidências não deve bloquear o setup, porque a empresa pode estar começando sem documentos cadastrados. Use o diagnóstico depois que o contexto, módulos e responsáveis estiverem definidos.</p>
+                <a class="setup-btn warning" href="organizacao.html?view=diagnostico"><i class="fas fa-arrow-up-right-from-square"></i> Abrir diagnóstico ISO</a>
+            </div>
+        </div>`;
+}
+function saveCompany() {
+    const ids = ['razaoSocial','nomeFantasia','cnpj','unidade','endereco','cidade','estado','escopo','produtosServicos','processos','timezone','certificacao','adminNome','adminEmail','representante','setupNotas'];
+    const previous = readJSON(COMPANY_KEY, {});
+    const data = Object.assign({}, previous);
+    ids.forEach(id => data[id] = document.getElementById(id)?.value || '');
+    data.empresa_id = data.cnpj || previous.empresa_id || 'empresa_demo';
+    data.dataCadastro = data.dataCadastro || new Date().toISOString();
+    data.updatedAt = new Date().toISOString();
+    if (data.razaoSocial || data.cnpj) delete data.configurarDepois?.empresa;
+    writeJSON(COMPANY_KEY, data);
+    ensureAdminUser(data);
+    toast('Empresa salva.');
+    updateSummary();
+}
+function ensureAdminUser(company) {
+    const email = String(company.adminEmail || '').toLowerCase();
+    if (!email) return;
+    const users = getSetupUsers();
+    let user = users.find(item => String(item.email || '').toLowerCase() === email);
+    if (!user) {
+        user = {id:Date.now(), name:company.adminNome || 'Admin da empresa', email, role:'admin_company', roleLabel:'Administrador da Empresa', sectorId:'', sectorName:'Empresa geral', status:'ativo', createdAt:new Date().toISOString()};
+        users.push(user);
+    } else {
+        Object.assign(user, {name:company.adminNome || user.name, role:'admin_company', roleLabel:'Administrador da Empresa', status:'ativo'});
+    }
+    saveSetupUsers(users);
+}
+function renderSectors() {
+    const data = getCadastrosSetup();
+    const users = getSetupUsers().filter(u => u.status !== 'inativo');
+    const sectors = filteredSetup(data.setores.filter(s => !s.deletedAt), ['nome','responsavel','descricao']);
+    document.getElementById('view-setores').innerHTML = `
+        ${setupLaterNotice('setores')}
+        <div class="setup-grid">
+            <div class="setup-form-card">
+                <h3><i class="fas fa-plus" style="color:var(--primary)"></i> Cadastrar setor</h3>
+                ${field('Nome do setor','sectorName','')}
+                ${textarea('Descrição / processo principal','sectorDesc','')}
+                <div class="setup-field"><label>Responsável</label><select class="setup-select" id="sectorResponsible">${setupSelectOptions(users.map(u => ({id:u.id,nome:u.name})), '', 'Selecionar depois')}</select></div>
+                <div class="setup-actions"><button class="setup-btn primary" onclick="saveSectorSetup()"><i class="fas fa-plus"></i> Adicionar setor</button><button class="setup-btn" onclick="seedDefaultSectors()"><i class="fas fa-wand-magic-sparkles"></i> Sugerir setores básicos</button>${setupLaterButton('setores','usuarios')}</div>
+            </div>
+            <div class="setup-panel">
+                <h3><i class="fas fa-sitemap" style="color:var(--accent)"></i> Setores cadastrados</h3>
+                <div class="gap-list">${sectors.length ? sectors.map(s => `<div class="gap-item" style="border-left-color:var(--primary);background:rgba(15,117,189,.08)"><strong>${sanitize(s.nome)}</strong><p>${sanitize(s.descricao || 'Sem descrição')}<br>Responsável: ${sanitize(s.responsavel || 'Não definido')}</p><button class="setup-btn" onclick="removeSectorSetup('${s.id}')">Remover</button></div>`).join('') : '<p style="color:rgba(255,255,255,.5)">Nenhum setor cadastrado.</p>'}</div>
+            </div>
+        </div>`;
+}
+function saveSectorSetup() {
+    const nome = document.getElementById('sectorName').value.trim();
+    if (!nome) return alert('Informe o nome do setor.');
+    const data = getCadastrosSetup();
+    const user = getSetupUsers().find(u => String(u.id) === String(document.getElementById('sectorResponsible').value));
+    data.setores.push({id:String(Date.now()), nome, descricao:document.getElementById('sectorDesc').value.trim(), responsavel:user?.name || '', responsavelId:user?.id || '', ativo:true, createdAt:new Date().toISOString()});
+    clearSetupLater('setores');
+    saveCadastrosSetup(data);
+    renderSectors(); updateSummary(); toast('Setor cadastrado.');
+}
+function seedDefaultSectors() {
+    const data = getCadastrosSetup();
+    ['Direção','Qualidade','Comercial','Compras','Produção','Manutenção','RH'].forEach(nome => {
+        if (!data.setores.some(s => String(s.nome).toLowerCase() === nome.toLowerCase())) data.setores.push({id:String(Date.now()+Math.random()), nome, descricao:'Setor sugerido para implantação inicial', responsavel:'', responsavelId:'', ativo:true, createdAt:new Date().toISOString()});
+    });
+    saveCadastrosSetup(data); renderSectors(); updateSummary(); toast('Setores sugeridos adicionados.');
+    clearSetupLater('setores');
+}
+function removeSectorSetup(id) {
+    const data = getCadastrosSetup();
+    const sector = data.setores.find(s => String(s.id) === String(id));
+    if (sector) sector.deletedAt = new Date().toISOString();
+    saveCadastrosSetup(data); renderSectors(); updateSummary();
+}
+function renderUsers() {
+    const users = filteredSetup(getSetupUsers().filter(u => !u.developmentOnly), ['name','email','roleLabel','sectorName']);
+    const sectors = getCadastrosSetup().setores.filter(s => !s.deletedAt);
+    document.getElementById('view-usuarios').innerHTML = `
+        ${setupLaterNotice('usuarios')}
+        <div class="setup-grid">
+            <div class="setup-form-card">
+                <h3><i class="fas fa-user-plus" style="color:var(--primary)"></i> Cadastrar usuário</h3>
+                ${field('Nome','setupUserName','')}
+                ${field('E-mail corporativo','setupUserEmail','','email')}
+                <div class="setup-field"><label>Perfil</label><select class="setup-select" id="setupUserRole"><option value="user">Usuário</option><option value="admin_quality">Administrador da Qualidade</option><option value="admin_company">Administrador da Empresa</option></select></div>
+                <div class="setup-field"><label>Setor</label><select class="setup-select" id="setupUserSector">${setupSelectOptions(sectors, '', 'Empresa geral')}</select></div>
+                <div class="setup-actions"><button class="setup-btn primary" onclick="saveUserSetup()"><i class="fas fa-plus"></i> Adicionar usuário</button><button class="setup-btn" onclick="showSetupView('permissoes')"><i class="fas fa-user-shield"></i> Configurar permissões</button>${setupLaterButton('usuarios','maquinas')}</div>
+            </div>
+            <div class="setup-panel">
+                <h3><i class="fas fa-users" style="color:var(--accent)"></i> Usuários cadastrados</h3>
+                <div style="overflow:auto"><table class="history-table"><thead><tr><th>Usuário</th><th>Perfil</th><th>Setor</th><th>Status</th></tr></thead><tbody>${users.length ? users.map(u => `<tr><td><strong style="color:#fff">${sanitize(u.name)}</strong><br><small>${sanitize(u.email)}</small></td><td>${sanitize(u.roleLabel || u.role)}</td><td>${sanitize(u.sectorName || 'Empresa geral')}</td><td>${sanitize(u.status || 'ativo')}</td></tr>`).join('') : '<tr><td colspan="4" style="color:rgba(255,255,255,.45)">Nenhum usuário cadastrado.</td></tr>'}</tbody></table></div>
+            </div>
+        </div>`;
+}
+function saveUserSetup() {
+    const name = document.getElementById('setupUserName').value.trim();
+    const email = document.getElementById('setupUserEmail').value.trim().toLowerCase();
+    if (!name || !email) return alert('Informe nome e e-mail.');
+    const users = getSetupUsers();
+    if (users.some(u => String(u.email).toLowerCase() === email && u.status !== 'inativo')) return alert('Já existe usuário ativo com este e-mail.');
+    const sector = getCadastrosSetup().setores.find(s => String(s.id) === String(document.getElementById('setupUserSector').value));
+    const role = document.getElementById('setupUserRole').value;
+    users.push({id:Date.now(), name, email, role, roleLabel:{user:'Usuário',admin_quality:'Administrador da Qualidade',admin_company:'Administrador da Empresa'}[role], sectorId:sector?.id || '', sectorName:sector?.nome || 'Empresa geral', status:'ativo', createdAt:new Date().toISOString()});
+    clearSetupLater('usuarios');
+    saveSetupUsers(users); renderUsers(); updateSummary(); toast('Usuário cadastrado.');
+}
+function renderMachines() {
+    const data = getCadastrosSetup();
+    const sectors = data.setores.filter(s => !s.deletedAt);
+    const machines = filteredSetup(data.maquinas.filter(m => !m.deletedAt), ['nome','codigo','setor','criticidade']);
+    document.getElementById('view-maquinas').innerHTML = `
+        ${setupLaterNotice('maquinas')}
+        <div class="setup-grid">
+            <div class="setup-form-card">
+                <h3><i class="fas fa-gears" style="color:var(--primary)"></i> Máquinas / recursos críticos</h3>
+                <p style="color:rgba(255,255,255,.5);font-size:.86rem;margin-top:0">Opcional. Use para empresas industriais ou quando calibração, inspeção ou manutenção dependerem de equipamentos.</p>
+                ${field('Código','machineCode','')}
+                ${field('Nome da máquina/recurso','machineName','')}
+                <div class="setup-field"><label>Setor</label><select class="setup-select" id="machineSector">${setupSelectOptions(sectors, '', 'Selecionar setor')}</select></div>
+                <div class="setup-field"><label>Criticidade</label><select class="setup-select" id="machineCriticality"><option>Baixa</option><option>Média</option><option>Alta</option></select></div>
+                <div class="setup-actions"><button class="setup-btn primary" onclick="saveMachineSetup()"><i class="fas fa-plus"></i> Adicionar máquina</button><button class="setup-btn" onclick="skipMachinesSetup()"><i class="fas fa-forward"></i> Não usar agora</button>${setupLaterButton('maquinas','modulos')}</div>
+            </div>
+            <div class="setup-panel">
+                <h3><i class="fas fa-list" style="color:var(--accent)"></i> Máquinas cadastradas</h3>
+                <div class="gap-list">${machines.length ? machines.map(m => `<div class="gap-item" style="border-left-color:var(--warning);background:rgba(245,158,11,.08)"><strong>${sanitize(m.codigo)} - ${sanitize(m.nome)}</strong><p>Setor: ${sanitize(m.setor || 'Não definido')} | Criticidade: ${sanitize(m.criticidade || 'Média')}</p></div>`).join('') : '<p style="color:rgba(255,255,255,.5)">Nenhuma máquina cadastrada. Esta etapa pode ser marcada como não aplicável.</p>'}</div>
+            </div>
+        </div>`;
+}
+function saveMachineSetup() {
+    const nome = document.getElementById('machineName').value.trim();
+    if (!nome) return alert('Informe o nome da máquina/recurso.');
+    const data = getCadastrosSetup();
+    const sector = data.setores.find(s => String(s.id) === String(document.getElementById('machineSector').value));
+    data.maquinas.push({id:String(Date.now()), codigo:document.getElementById('machineCode').value.trim() || `MQ-${data.maquinas.length + 1}`, nome, setorId:sector?.id || '', setor:sector?.nome || '', criticidade:document.getElementById('machineCriticality').value, ativo:true, createdAt:new Date().toISOString()});
+    clearSetupLater('maquinas');
+    saveCadastrosSetup(data); renderMachines(); updateSummary(); toast('Máquina cadastrada.');
+}
+function skipMachinesSetup() {
+    const setup = readJSON(COMPANY_KEY, {});
+    setup.maquinasNaoAplicavel = true;
+    if (setup.configurarDepois) delete setup.configurarDepois.maquinas;
+    writeJSON(COMPANY_KEY, setup);
+    updateSummary(); toast('Etapa de máquinas marcada como não aplicável.');
+}
+function renderModules() {
+    const settings = getSetupSettings();
+    document.getElementById('view-modulos').innerHTML = `${setupLaterNotice('modulos')}<div class="setup-panel">
+        <h3><i class="fas fa-cubes" style="color:var(--primary)"></i> Módulos ativos</h3>
+        <p style="color:rgba(255,255,255,.5);font-size:.86rem;margin-top:0">Ative apenas o que a empresa usará no início. BPM permanece disponível em todos os planos e pode apoiar fluxos dos demais módulos.</p>
+        <div class="setup-actions" style="margin-bottom:12px">${setupLaterButton('modulos','permissoes')}</div>
+        <div class="setup-grid">${SETUP_MODULES.map(m => `<label class="setup-form-card" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer"><input type="checkbox" ${settings.modules[m[0]]!==false?'checked':''} onchange="toggleSetupModule('${m[0]}',this.checked)" style="margin-top:4px"><span><strong style="color:#fff">${m[1]}</strong><br><small style="color:rgba(255,255,255,.48)">${m[2]}</small></span></label>`).join('')}</div>
+    </div>`;
+}
+function toggleSetupModule(id, active) {
+    const settings = getSetupSettings();
+    settings.modules[id] = id === 'bpm' ? true : active;
+    clearSetupLater('modulos');
+    saveSetupSettings(settings); updateSummary(); renderModules();
+}
+function renderPermissions() {
+    const settings = getSetupSettings();
+    const allUsers = filteredSetup(getSetupUsers().filter(u => u.status !== 'inativo' && !u.developmentOnly), ['name','email','roleLabel']);
+    const users = permissionUserFilter ? allUsers.filter(user => String(user.id) === String(permissionUserFilter)) : allUsers;
+    document.getElementById('view-permissoes').innerHTML = `${setupLaterNotice('permissoes')}<div class="setup-panel">
+        <h3><i class="fas fa-user-shield" style="color:var(--primary)"></i> Acessos por usuário e módulo</h3>
+        <p style="color:rgba(255,255,255,.5);font-size:.86rem;margin-top:0">Defina quem pode visualizar, criar, editar, apagar e aprovar. Administradores podem receber tudo por padrão, mas o setup deixa a regra explícita para o backend oficial.</p>
+        <div class="setup-grid" style="grid-template-columns:minmax(240px,420px) 1fr;gap:12px;margin-bottom:12px">
+            <div class="setup-field" style="margin-bottom:0">
+                <label>Filtrar usuário</label>
+                <select class="setup-select" id="permissionUserFilter" onchange="setPermissionUserFilter(this.value)">
+                    <option value="">Todos os usuários</option>
+                    ${allUsers.map(user => `<option value="${sanitize(user.id)}" ${String(user.id)===String(permissionUserFilter)?'selected':''}>${sanitize(user.name)} - ${sanitize(user.email)}</option>`).join('')}
+                </select>
+            </div>
+            <div class="setup-field" style="margin-bottom:0">
+                <label>Resumo do filtro</label>
+                <div class="setup-input" style="display:flex;align-items:center;color:rgba(255,255,255,.72)">${permissionUserFilter ? `${users.length ? sanitize(users[0].name) : 'Usuário não encontrado'} · ${SETUP_MODULES.filter(m => settings.modules[m[0]] !== false).length} módulos ativos` : `${allUsers.length} usuários · ${SETUP_MODULES.filter(m => settings.modules[m[0]] !== false).length} módulos ativos`}</div>
+            </div>
+        </div>
+        <div class="setup-actions" style="margin-bottom:12px"><button class="setup-btn primary" onclick="applyDefaultPermissions()"><i class="fas fa-wand-magic-sparkles"></i> Aplicar permissões padrão</button>${setupLaterButton('permissoes','responsaveis')}</div>
+        <div style="overflow:auto"><table class="history-table"><thead><tr><th>Usuário</th><th>Módulo</th>${SETUP_ACTIONS.map(a => `<th>${permissionLabel(a)}</th>`).join('')}</tr></thead><tbody>${users.length ? users.map(user => SETUP_MODULES.filter(m => settings.modules[m[0]] !== false).map(m => permissionRow(user, m, settings)).join('')).join('') : '<tr><td colspan="7" style="color:rgba(255,255,255,.45)">Cadastre usuários antes de definir permissões.</td></tr>'}</tbody></table></div>
+    </div>`;
+}
+function setPermissionUserFilter(userId) {
+    permissionUserFilter = userId || '';
+    renderPermissions();
+}
+function permissionRow(user, module, settings) {
+    const key = `${user.id}:${module[0]}`;
+    const current = settings.permissions[key] || defaultPermissionFor(user.role);
+    return `<tr><td><strong style="color:#fff">${sanitize(user.name)}</strong><br><small>${sanitize(user.roleLabel || user.role)}</small></td><td>${sanitize(module[1])}</td>${SETUP_ACTIONS.map(action => `<td><input type="checkbox" ${current[action]?'checked':''} onchange="saveSetupPermission('${user.id}','${module[0]}','${action}',this.checked)"></td>`).join('')}</tr>`;
+}
+function permissionLabel(action) { return {view:'Ver',create:'Criar',edit:'Editar',delete:'Apagar',approve:'Aprovar'}[action]; }
+function defaultPermissionFor(role) {
+    const admin = role === 'admin_company' || role === 'admin_quality';
+    return {view:true, create:admin, edit:admin, delete:role === 'admin_company', approve:admin};
+}
+function saveSetupPermission(userId, moduleId, action, checked) {
+    const settings = getSetupSettings();
+    const key = `${userId}:${moduleId}`;
+    settings.permissions[key] = Object.assign(defaultPermissionFor('user'), settings.permissions[key] || {});
+    settings.permissions[key][action] = checked;
+    clearSetupLater('permissoes');
+    saveSetupSettings(settings);
+}
+function applyDefaultPermissions() {
+    const settings = getSetupSettings();
+    getSetupUsers().filter(u => u.status !== 'inativo' && !u.developmentOnly).forEach(user => {
+        SETUP_MODULES.filter(m => settings.modules[m[0]] !== false).forEach(module => {
+            settings.permissions[`${user.id}:${module[0]}`] = defaultPermissionFor(user.role);
+        });
+    });
+    saveSetupSettings(settings);
+    clearSetupLater('permissoes');
+    renderPermissions();
+    updateSummary();
+    toast('Permissões padrão aplicadas.');
+}
+function renderResponsibles() {
+    const data = getCadastrosSetup();
+    const users = getSetupUsers().filter(u => u.status !== 'inativo');
+    const sectors = filteredSetup(data.setores.filter(s => !s.deletedAt), ['nome','responsavel','descricao']);
+    document.getElementById('view-responsaveis').innerHTML = `${setupLaterNotice('responsaveis')}<div class="setup-panel">
+        <h3><i class="fas fa-user-check" style="color:var(--primary)"></i> Responsáveis por setor</h3>
+        <p style="color:rgba(255,255,255,.5);font-size:.86rem;margin-top:0">Responsáveis definidos aqui alimentam permissões, notificações, aprovações e roteamento de pendências no desenvolvimento oficial.</p>
+        <div class="setup-actions" style="margin-bottom:12px">${setupLaterButton('responsaveis','revisao')}</div>
+        <div class="gap-list">${sectors.length ? sectors.map(s => `<div class="gap-item" style="border-left-color:var(--accent);background:rgba(16,185,129,.08)"><strong>${sanitize(s.nome)}</strong><div class="setup-field" style="margin-top:10px"><label>Responsável</label><select class="setup-select" onchange="setSectorResponsible('${s.id}',this.value)">${setupSelectOptions(users.map(u => ({id:u.id,nome:u.name})), s.responsavelId, 'Sem responsável')}</select></div></div>`).join('') : '<p style="color:rgba(255,255,255,.5)">Cadastre setores antes de definir responsáveis.</p>'}</div>
+    </div>`;
+}
+function setSectorResponsible(sectorId, userId) {
+    const data = getCadastrosSetup();
+    const sector = data.setores.find(s => String(s.id) === String(sectorId));
+    const user = getSetupUsers().find(u => String(u.id) === String(userId));
+    if (sector) { sector.responsavelId = user?.id || ''; sector.responsavel = user?.name || ''; }
+    clearSetupLater('responsaveis');
+    saveCadastrosSetup(data); updateSummary(); toast('Responsável atualizado.');
+}
+function setupChecklist() {
+    const c = readJSON(COMPANY_KEY, {});
+    const data = getCadastrosSetup();
+    const users = getSetupUsers().filter(u => !u.developmentOnly && u.status !== 'inativo');
+    const settings = getSetupSettings();
+    return [
+        {step:'empresa', label:'Empresa cadastrada', valid:Boolean(c.razaoSocial && c.cnpj), detail:'Razão social e CNPJ são a base do tenant.'},
+        {step:'setores', label:'Setores definidos', valid:data.setores.some(s => !s.deletedAt), detail:'Setores serão usados em usuários, responsáveis, filtros e permissões.'},
+        {step:'usuarios', label:'Usuários cadastrados', valid:users.length > 0, detail:'Inclua ao menos o admin da empresa e responsáveis operacionais.'},
+        {step:'maquinas', label:'Máquinas avaliadas', valid:c.maquinasNaoAplicavel || data.maquinas.some(m => !m.deletedAt), detail:'Opcional, mas precisa ser cadastrado, marcado como não aplicável ou configurado depois.'},
+        {step:'modulos', label:'Módulos ativos definidos', valid:SETUP_MODULES.some(m => settings.modules[m[0]] !== false), detail:'Controla o que aparece no sistema da empresa.'},
+        {step:'permissoes', label:'Permissões configuradas', valid:Object.keys(settings.permissions || {}).length > 0, detail:'Necessário para validar segurança e usabilidade no backend oficial.'},
+        {step:'responsaveis', label:'Responsáveis por setor definidos', valid:data.setores.filter(s => !s.deletedAt).length > 0 && data.setores.filter(s => !s.deletedAt).every(s => s.responsavelId), detail:'Evita pendências sem dono nos fluxos.'}
+    ].map(item => Object.assign(item, {deferred:isSetupDeferred(item.step), ok:item.valid || isSetupDeferred(item.step)}));
+}
+function setupCompletion() {
+    const list = setupChecklist();
+    return Math.round((list.filter(i => i.ok).length / list.length) * 100);
+}
+function renderReview() {
+    const data = getCadastrosSetup();
+    const users = getSetupUsers().filter(u => !u.developmentOnly && u.status !== 'inativo');
+    const settings = getSetupSettings();
+    const activeModules = SETUP_MODULES.filter(m => settings.modules[m[0]] !== false);
+    document.getElementById('view-revisao').innerHTML = `
+        <div class="result-cards">
+            <div class="result-card"><span>Conclusão</span><strong>${setupCompletion()}%</strong></div>
+            <div class="result-card"><span>Setores</span><strong>${data.setores.filter(s=>!s.deletedAt).length}</strong></div>
+            <div class="result-card"><span>Usuários</span><strong>${users.length}</strong></div>
+            <div class="result-card"><span>Módulos</span><strong>${activeModules.length}</strong></div>
+        </div>
+        <div class="setup-grid">
+            <div class="setup-panel">
+                <h3><i class="fas fa-clipboard-check" style="color:var(--accent)"></i> Checklist de implantação</h3>
+                <div class="gap-list">${setupChecklist().map(item => `<div class="gap-item" style="border-left-color:${item.valid?'var(--accent)':item.deferred?'var(--warning)':'var(--danger)'};background:${item.valid?'rgba(16,185,129,.08)':item.deferred?'rgba(245,158,11,.08)':'rgba(239,68,68,.08)'}"><strong>${item.valid?'OK':item.deferred?'Adiado':'Pendente'} - ${sanitize(item.label)}</strong><p>${sanitize(item.detail)}</p></div>`).join('')}</div>
+            </div>
+            <div class="setup-panel">
+                <h3><i class="fas fa-route" style="color:var(--primary)"></i> Próximos passos recomendados</h3>
+                <div class="gap-list">
+                    <div class="gap-item" style="border-left-color:var(--primary);background:rgba(15,117,189,.08)"><strong>1. Validar configurações gerais</strong><p>Abrir Configurações para revisar plano, armazenamento, anexos e módulos.</p></div>
+                    <div class="gap-item" style="border-left-color:var(--primary);background:rgba(15,117,189,.08)"><strong>2. Criar documentos controlados</strong><p>Somente depois do setup faz sentido iniciar controle documental e aprovações.</p></div>
+                    <div class="gap-item" style="border-left-color:var(--primary);background:rgba(15,117,189,.08)"><strong>3. Rodar diagnóstico ISO</strong><p>Executar em Organização quando houver contexto, responsáveis e primeiros registros.</p></div>
+                </div>
+                <div class="setup-actions"><button class="setup-btn success" onclick="finishSetup()"><i class="fas fa-check"></i> Marcar setup como concluído</button>${setupLaterButton('revisao','')}<a class="setup-btn warning" href="organizacao.html?view=diagnostico"><i class="fas fa-brain"></i> Ir para diagnóstico ISO</a></div>
+            </div>
+        </div>`;
+}
+function finishSetup() {
+    const setup = readJSON(COMPANY_KEY, {});
+    setup.setupConcluido = true;
+    setup.setupConcluidoEm = new Date().toISOString();
+    writeJSON(COMPANY_KEY, setup);
+    updateSummary(); renderReview(); toast('Setup marcado como concluído.');
+}
+
 function showSetupView(view) {
     document.querySelectorAll('.setup-view').forEach(v => v.classList.remove('active'));
-    document.getElementById(`view-${view}`).classList.add('active');
-    document.querySelectorAll('.setup-tab').forEach(btn => btn.classList.toggle('active', btn.textContent.toLowerCase().includes(view === 'empresa' ? 'empresa' : view === 'diagnostico' ? 'diagn' : view)));
+    document.getElementById(`view-${view}`)?.classList.add('active');
+    const labels = {empresa:'empresa',setores:'setores',usuarios:'usuários',maquinas:'máquinas',modulos:'módulos',permissoes:'permissões',responsaveis:'responsáveis',revisao:'revisão'};
+    document.querySelectorAll('.setup-tab').forEach(btn => btn.classList.toggle('active', btn.textContent.toLowerCase().includes(labels[view] || view)));
     document.querySelectorAll('.sidebar .nav-item').forEach(item => item.classList.remove('active'));
-    document.querySelectorAll('.sidebar .nav-item').forEach(item => { if (item.textContent.toLowerCase().includes(view === 'diagnostico' ? 'diagn' : view)) item.classList.add('active'); });
+    document.querySelectorAll('.sidebar .nav-item').forEach(item => { if (item.textContent.toLowerCase().includes(labels[view] || view)) item.classList.add('active'); });
     if (view === 'empresa') renderCompany();
-    if (view === 'diagnostico') renderDiagnostic();
-    if (view === 'resultado') renderResult();
-    if (view === 'historico') renderHistory();
-    if (view === 'perguntas') renderQuestionsConfig();
+    if (view === 'setores') renderSectors();
+    if (view === 'usuarios') renderUsers();
+    if (view === 'maquinas') renderMachines();
+    if (view === 'modulos') renderModules();
+    if (view === 'permissoes') renderPermissions();
+    if (view === 'responsaveis') renderResponsibles();
+    if (view === 'revisao') renderReview();
     window.scrollTo({top:0,behavior:'smooth'});
 }
 function updateSummary() {
-    const r = calculateDiagnostic();
-    document.getElementById('heroPercent').textContent = `${r.percentual_estimado_atendimento}%`;
+    document.getElementById('heroPercent').textContent = `${setupCompletion()}%`;
 }
 function handleSetupSearch(value) {
     searchTerm = (value || '').toLowerCase().trim();
-    if (document.getElementById('view-diagnostico').classList.contains('active')) renderDiagnostic();
+    if (document.getElementById('view-setores')?.classList.contains('active')) renderSectors();
+    if (document.getElementById('view-usuarios')?.classList.contains('active')) renderUsers();
+    if (document.getElementById('view-maquinas')?.classList.contains('active')) renderMachines();
+    if (document.getElementById('view-responsaveis')?.classList.contains('active')) renderResponsibles();
 }
 function toggleUserMenu(e) {
     e.stopPropagation();
@@ -656,11 +1072,14 @@ function toast(message) {
 
 seedQuestions();
 renderCompany();
-renderDiagnostic();
-renderResult();
-renderHistory();
-renderQuestionsConfig();
+renderSectors();
+renderUsers();
+renderMachines();
+renderModules();
+renderPermissions();
+renderResponsibles();
+renderReview();
 updateSummary();
 </script>
-<script src="../assets/js/global-search.js"></script></body>
+<script src="../assets/js/sgq-core.js"></script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>

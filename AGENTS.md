@@ -21,6 +21,8 @@ O SGQ Online deve ser simples, funcional e fácil de manter. Priorize clareza, r
 - Validar dados de entrada no backend mesmo que o frontend valide.
 - Evitar acoplamento entre módulos; integrações devem ocorrer por IDs, eventos ou serviços pequenos.
 - Todo endpoint deve respeitar isolamento por empresa/tenant.
+- O usuário Admin Master é global e separado dos tenants; ele deve usar 2FA obrigatório.
+- Admin Master só pode acessar dados internos de uma empresa mediante aprovação explícita do admin dessa empresa, com trilha de auditoria.
 - Toda entidade crítica deve possuir `created_at`, `updated_at` e, quando aplicável, `deleted_at`.
 - Preferir paginação, filtros e ordenação simples em listagens.
 - Não criar microserviços no início. Começar monolítico modular.

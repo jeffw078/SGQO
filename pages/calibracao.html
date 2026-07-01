@@ -19,7 +19,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-ruler-combined" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Calibração de Equipamentos</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -357,10 +356,12 @@
 
 <script>
 const DB_KEY = 'sgq_calibracao';
+let editingInstrumentId = null;
 let currentInstrId = null;
 
 function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"instrumentos":[],"categorias":[],"historico":[]}'); }
 function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+function calibrationAlertDays(){return Number(SGQCore.getSettings().moduleSettings?.calibration?.alertDays)||30;}
 
 function seedData() {
     const db = getDB();
@@ -401,7 +402,7 @@ function getStatusClass(instr) {
     if (instr.status === 'inativo') return 'inativa';
     if (instr.status === 'calibrando') return 'andamento';
     if (diff < 0) return 'vencido';
-    if (diff <= 30) return 'vencendo';
+    if (diff <= calibrationAlertDays()) return 'vencendo';
     return 'vigente';
 }
 
@@ -418,7 +419,7 @@ function renderInstrumentos() {
         }
     });
 
-    let items = db.instrumentos.filter(i => {
+    let items = SGQCore.filterRecords(db.instrumentos,'calibracao').filter(i => {
         if (search && !i.nome.toLowerCase().includes(search) && !i.codigo.toLowerCase().includes(search)) return false;
         if (sf && i.status !== sf) return false;
         if (cf && i.categoria !== cf) return false;
@@ -510,6 +511,7 @@ function openDetalhe(id) {
         footerHtml += `<button class="mod-btn accent" onclick="openRetornoModal(${id})"><i class="fas fa-check"></i> Registrar Retorno</button>`;
     } else if (instr.status !== 'inativo') {
         footerHtml += `<button class="mod-btn danger" onclick="openDesativarModal(${id})" style="margin-right:auto"><i class="fas fa-power-off"></i> Desativar</button>`;
+        footerHtml += `<button class="mod-btn ghost" onclick="editInstrument(${id})"><i class="fas fa-pen"></i> Editar</button>`;
         footerHtml += `<button class="mod-btn warning" onclick="openCalibrarModal(${id})"><i class="fas fa-tools"></i> Enviar para Calibração</button>`;
     }
     document.getElementById('detalhe-footer').innerHTML = footerHtml;
@@ -544,7 +546,7 @@ function renderCategorias() {
     `).join('');
 }
 
-function openNovoInstrumentoModal() { openModal('modalNovo'); }
+function openNovoInstrumentoModal() { editingInstrumentId=null;['codigo','nome','categoria','local','data-cal','vencimento','empresa','certificado','obs'].forEach(key=>{const element=document.getElementById('ni-'+key);if(element)element.value='';});openModal('modalNovo'); }
 
 function salvarInstrumento() {
     const codigo = document.getElementById('ni-codigo').value.trim();
@@ -553,17 +555,18 @@ function salvarInstrumento() {
     const vencimento = document.getElementById('ni-vencimento').value;
     if (!codigo || !nome || !categoria || !vencimento) return alert('Preencha os campos obrigatórios.');
     const db = getDB();
-    const newId = db.instrumentos.length ? Math.max(...db.instrumentos.map(i=>i.id))+1 : 1;
     const today = new Date();
     const venc = new Date(vencimento);
     const diff = Math.ceil((venc-today)/(1000*60*60*24));
-    let status = diff < 0 ? 'vencido' : diff <= 30 ? 'vencendo' : 'vigente';
-    db.instrumentos.push({ id:newId, codigo, nome, categoria, local:document.getElementById('ni-local').value, dataCal:document.getElementById('ni-data-cal').value, vencimento, empresa:document.getElementById('ni-empresa').value, certificado:document.getElementById('ni-certificado').value, obs:document.getElementById('ni-obs').value, status, historico:[] });
+    let status = diff < 0 ? 'vencido' : diff <= calibrationAlertDays() ? 'vencendo' : 'vigente';
+    const current=db.instrumentos.find(item=>item.id===editingInstrumentId);const record={id:current?.id||(db.instrumentos.length ? Math.max(...db.instrumentos.map(i=>i.id))+1 : 1),codigo,nome,categoria,local:document.getElementById('ni-local').value,dataCal:document.getElementById('ni-data-cal').value,vencimento,empresa:document.getElementById('ni-empresa').value,certificado:document.getElementById('ni-certificado').value,obs:document.getElementById('ni-obs').value,status,historico:current?.historico||[],createdById:current?.createdById||SGQCore.currentUser()?.id,createdBy:current?.createdBy||SGQCore.currentUser()?.name,updatedAt:new Date().toISOString()};if(current)Object.assign(current,record);else db.instrumentos.push(record);
     saveDB(db);
     closeModal('modalNovo');
     renderInstrumentos();
-    showToast('Instrumento cadastrado!', 'success');
+    SGQCore.audit('Calibração',current?'editou':'criou','Instrumento',record.id,record.codigo);editingInstrumentId=null;showToast(current?'Instrumento atualizado!':'Instrumento cadastrado!', 'success');
 }
+
+function editInstrument(id){const item=getDB().instrumentos.find(entry=>entry.id===id);if(!item)return;editingInstrumentId=id;const map={'codigo':'codigo','nome':'nome','categoria':'categoria','local':'local','data-cal':'dataCal','vencimento':'vencimento','empresa':'empresa','certificado':'certificado','obs':'obs'};Object.entries(map).forEach(([field,key])=>document.getElementById('ni-'+field).value=item[key]||'');closeModal('modalDetalhe');openModal('modalNovo');}
 
 function openCalibrarModal(id) {
     const db = getDB();
@@ -607,7 +610,7 @@ function confirmarRetorno() {
         i.historico.push({ data:i.dataCal, vencimento:i.vencimento, empresa:i.empresa, certificado:i.certificado, resultado:'aprovado' });
         i.dataCal=data; i.vencimento=venc; i.certificado=cert;
         const today=new Date(); const vencD=new Date(venc); const diff=Math.ceil((vencD-today)/(1000*60*60*24));
-        i.status = diff<0?'vencido':diff<=30?'vencendo':'vigente';
+        i.status = diff<0?'vencido':diff<=calibrationAlertDays()?'vencendo':'vigente';
         i.fornecedorCal=undefined; i.retornoPrevisto=undefined;
     }
     saveDB(db);
@@ -680,5 +683,5 @@ document.addEventListener('click',function(e){var m=document.getElementById('use
 function startModuleTour() {
     alert('Tour deste módulo em breve! ');
 }
-</script><script src="../assets/js/global-search.js"></script></body>
+</script><script src="../assets/js/sgq-core.js"></script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>

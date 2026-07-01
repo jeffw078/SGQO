@@ -18,7 +18,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-chart-line" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Indicadores e KPIs</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -187,6 +186,7 @@
 
 <script>
 const DB_KEY = 'sgq_indicadores';
+let editingKpiId = null;
 
 function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"kpis":[],"lancamentos":[]}'); }
 function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
@@ -242,7 +242,7 @@ function isKpiAtingido(kpi, resultado) {
 function renderDashboard() {
     const db = getDB();
     let atingidos = 0, naoAtingidos = 0, semDados = 0;
-    const kpiHtml = db.kpis.map(kpi => {
+    const activeKpis=SGQCore.filterRecords(db.kpis,'indicadores').filter(kpi=>kpi.ativo!==false&&!kpi.deletedAt);const kpiHtml = activeKpis.map(kpi => {
         const lanc = getUltimoLancamento(kpi.id);
         const resultado = lanc ? lanc.resultado : null;
         const atingido = isKpiAtingido(kpi, resultado);
@@ -274,10 +274,10 @@ function renderDashboard() {
     document.getElementById('stat-atingidos').textContent = atingidos;
     document.getElementById('stat-nao-atingidos').textContent = naoAtingidos;
     document.getElementById('stat-sem-dados').textContent = semDados;
-    document.getElementById('stat-total-kpi').textContent = db.kpis.length;
+    document.getElementById('stat-total-kpi').textContent = activeKpis.length;
     document.getElementById('kpi-grid').innerHTML = kpiHtml;
-    document.getElementById('empty-kpi').style.display = db.kpis.length ? 'none' : 'flex';
-    document.getElementById('kpi-grid').style.display = db.kpis.length ? 'grid' : 'none';
+    document.getElementById('empty-kpi').style.display = activeKpis.length ? 'none' : 'flex';
+    document.getElementById('kpi-grid').style.display = activeKpis.length ? 'grid' : 'none';
 }
 
 function renderKPIsTable() {
@@ -285,9 +285,9 @@ function renderKPIsTable() {
     const tbody = document.getElementById('tbody-kpis');
     const emptyEl = document.getElementById('empty-kpis-tab');
     const tableWrap = document.querySelector('.mod-table-wrap');
-    if (!db.kpis.length) { tbody.innerHTML=''; emptyEl.style.display='flex'; tableWrap.style.display='none'; return; }
+    const items=SGQCore.filterRecords(db.kpis,'indicadores').filter(k=>k.ativo!==false&&!k.deletedAt);if (!items.length) { tbody.innerHTML=''; emptyEl.style.display='flex'; tableWrap.style.display='none'; return; }
     emptyEl.style.display='none'; tableWrap.style.display='block';
-    tbody.innerHTML = db.kpis.map(k => `<tr>
+    tbody.innerHTML = items.map(k => `<tr>
         <td><span style="font-weight:700;color:#fff">${k.nome}</span><div style="font-size:.73rem;color:rgba(255,255,255,.3)">${k.desc}</div></td>
         <td>${k.unidade}</td>
         <td>${k.freq}</td>
@@ -295,14 +295,14 @@ function renderKPIsTable() {
         <td>${k.resp}</td>
         <td><span style="font-size:.78rem;color:rgba(255,255,255,.4)">${k.fonte}</span></td>
         <td><span class="sbadge concluida">Ativo</span></td>
-        <td><button class="tbl-btn danger" onclick="deleteKPI(${k.id})"><i class="fas fa-trash"></i></button></td>
+        <td><button class="tbl-btn" onclick="editKPI(${k.id})"><i class="fas fa-pen"></i></button><button class="tbl-btn danger" onclick="deleteKPI(${k.id})"><i class="fas fa-ban"></i></button></td>
     </tr>`).join('');
 }
 
 function populateLancKPI() {
     const db = getDB();
     const sel = document.getElementById('lanc-kpi');
-    sel.innerHTML = '<option value="">Selecione...</option>' + db.kpis.map(k=>`<option value="${k.id}">${k.nome} (${k.sigla})</option>`).join('');
+    sel.innerHTML = '<option value="">Selecione...</option>' + db.kpis.filter(k=>k.ativo!==false&&!k.deletedAt).map(k=>`<option value="${k.id}">${k.nome} (${k.sigla})</option>`).join('');
     document.getElementById('lanc-data').value = new Date().toISOString().slice(0,10);
 }
 
@@ -325,7 +325,7 @@ function renderHistoricoLanc() {
 function renderMetas() {
     const db = getDB();
     const cont = document.getElementById('metas-lista');
-    cont.innerHTML = db.kpis.map(k => `<div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
+    cont.innerHTML = db.kpis.filter(k=>k.ativo!==false&&!k.deletedAt).map(k => `<div style="display:flex;align-items:center;gap:14px;padding:14px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
         <div style="flex:1"><div style="font-weight:700;color:#fff">${k.nome} <span style="font-size:.78rem;color:rgba(255,255,255,.35)">(${k.sigla})</span></div><div style="font-size:.78rem;color:rgba(255,255,255,.35)">Frequência: ${k.freq} � Responsável: ${k.resp}</div></div>
         <div style="text-align:right"><div style="font-size:1.2rem;font-weight:800;color:var(--accent)">${k.direcao==='menor'?'?':k.direcao==='maior'?'?':'='} ${k.meta} <span style="font-size:.75rem">${k.unidade}</span></div><div style="font-size:.72rem;color:rgba(255,255,255,.3)">${k.clausula}</div></div>
     </div>`).join('');
@@ -336,12 +336,11 @@ function salvarKPI() {
     const meta = parseFloat(document.getElementById('kpi-meta').value);
     if (!nome || isNaN(meta)) return alert('Preencha nome e meta do KPI.');
     const db = getDB();
-    const newId = db.kpis.length ? Math.max(...db.kpis.map(k=>k.id))+1 : 1;
-    db.kpis.push({ id:newId, nome, sigla:document.getElementById('kpi-sigla').value, unidade:document.getElementById('kpi-unidade').value, freq:document.getElementById('kpi-freq').value, meta, direcao:document.getElementById('kpi-direcao').value, resp:document.getElementById('kpi-resp').value, fonte:document.getElementById('kpi-fonte').value, clausula:document.getElementById('kpi-clausula').value, desc:document.getElementById('kpi-desc').value });
+    const current=db.kpis.find(item=>item.id===editingKpiId);const record={ id:current?.id||(db.kpis.length ? Math.max(...db.kpis.map(k=>k.id))+1 : 1), nome, sigla:document.getElementById('kpi-sigla').value, unidade:document.getElementById('kpi-unidade').value, freq:document.getElementById('kpi-freq').value, meta, direcao:document.getElementById('kpi-direcao').value, resp:document.getElementById('kpi-resp').value, fonte:document.getElementById('kpi-fonte').value, clausula:document.getElementById('kpi-clausula').value, desc:document.getElementById('kpi-desc').value,ativo:true,createdById:current?.createdById||SGQCore.currentUser()?.id,createdBy:current?.createdBy||SGQCore.currentUser()?.name,updatedAt:new Date().toISOString()};if(current)Object.assign(current,record);else db.kpis.push(record);
     saveDB(db);
     closeModal('modalNovoKPI');
     renderKPIsTable();
-    showToast('KPI cadastrado!', 'success');
+    SGQCore.audit('Indicadores',current?'editou':'criou','KPI',record.id,record.nome);editingKpiId=null;showToast(current?'KPI atualizado!':'KPI cadastrado!', 'success');
 }
 
 function salvarLancamento() {
@@ -360,16 +359,15 @@ function salvarLancamento() {
 }
 
 function deleteKPI(id) {
-    if (!confirm('Excluir este KPI e todos os seus lançamentos?')) return;
-    const db = getDB();
-    db.kpis = db.kpis.filter(k=>k.id!==id);
-    db.lancamentos = db.lancamentos.filter(l=>l.kpiId!==id);
+    const reason=prompt('Motivo da desativação do KPI:');if(!reason)return;
+    const db = getDB();SGQCore.softDeactivate(db.kpis,id,{module:'Indicadores',entityType:'KPI',reason});
     saveDB(db);
     renderKPIsTable();
-    showToast('KPI removido.','success');
+    showToast('KPI desativado. Os lançamentos foram preservados.','success');
 }
 
-function openNovoKPIModal() { openModal('modalNovoKPI'); }
+function editKPI(id){const item=getDB().kpis.find(entry=>entry.id===id);if(!item)return;editingKpiId=id;['nome','sigla','unidade','freq','meta','direcao','resp','fonte','clausula','desc'].forEach(key=>{const element=document.getElementById('kpi-'+key);if(element)element.value=item[key]??'';});openModal('modalNovoKPI');}
+function openNovoKPIModal() { editingKpiId=null;openModal('modalNovoKPI'); }
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 function formatDate(str) { if(!str) return '-'; const d=new Date(str+(str.length===10?'T00:00':'')); return d.toLocaleDateString('pt-BR'); }
@@ -388,5 +386,5 @@ document.addEventListener('click',function(e){var m=document.getElementById('use
 function startModuleTour() {
     alert('Tour deste módulo em breve! ');
 }
-</script><script src="../assets/js/global-search.js"></script></body>
+</script><script src="../assets/js/sgq-core.js"></script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>

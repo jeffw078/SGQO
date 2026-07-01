@@ -53,7 +53,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-pen-ruler" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Projeto e Desenvolvimento</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -172,6 +171,7 @@
     </div>
 </div>
 
+<script src="../assets/js/sgq-core.js"></script>
 <script>
 const PD_KEY = 'sgq_projeto_desenvolvimento';
 let currentProjectId = null;
@@ -358,7 +358,7 @@ function renderStage(project, stage, index) {
                         <button class="mod-btn danger" onclick="saveStage('${stage.key}', 'reprovada')"><i class="fas fa-xmark"></i> Reprovar</button>
                     </div>
                 </div>
-                ${stage.key === 'mudancas' ? `<div class="analysis-note" style="margin-top:12px"><a href="organizacao.html?view=mudancas" style="color:#93c5fd;font-weight:700">Abrir controle de mudanças</a> para avaliar risco, aprovação e plano de ação da alteração.</div>` : ''}
+                ${stage.key === 'mudancas' ? `<div class="analysis-note" style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:12px"><span>Mudanças do projeto devem passar por risco, aprovação e plano.</span><button class="mod-btn warning" onclick="createProjectChange(${project.id})"><i class="fas fa-repeat"></i> Registrar mudança</button></div>` : ''}
             </div>
         </div>
     `;
@@ -381,6 +381,24 @@ function saveStage(key, status) {
     renderProjetos();
     renderDetail();
     showToast('Etapa atualizada.', 'success');
+}
+
+function createProjectChange(projectId) {
+    const project = getDB().projetos.find(p => p.id === projectId);
+    if (!project) return;
+    const org = SGQCore.read('sgq_organizacao_iso', {contexto:{},swot:[],partes:[],recursos:[],mudancas:[],analises:[]});
+    org.mudancas = org.mudancas || [];
+    const existing = org.mudancas.find(item => item.origemTipo === 'Projeto' && item.origemId === project.id && item.status !== 'concluida');
+    if (!existing) {
+        const stage = project.stages.mudancas || {};
+        org.mudancas.push({ id:SGQCore.nextId(org.mudancas), tipo:'Produto ou serviço', titulo:`Mudança do projeto: ${project.nome}`,
+            motivo:stage.observacoes || 'Mudança identificada durante projeto e desenvolvimento.', impacto:'Avaliar impactos nas entradas, saídas, verificação, validação e liberação.',
+            risco:'Médio', aprovador:stage.aprovadoPor || project.responsavel, prazo:project.prazo, plano:'Sim', evidencia:stage.evidencia || '',
+            status:'analise', decisao:'', origemTipo:'Projeto', origemId:project.id, origemTitulo:project.nome, createdAt:new Date().toISOString() });
+        SGQCore.write('sgq_organizacao_iso', org);
+        SGQCore.audit('Projeto e desenvolvimento', 'gerou', 'Mudança', org.mudancas[org.mudancas.length - 1].id, project.nome);
+    }
+    location.href = 'organizacao.html?view=mudancas';
 }
 
 function openNovoProjetoModal() {
@@ -446,5 +464,5 @@ if (initial) currentProjectId = initial.id;
 renderProjetos();
 if (currentProjectId) renderDetail();
 </script>
-<script src="../assets/js/global-search.js"></script></body>
+<script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>

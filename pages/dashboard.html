@@ -23,9 +23,9 @@
                     <a href="dashboard.html" class="nav-item active">
                         <i class="fas fa-chart-pie"></i> Dashboard
                     </a>
-                    <a href="javascript:void(0)" class="nav-item">
+                    <a href="assistente-ia.html" class="nav-item">
                         <i class="fas fa-brain"></i> Assistente IA
-                        <span class="badge" style="background:rgba(16,185,129,.3);color:#34d399">Em breve</span>
+                        <span class="badge" style="background:rgba(16,185,129,.3);color:#34d399">Novo</span>
                     </a>
                 </div>
 
@@ -89,14 +89,8 @@
                     <a href="auditorias.html" class="nav-item">
                         <i class="fas fa-magnifying-glass-chart"></i> Auditorias Internas
                     </a>
-                    <a href="organizacao.html?view=analise" class="nav-item">
-                        <i class="fas fa-people-roof"></i> Análise Crítica
-                    </a>
                     <a href="indicadores.html" class="nav-item">
                         <i class="fas fa-chart-line"></i> Indicadores / KPIs
-                    </a>
-                    <a href="organizacao.html?view=dados" class="nav-item">
-                        <i class="fas fa-chart-simple"></i> Análise de Dados
                     </a>
                     <a href="projeto-desenvolvimento.html" class="nav-item">
                         <i class="fas fa-pen-ruler"></i> Projeto e Desenvolvimento
@@ -104,14 +98,8 @@
                     <a href="riscos.html" class="nav-item">
                         <i class="fas fa-shield-halved"></i> Gestão de Riscos
                     </a>
-                    <a href="organizacao.html?view=mudancas" class="nav-item">
-                        <i class="fas fa-repeat"></i> Controle de Mudanças
-                    </a>
                     <a href="nao-conformidades.html?tipo=melhoria" class="nav-item">
                         <i class="fas fa-lightbulb"></i> Melhoria Contínua
-                    </a>
-                    <a href="organizacao.html?view=diagnostico" class="nav-item">
-                        <i class="fas fa-shield-halved"></i> Diagnóstico ISO
                     </a>
                 </div>
 
@@ -122,6 +110,9 @@
                     <div class="nav-section-title">Cadastros</div>
                     <a href="cadastros.html" class="nav-item">
                         <i class="fas fa-box-archive"></i> Pedidos, Produtos e Setores
+                    </a>
+                    <a href="configuracoes.html" class="nav-item">
+                        <i class="fas fa-gears"></i> Configurações Gerais
                     </a>
                 </div>
             </nav>
@@ -140,7 +131,7 @@
                     </div>
                 </div>
                 <div class="topbar-right">
-                    <button class="topbar-icon" title="Assistente IA"><i class="fas fa-brain"></i></button>
+                    <a class="topbar-icon" title="Assistente IA" href="assistente-ia.html"><i class="fas fa-brain"></i></a>
                     <button class="topbar-icon" title="Notificações"><i class="fas fa-bell"></i><span class="notif-dot"></span></button>
                     <div class="user-menu" id="userMenu">
                         <button class="user-btn" onclick="toggleUserMenu(event)">
@@ -171,6 +162,7 @@
                         <p>Visão geral do Sistema de Gestão da Qualidade</p>
                     </div>
                     <div style="display:flex;gap:10px">
+                        <button class="btn btn-sm" onclick="SGQOnboarding.startCompanyOnboarding()"><i class="fas fa-route"></i> Guia de implantação</button>
                         <select style="padding:8px 14px;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-md);font-family:inherit;font-size:.85rem;background:rgba(255,255,255,.06);color:#fff;cursor:pointer">
                             <option>Últimos 30 dias</option>
                             <option>Últimos 7 dias</option>
@@ -190,9 +182,9 @@
                             <div class="stat-icon" style="background:rgba(15,117,189,.1);color:var(--primary)">
                                 <i class="fas fa-file-lines"></i>
                             </div>
-                            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> 8%</div>
+                            <div class="stat-trend up"><i class="fas fa-database"></i> Dados locais</div>
                         </div>
-                        <div class="stat-value">142</div>
+                        <div class="stat-value" id="dashboard-documents">0</div>
                         <div class="stat-label">Documentos Controlados</div>
                     </div>
 
@@ -201,9 +193,9 @@
                             <div class="stat-icon" style="background:rgba(239,68,68,.1);color:var(--danger)">
                                 <i class="fas fa-bug"></i>
                             </div>
-                            <div class="stat-trend down"><i class="fas fa-arrow-down"></i> 23%</div>
+                            <div class="stat-trend down"><i class="fas fa-database"></i> Dados locais</div>
                         </div>
-                        <div class="stat-value">5</div>
+                        <div class="stat-value" id="dashboard-open-rnc">0</div>
                         <div class="stat-label">NCs Abertas</div>
                     </div>
 
@@ -212,9 +204,9 @@
                             <div class="stat-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">
                                 <i class="fas fa-clipboard-check"></i>
                             </div>
-                            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> 15%</div>
+                            <div class="stat-trend up"><i class="fas fa-calculator"></i> Regras locais</div>
                         </div>
-                        <div class="stat-value">87%</div>
+                        <div class="stat-value" id="dashboard-iso-score">0%</div>
                         <div class="stat-label">Conformidade ISO</div>
                     </div>
 
@@ -223,9 +215,9 @@
                             <div class="stat-icon" style="background:rgba(245,158,11,.1);color:var(--warning)">
                                 <i class="fas fa-list-check"></i>
                             </div>
-                            <div class="stat-trend up"><i class="fas fa-arrow-up"></i> 5%</div>
+                            <div class="stat-trend up"><i class="fas fa-clock"></i> <span id="dashboard-overdue">0</span> atrasada(s)</div>
                         </div>
-                        <div class="stat-value">12</div>
+                        <div class="stat-value" id="dashboard-open-actions">0</div>
                         <div class="stat-label">Ações em Andamento</div>
                     </div>
                 </div>
@@ -237,8 +229,8 @@
                     </div>
                     <div class="setup-sgq-content">
                         <div class="setup-sgq-kicker">Configuração inicial</div>
-                        <h3>Setup da Empresa e Diagnóstico Inicial do SGQ</h3>
-                        <p>Cadastre as informações principais da empresa, vincule evidências aos requisitos ISO 9001 e gere o diagnóstico de lacunas.</p>
+                        <h3>Setup inicial da empresa</h3>
+                        <p>Cadastre empresa, setores, usuários, máquinas, módulos ativos, permissões e responsáveis antes de iniciar a operação do SGQ.</p>
                     </div>
                     <div class="setup-sgq-action">
                         <span>Abrir setup</span>
@@ -527,14 +519,14 @@
                                 <div class="activity-item">
                                     <div class="activity-dot" style="background:var(--warning)"></div>
                                     <div>
-                                        <div class="activity-text"><strong>Calibração</strong> do paqu?metro #05 vence em 3 dias</div>
+                                        <div class="activity-text"><strong>Calibração</strong> do paquímetro #05 vence em 3 dias</div>
                                         <div class="activity-time">Há 3 horas</div>
                                     </div>
                                 </div>
                                 <div class="activity-item">
                                     <div class="activity-dot" style="background:var(--accent)"></div>
                                     <div>
-                                        <div class="activity-text"><strong>Plano de Ação #21</strong> conclu?do - ação corretiva eficaz</div>
+                                        <div class="activity-text"><strong>Plano de Ação #21</strong> concluído - ação corretiva eficaz</div>
                                         <div class="activity-time">Há 5 horas</div>
                                     </div>
                                 </div>
@@ -627,7 +619,7 @@
                     <!-- OEE - Overall Equipment Effectiveness -->
                     <div class="card">
                         <div class="card-header">
-                            <h4><i class="fas fa-gauge-high" style="color:var(--primary);margin-right:8px"></i> OEE - Efici?ncia Global</h4>
+                            <h4><i class="fas fa-gauge-high" style="color:var(--primary);margin-right:8px"></i> OEE - Eficiência Global</h4>
                             <span class="status-badge active"><span class="status-dot"></span> Tempo real</span>
                         </div>
                         <div class="card-body" style="text-align:center;padding:20px 24px">
@@ -697,7 +689,7 @@
                                     <i class="fas fa-exclamation-circle" style="color:var(--danger);font-size:.9rem"></i>
                                     <div>
                                         <div style="font-size:.85rem;font-weight:600;color:#fff">2 calibrações vencendo</div>
-                                        <div style="font-size:.75rem;color:rgba(255,255,255,.3)">Paqu?metro #05 e Micrômetro #12</div>
+                                        <div style="font-size:.75rem;color:rgba(255,255,255,.3)">Paquímetro #05 e Micrômetro #12</div>
                                     </div>
                                 </div>
                                 <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(245,158,11,.08);border-radius:var(--radius-sm);border-left:3px solid var(--warning)">
@@ -793,6 +785,7 @@
         </div>
     </div>
 
+    <script src="../assets/js/sgq-core.js"></script>
     <script>
         function toggleUserMenu(e) {
             e.stopPropagation();
@@ -829,6 +822,21 @@
             icon: 'fa-diagram-project',
             color: 'var(--primary)'
         }));
+
+        function hydrateDashboardMetrics() {
+            const metrics = SGQCore.metrics();
+            const coverage = SGQCore.coverage();
+            const ok = coverage.filter(item => item[2] === 'ok').length;
+            const partial = coverage.filter(item => item[2] === 'partial').length;
+            const score = coverage.length ? Math.round(((ok + partial * 0.5) / coverage.length) * 100) : 0;
+            document.getElementById('dashboard-documents').textContent = metrics.documents;
+            document.getElementById('dashboard-open-rnc').textContent = metrics.openRnc;
+            document.getElementById('dashboard-open-actions').textContent = metrics.openPlans + metrics.openImprovements;
+            document.getElementById('dashboard-overdue').textContent = metrics.overdueActions;
+            document.getElementById('dashboard-iso-score').textContent = `${score}%`;
+        }
+
+        hydrateDashboardMetrics();
 
         // ===== Busca Global do Dashboard =====
         const globalSearchInput = document.getElementById('globalSearchInput');
@@ -1061,5 +1069,5 @@
         // Render on load
         renderProcessos(processos);
     </script>
-</body>
+<script src="../assets/js/onboarding.js"></script></body>
 </html>

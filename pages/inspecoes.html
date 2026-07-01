@@ -22,7 +22,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-clipboard-check" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Inspeções e Liberação</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -650,7 +649,7 @@ function renderDashboard() {
 //  LIST VIEWS 
 function renderList(type) {
     const db = getDB();
-    const items = db.inspecoes.filter(i => i.status === (type === 'andamento' ? 'andamento' : 'finalizada'));
+    const items = SGQCore.filterRecords(db.inspecoes,'inspecoes').filter(i => i.status === (type === 'andamento' ? 'andamento' : 'finalizada'));
     const listEl = document.getElementById('list-' + type);
     const emptyEl = document.getElementById('empty-' + type);
     if (!items.length) { listEl.innerHTML = ''; emptyEl.style.display = 'flex'; return; }
@@ -674,7 +673,7 @@ function renderList(type) {
 
 function renderFinalizadas() {
     const db = getDB();
-    const items = db.inspecoes.filter(i => i.status === 'finalizada');
+    const items = SGQCore.filterRecords(db.inspecoes,'inspecoes').filter(i => i.status === 'finalizada');
     const tbody = document.getElementById('tbody-finalizadas');
     const empty = document.getElementById('empty-finalizadas');
     if (!items.length) { tbody.innerHTML = ''; empty.style.display = 'flex'; document.querySelector('.mod-table-wrap').style.display='none'; return; }
@@ -699,7 +698,7 @@ function renderFinalizadas() {
 
 function renderBloqueados() {
     const db = getDB();
-    const items = db.inspecoes.filter(i => i.bloqueado === true);
+    const items = SGQCore.filterRecords(db.inspecoes,'inspecoes').filter(i => i.bloqueado === true);
     const listEl = document.getElementById('list-bloqueados');
     const emptyEl = document.getElementById('empty-bloqueados');
     if (!items.length) { listEl.innerHTML = ''; emptyEl.style.display = 'flex'; return; }
@@ -751,7 +750,7 @@ function criarInspecao() {
         id: newId, tipo: tipo, produto, pedido: document.getElementById('insp-pedido').value,
         inspetor, totalProd: total, qtInspecionada: qtInsp, status: 'andamento',
         resultado: null, defeitos: 0, inicio: new Date().toISOString().slice(0,16),
-        fim: null, obs: document.getElementById('insp-obs').value, imagens: []
+        fim: null, obs: document.getElementById('insp-obs').value, imagens: [],createdById:SGQCore.currentUser()?.id,createdBy:SGQCore.currentUser()?.name
     });
     saveDB(db);
     switchView('andamento');
@@ -847,10 +846,10 @@ function confirmarLiberacao() {
 }
 
 function descartarBloqueado(id) {
-    if (!confirm('Confirmar descarte do produto não conforme? Esta ação não pode ser desfeita.')) return;
+    if (!confirm('Confirmar a disposição como descarte? O produto não poderá ser liberado, mas o registro e o histórico serão preservados.')) return;
     const db = getDB();
     const insp = db.inspecoes.find(i => i.id === id);
-    if (insp) { insp.bloqueado = false; insp.descartado = true; }
+    if (insp) { insp.bloqueado = false; insp.descartado = true;insp.disposicaoEm=new Date().toISOString();insp.disposicaoPor=SGQCore.currentUser()?.name;SGQCore.audit('Inspeções','registrou descarte','Inspeção',id,'Produto não conforme descartado'); }
     saveDB(db);
     renderView(currentView);
 }
@@ -921,6 +920,5 @@ document.addEventListener('click',function(e){var m=document.getElementById('use
 function startModuleTour() {
     alert('Tour deste módulo em breve! ');
 }
-</script><script src="../assets/js/global-search.js"></script></body>
+</script><script src="../assets/js/sgq-core.js"></script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>
-

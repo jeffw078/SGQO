@@ -158,7 +158,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-industry" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Processo Produtivo</span>
-                    <button onclick="startModuleTour()" title="Ajuda" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -834,7 +833,7 @@ function renderOrdens() {
             db.config.maquinas.map(m => `<option value="${m.id}" ${m.id===cur?'selected':''}>${m.nome}</option>`).join('');
     }
 
-    let ordens = [...db.ordens];
+    let ordens = SGQCore.filterRecords(db.ordens,'producao');
     if (filterStatus) ordens = ordens.filter(o => o.status === filterStatus);
     if (filterMaq)    ordens = ordens.filter(o => o.maquinaId === filterMaq);
     if (search) ordens = ordens.filter(o => {
@@ -969,6 +968,8 @@ function saveOP(e) {
         qtdeReal:     parseInt(document.getElementById('op-qtde-real').value)    || 0,
         qtdeDefeito:  parseInt(document.getElementById('op-qtde-defeito').value) || 0,
         obs:          document.getElementById('op-obs').value.trim(),
+        createdById:  id ? (db.ordens.find(o=>o.id===id)?.createdById || SGQCore.currentUser()?.id) : SGQCore.currentUser()?.id,
+        createdBy:    id ? (db.ordens.find(o=>o.id===id)?.createdBy || SGQCore.currentUser()?.name) : SGQCore.currentUser()?.name,
         createdAt:    id ? (db.ordens.find(o=>o.id===id)?.createdAt || Date.now()) : Date.now(),
         updatedAt:    Date.now()
     };
@@ -991,8 +992,8 @@ function concludeOP(id) {
     if(op){ op.status='concluida'; op.dataConclusao=new Date().toISOString().slice(0,10); saveDB(db); renderDashboard(); renderOrdens(); }
 }
 function deleteOP(id) {
-    if (!confirm('Excluir esta ordem de produção? Esta ação não pode ser desfeita.')) return;
-    const db = getDB(); db.ordens = db.ordens.filter(o=>o.id!==id); saveDB(db); renderOrdens();
+    const reason=prompt('Motivo do cancelamento/desativação da ordem:');if(!reason)return;
+    const db=getDB(),item=db.ordens.find(o=>o.id===id);if(!item)return;item.status='cancelada';item.deletedAt=new Date().toISOString();item.deletedBy=SGQCore.currentUser()?.name;item.deactivationReason=reason;saveDB(db);SGQCore.audit('Produção','desativou','Ordem de produção',id,reason);renderOrdens();
 }
 function exportOPs() {
     const db = getDB(), cad = getCadDB();
@@ -1265,8 +1266,8 @@ function saveTurno(id) {
     saveDB(db); closeAllModals(); renderTurnos(); showToast('Turno salvo!','success');
 }
 function deleteTurno(id) {
-    if (!confirm('Remover este turno?')) return;
-    const db=getDB(); db.config.turnos=db.config.turnos.filter(t=>t.id!==id); saveDB(db); renderTurnos();
+    const reason=prompt('Motivo da desativação do turno:');if(!reason)return;
+    const db=getDB(),item=db.config.turnos.find(t=>t.id===id);if(item){item.ativo=false;item.deletedAt=new Date().toISOString();item.deactivationReason=reason;}saveDB(db);SGQCore.audit('Produção','desativou','Turno',id,reason);renderTurnos();
 }
 
 // ---- Máquinas ----
@@ -1328,17 +1329,18 @@ function saveMaquina(id) {
     saveDB(db);closeAllModals();renderMaquinas();showToast('Máquina salva!','success');
 }
 function deleteMaquina(id){
-    if(!confirm('Remover esta máquina?'))return;
-    const db=getDB();db.config.maquinas=db.config.maquinas.filter(m=>m.id!==id);saveDB(db);renderMaquinas();
+    const reason=prompt('Motivo da desativação da máquina:');if(!reason)return;
+    const db=getDB(),item=db.config.maquinas.find(m=>m.id===id);if(item){item.ativa=false;item.deletedAt=new Date().toISOString();item.deactivationReason=reason;}saveDB(db);SGQCore.audit('Produção','desativou','Máquina',id,reason);renderMaquinas();
 }
 
 // ---- Motivos de Parada ----
 function renderParadas() {
     const db=getDB();
+    const activeItems=db.config.motivosParada.filter(item=>item.ativo!==false&&!item.deletedAt);
     const empty=document.getElementById('empty-paradas'), wrap=document.getElementById('lista-paradas');
-    if(db.config.motivosParada.length===0){wrap.style.display='none';empty.style.display='';return;}
+    if(activeItems.length===0){wrap.style.display='none';empty.style.display='';return;}
     empty.style.display='none';wrap.style.display='';
-    document.getElementById('tbody-paradas').innerHTML=db.config.motivosParada.map(m=>`
+    document.getElementById('tbody-paradas').innerHTML=activeItems.map(m=>`
         <tr>
             <td><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:50%;background:${m.cor};display:inline-block;flex-shrink:0"></span>${m.nome}</span></td>
             <td><span class="tag gray">${m.categoria}</span></td>
@@ -1382,8 +1384,8 @@ function saveParada(id){
     saveDB(db);closeAllModals();renderParadas();showToast('Motivo salvo!','success');
 }
 function deleteParada(id){
-    if(!confirm('Remover este motivo de parada?'))return;
-    const db=getDB();db.config.motivosParada=db.config.motivosParada.filter(m=>m.id!==id);saveDB(db);renderParadas();
+    const reason=prompt('Motivo da desativação deste motivo de parada:');if(!reason)return;
+    const db=getDB(),item=db.config.motivosParada.find(m=>m.id===id);if(item){item.ativo=false;item.deletedAt=new Date().toISOString();item.deactivationReason=reason;}saveDB(db);SGQCore.audit('Produção','desativou','Motivo de parada',id,reason);renderParadas();
 }
 
 // ============================================================
@@ -1436,5 +1438,5 @@ function startModuleTour() {
     renderDashboard();
 })();
 </script>
-<script src="../assets/js/global-search.js"></script></body>
+<script src="../assets/js/sgq-core.js"></script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>

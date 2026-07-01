@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente IA - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .ai-page .page-content { max-width:1440px; margin:0 auto; width:100%; }
+        .ai-hero { display:grid; grid-template-columns:1fr 310px; gap:18px; margin-bottom:18px; }
+        .ai-hero-main { position:relative; overflow:hidden; padding:26px; border-radius:18px; border:1px solid rgba(96,165,250,.24); background:radial-gradient(circle at top left,rgba(96,165,250,.28),transparent 35%),linear-gradient(135deg,rgba(15,117,189,.18),rgba(16,185,129,.08)); }
+        .ai-hero-main:after { content:""; position:absolute; right:-80px; top:-80px; width:240px; height:240px; border-radius:50%; background:rgba(96,165,250,.12); filter:blur(2px); }
+        .ai-kicker { display:inline-flex; align-items:center; gap:8px; padding:7px 10px; border-radius:999px; background:rgba(96,165,250,.13); color:#bfdbfe; font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; }
+        .ai-hero h2 { position:relative; margin:14px 0 8px; color:#fff; font-size:1.85rem; line-height:1.15; }
+        .ai-hero p { position:relative; max-width:780px; margin:0; color:rgba(255,255,255,.64); line-height:1.58; }
+        .ai-credit-card { padding:20px; border-radius:18px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.045); }
+        .ai-credit-card span { color:rgba(255,255,255,.46); font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; }
+        .ai-credit-card strong { display:block; margin:8px 0 4px; color:#fff; font-size:2.4rem; line-height:1; }
+        .ai-credit-card p { margin:0 0 12px; color:rgba(255,255,255,.5); font-size:.82rem; }
+        .ai-credit-bar { height:8px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,.08); }
+        .ai-credit-bar i { display:block; height:100%; width:0; border-radius:999px; background:linear-gradient(90deg,#10b981,#60a5fa); }
+        .ai-layout { display:grid; grid-template-columns:360px 1fr; gap:18px; align-items:start; }
+        .ai-card { border:1px solid rgba(255,255,255,.09); background:rgba(255,255,255,.045); border-radius:16px; padding:18px; }
+        .ai-card h3 { margin:0 0 12px; color:#fff; font-size:1rem; display:flex; align-items:center; gap:8px; }
+        .ai-task-list { display:flex; flex-direction:column; gap:10px; }
+        .ai-task { width:100%; text-align:left; display:grid; grid-template-columns:38px 1fr auto; gap:10px; align-items:center; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.04); color:#fff; cursor:pointer; transition:.18s ease; }
+        .ai-task:hover, .ai-task.active { transform:translateY(-1px); border-color:rgba(96,165,250,.42); background:rgba(15,117,189,.14); }
+        .ai-task i { width:38px; height:38px; display:grid; place-items:center; border-radius:10px; background:rgba(96,165,250,.14); color:#93c5fd; }
+        .ai-task strong { display:block; font-size:.86rem; margin-bottom:2px; }
+        .ai-task small { color:rgba(255,255,255,.45); font-size:.72rem; line-height:1.35; }
+        .ai-cost { padding:4px 8px; border-radius:999px; background:rgba(16,185,129,.12); color:#6ee7b7; font-size:.72rem; font-weight:800; white-space:nowrap; }
+        .ai-prompt-tools { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+        .ai-context { display:flex; gap:8px; flex-wrap:wrap; }
+        .ai-chip { border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.055); color:rgba(255,255,255,.68); border-radius:999px; padding:7px 10px; font-size:.75rem; cursor:pointer; }
+        .ai-chip.active { background:rgba(15,117,189,.22); border-color:rgba(96,165,250,.45); color:#dbeafe; }
+        .ai-textarea { width:100%; min-height:210px; padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,.1); background:rgba(8,18,33,.78); color:#fff; font:500 .95rem/1.55 Inter,Arial,sans-serif; resize:vertical; outline:none; }
+        .ai-textarea:focus { border-color:rgba(96,165,250,.55); box-shadow:0 0 0 3px rgba(96,165,250,.1); }
+        .ai-prompt-foot { display:flex; justify-content:space-between; gap:10px; margin-top:8px; color:rgba(255,255,255,.45); font-size:.76rem; flex-wrap:wrap; }
+        .ai-prompt-counter.warn { color:#fbbf24; }
+        .ai-prompt-counter.danger { color:#f87171; }
+        .ai-actions { display:flex; justify-content:space-between; gap:12px; margin-top:14px; flex-wrap:wrap; }
+        .ai-btn { border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.07); color:#fff; border-radius:10px; padding:11px 14px; cursor:pointer; font:inherit; font-size:.86rem; font-weight:800; display:inline-flex; align-items:center; gap:8px; }
+        .ai-btn.primary { border:0; background:linear-gradient(135deg,#0f75bd,#10b981); box-shadow:0 12px 28px rgba(15,117,189,.25); }
+        .ai-btn.warning { color:#fbbf24; background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.25); }
+        .ai-btn.positive { color:#ecfdf5; background:linear-gradient(135deg,#059669,#10b981); border-color:rgba(16,185,129,.45); box-shadow:0 12px 28px rgba(16,185,129,.18); }
+        .ai-btn.positive:hover { background:linear-gradient(135deg,#047857,#12c48b); }
+        .ai-btn:disabled { opacity:.45; cursor:not-allowed; }
+        .ai-response { min-height:340px; }
+        .ai-empty { display:grid; place-items:center; min-height:300px; color:rgba(255,255,255,.45); text-align:center; border:1px dashed rgba(255,255,255,.12); border-radius:14px; padding:24px; }
+        .ai-answer-head { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:14px; }
+        .ai-answer-head h3 { margin:0; color:#fff; }
+        .ai-answer-meta { display:flex; gap:8px; flex-wrap:wrap; }
+        .ai-pill { padding:6px 9px; border-radius:999px; background:rgba(255,255,255,.07); color:rgba(255,255,255,.58); font-size:.72rem; font-weight:800; }
+        .ai-output-section { margin-top:12px; padding:14px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); }
+        .ai-output-section h4 { margin:0 0 8px; color:#dbeafe; font-size:.9rem; }
+        .ai-output-section p, .ai-output-section li { color:rgba(255,255,255,.68); line-height:1.55; font-size:.88rem; }
+        .ai-output-section ul { margin:8px 0 0; padding-left:18px; }
+        .ai-history-item { padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.035); margin-bottom:9px; cursor:pointer; }
+        .ai-history-item strong { display:block; color:#fff; font-size:.84rem; margin-bottom:3px; }
+        .ai-history-item span { color:rgba(255,255,255,.42); font-size:.72rem; }
+        .ai-modal-backdrop { position:fixed; inset:0; z-index:100000; display:none; place-items:center; padding:22px; background:rgba(2,8,23,.76); backdrop-filter:blur(6px); }
+        .ai-modal-backdrop.active { display:grid; }
+        .ai-modal { width:min(520px,100%); border-radius:18px; border:1px solid rgba(96,165,250,.28); background:#10233d; color:#fff; box-shadow:0 28px 90px rgba(0,0,0,.55); overflow:hidden; }
+        .ai-modal-top { padding:22px; background:linear-gradient(135deg,rgba(15,117,189,.22),rgba(16,185,129,.12)); display:flex; gap:14px; align-items:flex-start; }
+        .ai-modal-top i { width:44px; height:44px; display:grid; place-items:center; border-radius:12px; background:rgba(255,255,255,.1); color:#93c5fd; font-size:1.25rem; }
+        .ai-modal h3 { margin:0 0 6px; }
+        .ai-modal p { margin:0; color:rgba(255,255,255,.62); line-height:1.5; }
+        .ai-modal-body { padding:20px 22px; }
+        .ai-consume-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.08); color:rgba(255,255,255,.68); }
+        .ai-consume-row strong { color:#fff; }
+        .ai-modal-actions { display:flex; gap:10px; padding:0 22px 22px; }
+        .ai-modal-actions button { flex:1; justify-content:center; }
+        .ai-top-credit { display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:999px; border:1px solid rgba(96,165,250,.28); background:rgba(96,165,250,.1); color:#dbeafe; font-size:.78rem; font-weight:800; }
+        @media(max-width:1100px){.ai-hero,.ai-layout{grid-template-columns:1fr}.ai-credit-card{order:-1}}
+        @media(max-width:640px){.ai-task{grid-template-columns:34px 1fr}.ai-cost{grid-column:2}.ai-modal-actions{flex-direction:column}.ai-prompt-tools{align-items:stretch}.ai-context{width:100%}}
+    </style>
+</head>
+<body>
+<div class="dashboard-layout ai-page">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px;"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Principal</div>
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+                <a href="assistente-ia.html" class="nav-item active"><i class="fas fa-brain"></i> Assistente IA</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Atalhos para contexto</div>
+                <a href="documentos.html" class="nav-item"><i class="fas fa-file-lines"></i> Documentos</a>
+                <a href="bpm.html" class="nav-item"><i class="fas fa-diagram-project"></i> BPM</a>
+                <a href="organizacao.html?view=diagnostico" class="nav-item"><i class="fas fa-building-shield"></i> Diagnóstico ISO</a>
+                <a href="nao-conformidades.html" class="nav-item"><i class="fas fa-bug"></i> NC/CAPA</a>
+                <a href="riscos.html" class="nav-item"><i class="fas fa-shield-halved"></i> Riscos</a>
+                <a href="indicadores.html" class="nav-item"><i class="fas fa-chart-line"></i> Indicadores</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Administração</div>
+                <a href="configuracoes.html" class="nav-item"><i class="fas fa-gears"></i> Configurações</a>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-search global-search" id="globalSearchBox">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="globalSearchInput" autocomplete="off" placeholder="Buscar módulo, documento ou ação">
+                    <button class="global-search-btn" id="globalSearchBtn" type="button" title="Buscar"><i class="fas fa-arrow-right"></i></button>
+                    <div class="global-search-results" id="globalSearchResults"></div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="ai-top-credit" title="Créditos mensais de IA"><i class="fas fa-bolt"></i><span id="topCredits">0 disponíveis</span></div>
+                <button class="topbar-icon" title="Notificações"><i class="fas fa-bell"></i><span class="notif-dot"></span></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" onclick="toggleUserMenu(event)"><div class="avatar">JW</div><span class="user-btn-name">Jefferson Willian</span><i class="fas fa-chevron-down"></i></button>
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-header"><div class="avatar">JW</div><div><div class="user-name">Jefferson Willian</div><div class="user-role">Gestor da Qualidade</div></div></div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="login.html" class="user-dropdown-item danger"><i class="fas fa-arrow-right-from-bracket"></i> Sair</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <section class="ai-hero">
+                <div class="ai-hero-main">
+                    <div class="ai-kicker"><i class="fas fa-sparkles"></i> Assistente IA do SGQ</div>
+                    <h2>Peça análises, gere fluxos e transforme registros em ações.</h2>
+                    <p>Esta tela simula a experiência final da IA: o usuário pode escrever um prompt livre ou escolher tarefas padrão. Antes de executar, o sistema informa o consumo de créditos conforme o plano contratado.</p>
+                </div>
+                <aside class="ai-credit-card">
+                    <span>Créditos IA disponíveis</span>
+                    <strong id="creditAvailable">0</strong>
+                    <p id="creditPlanText">Plano atual</p>
+                    <div class="ai-credit-bar"><i id="creditBar"></i></div>
+                    <button class="ai-btn positive" style="width:100%;justify-content:center;margin-top:14px" onclick="requestMoreCredits()"><i class="fas fa-plus"></i> Solicitar novas análises</button>
+                </aside>
+            </section>
+
+            <section class="ai-layout">
+                <aside class="ai-card">
+                    <h3><i class="fas fa-wand-magic-sparkles" style="color:#93c5fd"></i> Tarefas padrão</h3>
+                    <div class="ai-task-list" id="taskList"></div>
+                    <div style="height:14px"></div>
+                    <h3><i class="fas fa-clock-rotate-left" style="color:#10b981"></i> Histórico</h3>
+                    <div id="historyList"></div>
+                </aside>
+
+                <section>
+                    <div class="ai-card" style="margin-bottom:18px">
+                        <div class="ai-prompt-tools">
+                            <h3 style="margin:0"><i class="fas fa-message" style="color:#93c5fd"></i> Prompt da análise</h3>
+                            <div class="ai-context" id="contextChips"></div>
+                        </div>
+                        <textarea class="ai-textarea" id="promptInput" maxlength="2500" oninput="updatePromptCounter()"></textarea>
+                        <div class="ai-prompt-foot">
+                            <span>Limite no MVP: 2.500 caracteres por solicitação. No backend final, validar também por tokens.</span>
+                            <strong class="ai-prompt-counter" id="promptCounter">0 / 2500</strong>
+                        </div>
+                        <div class="ai-actions">
+                            <div>
+                                <button class="ai-btn" onclick="fillExamplePrompt()"><i class="fas fa-lightbulb"></i> Exemplo criativo</button>
+                                <button class="ai-btn" onclick="clearPrompt()"><i class="fas fa-eraser"></i> Limpar</button>
+                            </div>
+                            <button class="ai-btn primary" id="runButton" onclick="openConsumeModal()"><i class="fas fa-paper-plane"></i> Executar com IA</button>
+                        </div>
+                    </div>
+                    <div class="ai-card ai-response" id="responseBox">
+                        <div class="ai-empty">
+                            <div>
+                                <i class="fas fa-robot" style="font-size:2.2rem;color:#60a5fa;margin-bottom:12px"></i>
+                                <h3 style="justify-content:center">A resposta simulada aparecerá aqui</h3>
+                                <p>Escolha uma tarefa padrão ou edite o prompt livre. O consumo só ocorre após a confirmação.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </main>
+</div>
+
+<div class="ai-modal-backdrop" id="consumeModal">
+    <div class="ai-modal">
+        <div class="ai-modal-top">
+            <i class="fas fa-coins"></i>
+            <div>
+                <h3>Confirmar consumo de créditos</h3>
+                <p>Esta é uma simulação do controle comercial da IA. No app final, esta confirmação evita consumo acidental de análises contratadas.</p>
+            </div>
+        </div>
+        <div class="ai-modal-body">
+            <div class="ai-consume-row"><span>Tarefa</span><strong id="modalTask">Análise SGQ</strong></div>
+            <div class="ai-consume-row"><span>Consumo previsto</span><strong id="modalCost">1 crédito</strong></div>
+            <div class="ai-consume-row"><span>Disponíveis antes</span><strong id="modalBefore">0</strong></div>
+            <div class="ai-consume-row"><span>Disponíveis depois</span><strong id="modalAfter">0</strong></div>
+        </div>
+        <div class="ai-modal-actions">
+            <button class="ai-btn" onclick="closeConsumeModal()"><i class="fas fa-xmark"></i> Cancelar</button>
+            <button class="ai-btn primary" id="confirmRunBtn" onclick="confirmRunAi()"><i class="fas fa-check"></i> Confirmar e executar</button>
+        </div>
+    </div>
+</div>
+
+<script src="../assets/js/sgq-core.js"></script>
+<script src="../assets/js/global-search.js"></script>
+<script src="../assets/js/onboarding.js"></script>
+<script>
+const AI_USAGE_KEY = 'sgq_ai_usage_monthly';
+const AI_HISTORY_KEY = 'sgq_ai_assistant_history';
+const PROMPT_LIMIT = 2500;
+let selectedTask = 'bpm';
+let selectedContext = 'sgq';
+
+const tasks = [
+    {id:'bpm', title:'Modelar fluxo BPM', cost:2, icon:'fa-diagram-project', desc:'Cria etapas, responsáveis, decisões, SLAs e versionamento.', prompt:'Modele um fluxo BPM para aprovação e publicação de documentos controlados. Considere elaboração, revisão técnica, aprovação da qualidade, publicação, treinamento obrigatório quando aplicável, revisão periódica e obsolescência. Gere etapas, responsáveis, campos do formulário, decisões, notificações e regras de versionamento.'},
+    {id:'iso', title:'Diagnóstico ISO 9001', cost:3, icon:'fa-brain', desc:'Avalia lacunas por requisito e prioriza ações.', prompt:'Analise a maturidade do SGQ com foco na ISO 9001. Considere contexto, liderança, riscos, documentos, competências, operação, fornecedores, satisfação, auditorias, indicadores, NC/CAPA e melhoria. Gere lacunas, riscos de auditoria e plano de 30/60/90 dias.'},
+    {id:'documento', title:'Revisar documento', cost:1, icon:'fa-file-shield', desc:'Sugere melhorias, riscos e requisitos ISO atendidos.', prompt:'Revise o procedimento de controle de documentos e registros. Verifique clareza, responsabilidades, aprovação, distribuição, controle de revisão, retenção, obsolescência e rastreabilidade. Aponte ajustes recomendados e requisitos ISO relacionados.'},
+    {id:'plano', title:'Gerar plano de ação', cost:1, icon:'fa-list-check', desc:'Transforma problema em 5W2H com responsáveis.', prompt:'Crie um plano de ação 5W2H para reduzir atrasos em calibração de instrumentos críticos. Considere causa provável, responsáveis, prazos, evidências, indicador de eficácia e risco residual.'},
+    {id:'risco', title:'Analisar risco', cost:1, icon:'fa-shield-halved', desc:'Classifica risco, controles e plano de tratamento.', prompt:'Analise o risco de usar fornecedores sem reavaliação periódica. Classifique impacto, probabilidade, controles existentes, controles recomendados, gatilhos de monitoramento e ações de tratamento.'},
+    {id:'auditoria', title:'Preparar auditoria', cost:2, icon:'fa-magnifying-glass-chart', desc:'Gera checklist, trilha de evidências e perguntas.', prompt:'Prepare um roteiro de auditoria interna ISO 9001 para os processos Qualidade, Compras e Produção. Gere checklist por requisito, evidências esperadas, perguntas para auditar e critérios para registrar achados.'},
+    {id:'pendencias', title:'Resumo executivo', cost:1, icon:'fa-chart-simple', desc:'Resume pendências, prioridades e próximos passos.', prompt:'Gere um resumo executivo para a direção com as principais pendências do SGQ, riscos de auditoria, decisões necessárias e prioridades da semana.'}
+];
+
+const contexts = [
+    ['sgq','Sistema geral'],
+    ['documentos','Documentos'],
+    ['bpm','BPM'],
+    ['riscos','Riscos'],
+    ['fornecedores','Fornecedores'],
+    ['satisfacao','Satisfação'],
+    ['auditorias','Auditorias']
+];
+
+function monthKey() { return new Date().toISOString().slice(0,7); }
+function readUsage() { const usage = SGQCore.read(AI_USAGE_KEY, {}); return usage[monthKey()] || {used:0, extra:0}; }
+function writeUsage(current) { const usage = SGQCore.read(AI_USAGE_KEY, {}); usage[monthKey()] = current; SGQCore.write(AI_USAGE_KEY, usage); }
+function planCredits() { return Number(SGQCore.currentPlan().aiAnalysesPerMonth || 0); }
+function extraCredits() {
+    const direct = Number(SGQCore.read('sgq_ai_extra_credits', 0)) || 0;
+    const approved = SGQCore.read('sgq_ai_analysis_requests', []).filter(r => ['aprovada','aprovado','approved'].includes(String(r.status || '').toLowerCase())).reduce((sum,r) => sum + (Number(r.quantity) || 0), 0);
+    return direct + approved;
+}
+function totalCredits() { return planCredits() + extraCredits(); }
+function availableCredits() { return Math.max(0, totalCredits() - readUsage().used); }
+function currentTask() { return tasks.find(t => t.id === selectedTask) || tasks[0]; }
+function esc(value) { const span=document.createElement('span'); span.textContent=value||''; return span.innerHTML; }
+
+function renderCredits() {
+    const plan = SGQCore.currentPlan();
+    const total = totalCredits();
+    const used = readUsage().used;
+    const available = availableCredits();
+    creditAvailable.textContent = available;
+    topCredits.textContent = `${available} disponíveis`;
+    creditPlanText.textContent = `${plan.name}: ${plan.aiAnalysesPerMonth} análises/mês${extraCredits() ? ` + ${extraCredits()} adicionais` : ''}. Usadas: ${used}.`;
+    creditBar.style.width = total ? `${Math.min(100, (available / total) * 100)}%` : '0%';
+    runButton.disabled = available < currentTask().cost || promptInput.value.length > PROMPT_LIMIT;
+}
+
+function renderTasks() {
+    taskList.innerHTML = tasks.map(task => `<button class="ai-task ${task.id === selectedTask ? 'active' : ''}" onclick="selectTask('${task.id}')">
+        <i class="fas ${task.icon}"></i>
+        <span><strong>${task.title}</strong><small>${task.desc}</small></span>
+        <em class="ai-cost">${task.cost} cr.</em>
+    </button>`).join('');
+}
+
+function renderContexts() {
+    contextChips.innerHTML = contexts.map(([id,label]) => `<button class="ai-chip ${id === selectedContext ? 'active' : ''}" onclick="selectContext('${id}')">${label}</button>`).join('');
+}
+
+function selectTask(id) {
+    selectedTask = id;
+    promptInput.value = currentTask().prompt;
+    renderTasks();
+    updatePromptCounter();
+    renderCredits();
+}
+
+function selectContext(id) {
+    selectedContext = id;
+    renderContexts();
+}
+
+function fillExamplePrompt() {
+    promptInput.value = 'Crie um plano de implantação do SGQ Online para uma indústria metalúrgica com 3 unidades, 14 usuários, ISO 9001 em implantação, alto volume de documentos em planilhas, fornecedores críticos e necessidade de fluxo BPM para aprovação de documentos, tratamento de NCs e satisfação de clientes. Priorize o que deve entrar no MVP e o que pode ficar para fase 2.';
+    updatePromptCounter();
+}
+
+function clearPrompt() { promptInput.value = ''; updatePromptCounter(); }
+
+function updatePromptCounter() {
+    const size = promptInput.value.length;
+    promptCounter.textContent = `${size} / ${PROMPT_LIMIT}`;
+    promptCounter.classList.toggle('warn', size > PROMPT_LIMIT * .8 && size <= PROMPT_LIMIT);
+    promptCounter.classList.toggle('danger', size > PROMPT_LIMIT);
+    renderCredits();
+}
+
+function openConsumeModal() {
+    if (promptInput.value.length > PROMPT_LIMIT) return alert(`Reduza o prompt para no máximo ${PROMPT_LIMIT} caracteres.`);
+    const task = currentTask();
+    const available = availableCredits();
+    modalTask.textContent = task.title;
+    modalCost.textContent = `${task.cost} crédito${task.cost > 1 ? 's' : ''}`;
+    modalBefore.textContent = available;
+    modalAfter.textContent = Math.max(0, available - task.cost);
+    confirmRunBtn.disabled = available < task.cost;
+    consumeModal.classList.add('active');
+}
+
+function closeConsumeModal() { consumeModal.classList.remove('active'); }
+
+function confirmRunAi() {
+    const task = currentTask();
+    if (availableCredits() < task.cost) return;
+    const usage = readUsage();
+    usage.used += task.cost;
+    writeUsage(usage);
+    closeConsumeModal();
+    const answer = buildAnswer(task, promptInput.value.trim());
+    saveHistory(task, answer);
+    renderAnswer(task, answer);
+    renderHistory();
+    renderCredits();
+    SGQCore.audit('Assistente IA','executou','Análise IA',task.id,`${task.title} - ${task.cost} crédito(s)`);
+}
+
+function buildAnswer(task, prompt) {
+    const base = {
+        bpm: {
+            title:'Fluxo BPM sugerido',
+            sections:[
+                ['Desenho do fluxo', ['Solicitação criada pelo autor', 'Revisão técnica pelo responsável do setor', 'Aprovação da Qualidade', 'Publicação controlada', 'Notificação de leitura/treinamento', 'Revisão periódica ou obsolescência']],
+                ['Campos mínimos', ['Tipo documental, código, versão, setor, responsável, motivo da mudança, anexos, aprovadores, impacto em treinamento e data de próxima revisão']],
+                ['Regras críticas', ['Fluxos em andamento permanecem na versão atual', 'Novas execuções usam a versão publicada mais recente', 'Toda reprovação exige justificativa e retorna ao autor']]
+            ],
+            actions:['Criar template BPM “Controle de Documentos”', 'Vincular permissões de aprovação por módulo', 'Exibir alerta de versionamento no onboarding do módulo']
+        },
+        iso: {
+            title:'Diagnóstico ISO simulado',
+            sections:[
+                ['Lacunas prioritárias', ['Formalizar escopo e mapa de processos', 'Definir matriz de responsabilidades', 'Consolidar indicadores por processo', 'Executar auditoria interna com tratamento de achados']],
+                ['Riscos de auditoria', ['Evidências descentralizadas', 'Aprovações sem trilha', 'Registros sem responsável definido']],
+                ['Plano 30/60/90', ['30 dias: setup, setores, permissões e documentos críticos', '60 dias: riscos, fornecedores, auditoria e indicadores', '90 dias: análise crítica e melhoria contínua']]
+            ],
+            actions:['Abrir diagnóstico em Organização', 'Gerar planos de ação para lacunas críticas', 'Priorizar documentos obrigatórios']
+        },
+        documento: {
+            title:'Revisão documental simulada',
+            sections:[
+                ['Pontos fortes', ['Controle de versão previsto', 'Fluxo de aprovação definido', 'Histórico de mudanças rastreável']],
+                ['Melhorias recomendadas', ['Incluir regra de cópia controlada', 'Definir retenção por tipo documental', 'Amarrar treinamento obrigatório quando houver mudança operacional']],
+                ['ISO relacionada', ['7.5 Informação documentada', '7.2 Competência', '8.5 Controle de produção e serviço']]
+            ],
+            actions:['Atualizar procedimento', 'Revisar tipos documentais', 'Criar checklist de publicação']
+        },
+        plano: {
+            title:'Plano de ação 5W2H',
+            sections:[
+                ['O que fazer', ['Revisar lista de instrumentos críticos', 'Criar alerta de vencimento', 'Definir responsável por calibração', 'Bloquear uso de instrumento vencido']],
+                ['Como medir eficácia', ['Zero instrumentos críticos vencidos em uso por 60 dias', '100% dos certificados anexados no prazo']],
+                ['Responsáveis sugeridos', ['Qualidade: regra e verificação', 'Manutenção: execução', 'Gestor do setor: bloqueio operacional']]
+            ],
+            actions:['Criar plano em NC/CAPA', 'Configurar alerta em Calibração', 'Criar indicador de aderência']
+        },
+        risco: {
+            title:'Análise de risco',
+            sections:[
+                ['Classificação sugerida', ['Impacto alto: falhas do fornecedor afetam conformidade do produto', 'Probabilidade média: ausência de reavaliação aumenta variabilidade', 'Nível recomendado: crítico até haver controle periódico']],
+                ['Controles recomendados', ['Score trimestral', 'Bloqueio de fornecedor vencido', 'Plano de desenvolvimento para fornecedores críticos']],
+                ['Gatilhos', ['Atraso recorrente', 'Reclamação de cliente vinculada', 'NC de recebimento']]
+            ],
+            actions:['Registrar risco', 'Configurar reavaliação de fornecedor', 'Criar plano de tratamento']
+        },
+        auditoria: {
+            title:'Roteiro de auditoria',
+            sections:[
+                ['Qualidade', ['Controle documental', 'NC/CAPA', 'indicadores e análise crítica']],
+                ['Compras', ['Homologação, avaliação, reavaliação e tratamento de fornecedor crítico']],
+                ['Produção', ['Critérios de liberação, rastreabilidade, inspeções e tratamento de saída não conforme']]
+            ],
+            actions:['Criar programa de auditoria', 'Gerar checklist por processo', 'Vincular achados a planos de ação']
+        },
+        pendencias: {
+            title:'Resumo executivo',
+            sections:[
+                ['Prioridades da semana', ['Concluir setup de permissões', 'Definir responsáveis por setor', 'Criar documentos críticos', 'Publicar fluxo BPM de documentos']],
+                ['Decisões necessárias', ['Quem aprova documentos por setor', 'Quais módulos entram no piloto', 'Quais indicadores serão acompanhados pela direção']],
+                ['Risco de gestão', ['Sem responsáveis claros, pendências ficam sem dono e auditoria perde rastreabilidade']]
+            ],
+            actions:['Enviar resumo à direção', 'Abrir planos de ação', 'Revisar setup da empresa']
+        }
+    }[task.id];
+    return Object.assign({}, base, {prompt, context:selectedContext, createdAt:new Date().toISOString()});
+}
+
+function renderAnswer(task, answer) {
+    responseBox.innerHTML = `
+        <div class="ai-answer-head">
+            <div><h3><i class="fas ${task.icon}" style="color:#93c5fd;margin-right:8px"></i>${esc(answer.title)}</h3><p style="color:rgba(255,255,255,.5);margin:6px 0 0">Resposta padrão simulada para validar UX, créditos e estrutura de retorno da futura IA.</p></div>
+            <div class="ai-answer-meta"><span class="ai-pill">${task.cost} cr.</span><span class="ai-pill">${new Date(answer.createdAt).toLocaleString('pt-BR')}</span></div>
+        </div>
+        ${answer.sections.map(([title,items]) => `<div class="ai-output-section"><h4>${esc(title)}</h4><ul>${items.map(item => `<li>${esc(item)}</li>`).join('')}</ul></div>`).join('')}
+        <div class="ai-output-section"><h4>Próximas ações sugeridas</h4><ul>${answer.actions.map(item => `<li>${esc(item)}</li>`).join('')}</ul></div>
+        <div class="ai-output-section"><h4>Prompt analisado</h4><p>${esc(answer.prompt || 'Prompt padrão da tarefa selecionada.')}</p></div>`;
+}
+
+function saveHistory(task, answer) {
+    const history = SGQCore.read(AI_HISTORY_KEY, []);
+    history.unshift({id:Date.now(), taskId:task.id, taskTitle:task.title, cost:task.cost, answer});
+    SGQCore.write(AI_HISTORY_KEY, history.slice(0, 12));
+}
+
+function renderHistory() {
+    const history = SGQCore.read(AI_HISTORY_KEY, []);
+    historyList.innerHTML = history.length ? history.map(item => `<div class="ai-history-item" onclick="restoreHistory(${item.id})"><strong>${esc(item.taskTitle)}</strong><span>${new Date(item.answer.createdAt).toLocaleString('pt-BR')} · ${item.cost} crédito(s)</span></div>`).join('') : '<p style="color:rgba(255,255,255,.45);font-size:.84rem">Nenhuma análise executada ainda.</p>';
+}
+
+function restoreHistory(id) {
+    const item = SGQCore.read(AI_HISTORY_KEY, []).find(row => row.id === id);
+    if (!item) return;
+    selectedTask = item.taskId;
+    promptInput.value = item.answer.prompt || '';
+    renderTasks();
+    renderAnswer(currentTask(), item.answer);
+}
+
+function requestMoreCredits() {
+    const requests = SGQCore.read('sgq_ai_analysis_requests', []);
+    requests.unshift({id:Date.now(), quantity:10, reason:'Solicitação via Assistente IA', status:'pendente', createdAt:new Date().toISOString()});
+    SGQCore.write('sgq_ai_analysis_requests', requests);
+    SGQCore.notify({title:'Solicitação de IA registrada',message:'Pedido de 10 análises adicionais enviado para retorno comercial.',module:'Assistente IA',url:'assistente-ia.html'});
+    alert('Solicitação registrada: 10 análises adicionais aguardando retorno comercial.');
+}
+
+function toggleUserMenu(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu')?.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+    if (!e.target.closest('#userMenu')) document.getElementById('userMenu')?.classList.remove('open');
+    if (e.target.id === 'consumeModal') closeConsumeModal();
+});
+
+selectTask('bpm');
+renderContexts();
+renderHistory();
+renderCredits();
+updatePromptCounter();
+</script>
+</body>
+</html>

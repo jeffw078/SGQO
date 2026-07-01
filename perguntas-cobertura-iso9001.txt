@@ -103,3 +103,9 @@ Resposta: deve gerar
 
 28. Esse diagnostico deve ser automatico, manual ou misto?
 Resposta: automático, será desenvolvido utilizando api de IA posteriormente, verifique se isso pode ser testado de alguma forma grátis nesse momento
+
+
+COMPLEMENTO VALIDADO: PENDENCIAS DE DOCUMENTOS
+----------------------------------------------
+
+No módulo de Documentos deverá existir o botão "Minhas pendências" no mesmo nível da barra de pesquisa. A tela deverá reunir documentos de todas as pastas que aguardam aprovação do usuário autenticado, respeitando aprovadores configurados, ordem sequencial/alçada, permissões e aprovações já realizadas. O usuário deverá abrir e revisar o documento antes de aprovar. O contador e a lista deverão ser atualizados após a decisão.

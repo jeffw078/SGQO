@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Master - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="master-admin-page">
+<div class="master-shell">
+    <aside class="master-sidebar">
+        <div class="master-brand">
+            <img src="../assets/img/logo.png" alt="SGQ Online">
+            <span>Admin Master</span>
+        </div>
+
+        <nav class="master-nav">
+            <button class="master-nav-item active" data-view="overview" onclick="switchMasterView('overview', this)"><i class="fas fa-table-cells-large"></i> Visão Geral</button>
+            <button class="master-nav-item" data-view="empresas" onclick="switchMasterView('empresas', this)"><i class="fas fa-building"></i> Empresas</button>
+            <button class="master-nav-item" data-view="acessos" onclick="switchMasterView('acessos', this)"><i class="fas fa-user-shield"></i> Acessos Aprovados</button>
+            <button class="master-nav-item" data-view="analytics" onclick="switchMasterView('analytics', this)"><i class="fas fa-chart-line"></i> Analytics</button>
+            <button class="master-nav-item" data-view="logs" onclick="switchMasterView('logs', this)"><i class="fas fa-terminal"></i> Logs e Erros</button>
+            <button class="master-nav-item" data-view="helpdesk" onclick="switchMasterView('helpdesk', this)"><i class="fas fa-headset"></i> Help Desk</button>
+            <button class="master-nav-item" data-view="infra" onclick="switchMasterView('infra', this)"><i class="fas fa-network-wired"></i> VPN e Infra</button>
+            <a class="master-nav-item master-exit" href="login.html" onclick="logoutMaster()"><i class="fas fa-right-from-bracket"></i> Sair</a>
+        </nav>
+    </aside>
+
+    <main class="master-main">
+        <header class="master-topbar">
+            <div>
+                <div class="master-kicker">Console global</div>
+                <h1>Estado geral da aplicação</h1>
+            </div>
+            <div class="master-security-card">
+                <i class="fas fa-shield-halved"></i>
+                <div>
+                    <strong>2FA obrigatório</strong>
+                    <span>Mock ativo: sessão master verificada</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="master-alert">
+            <i class="fas fa-lock"></i>
+            <div>
+                <strong>Acesso às empresas exige aprovação.</strong>
+                O usuário master visualiza indicadores globais, mas só entra no ambiente de uma empresa quando o admin da empresa aprovar a solicitação.
+            </div>
+        </section>
+
+        <section id="view-overview" class="master-view active">
+            <div class="master-metrics" id="overviewMetrics"></div>
+
+            <div class="master-grid two">
+                <article class="master-panel">
+                    <div class="master-panel-head">
+                        <div>
+                            <h2>Saúde da aplicação</h2>
+                            <p>Resumo operacional das últimas 24 horas</p>
+                        </div>
+                        <span class="master-pill success">Operacional</span>
+                    </div>
+                    <div class="health-stack">
+                        <div class="health-row"><span>API principal</span><strong>99,98%</strong><div><i style="width:99%"></i></div></div>
+                        <div class="health-row"><span>Banco de dados</span><strong>99,92%</strong><div><i style="width:96%"></i></div></div>
+                        <div class="health-row"><span>Storage de evidências</span><strong>98,70%</strong><div><i style="width:88%"></i></div></div>
+                        <div class="health-row"><span>Fila de notificações</span><strong>94,10%</strong><div><i style="width:74%"></i></div></div>
+                    </div>
+                </article>
+
+                <article class="master-panel">
+                    <div class="master-panel-head">
+                        <div>
+                            <h2>Solicitações de acesso</h2>
+                            <p>Entrada em ambientes de clientes</p>
+                        </div>
+                        <button class="master-btn primary" onclick="requestCompanyAccess()"><i class="fas fa-key"></i> Solicitar</button>
+                    </div>
+                    <div id="accessRequestsList" class="request-list"></div>
+                </article>
+            </div>
+
+            <div class="master-grid three">
+                <article class="master-panel">
+                    <div class="master-panel-head compact"><h2>Empresas recentes</h2><button class="master-btn ghost" onclick="switchMasterView('empresas')">Ver</button></div>
+                    <div id="recentCompanies"></div>
+                </article>
+                <article class="master-panel">
+                    <div class="master-panel-head compact"><h2>Erros críticos</h2><button class="master-btn ghost" onclick="switchMasterView('logs')">Tratar</button></div>
+                    <div id="criticalLogs"></div>
+                </article>
+                <article class="master-panel">
+                    <div class="master-panel-head compact"><h2>Suporte</h2><button class="master-btn ghost" onclick="switchMasterView('helpdesk')">Abrir</button></div>
+                    <div id="ticketSummary"></div>
+                </article>
+            </div>
+        </section>
+
+        <section id="view-empresas" class="master-view">
+            <div class="master-section-head">
+                <div><h2>Empresas e admins</h2><p>Cadastro central de tenants e usuários administradores.</p></div>
+                <button class="master-btn primary" onclick="openCompanyModal()"><i class="fas fa-plus"></i> Nova empresa</button>
+            </div>
+            <div class="master-panel">
+                <table class="master-table">
+                    <thead><tr><th>Empresa</th><th>Plano</th><th>Status</th><th>Admin</th><th>Usuários</th><th>Último acesso</th><th>Ações</th></tr></thead>
+                    <tbody id="companiesTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="view-acessos" class="master-view">
+            <div class="master-section-head">
+                <div><h2>Acessos aprovados</h2><p>Controle de entrada do master em ambientes de clientes.</p></div>
+            </div>
+            <div class="master-grid two">
+                <article class="master-panel">
+                    <div class="master-panel-head compact"><h2>Pendentes de aprovação</h2></div>
+                    <div id="pendingAccessList" class="request-list"></div>
+                </article>
+                <article class="master-panel">
+                    <div class="master-panel-head compact"><h2>Aprovados recentemente</h2></div>
+                    <div id="approvedAccessList" class="request-list"></div>
+                </article>
+            </div>
+        </section>
+
+        <section id="view-analytics" class="master-view">
+            <div class="master-section-head">
+                <div><h2>Analytics de uso</h2><p>Acessos, módulos mais usados e adoção por empresa.</p></div>
+                <select class="master-select" onchange="renderAnalytics(this.value)">
+                    <option value="30">Últimos 30 dias</option>
+                    <option value="7">Últimos 7 dias</option>
+                    <option value="90">Últimos 90 dias</option>
+                </select>
+            </div>
+            <div class="master-grid two">
+                <article class="master-panel">
+                    <div class="master-panel-head compact"><h2>Acessos por dia</h2><span class="master-pill">Mock</span></div>
+                    <div id="accessChart" class="master-chart"></div>
+                </article>
+                <article class="master-panel">
+                    <div class="master-panel-head compact"><h2>Módulos mais usados</h2></div>
+                    <div id="moduleUsage"></div>
+                </article>
+            </div>
+            <div class="master-panel">
+                <div class="master-panel-head compact"><h2>Uso por empresa</h2></div>
+                <table class="master-table">
+                    <thead><tr><th>Empresa</th><th>Sessões</th><th>Usuários ativos</th><th>Módulo dominante</th><th>Risco de churn</th></tr></thead>
+                    <tbody id="usageTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="view-logs" class="master-view">
+            <div class="master-section-head">
+                <div><h2>Logs gerais e erros</h2><p>Níveis de verbosidade para triagem, ação e auditoria técnica.</p></div>
+                <select class="master-select" id="logLevelFilter" onchange="renderLogs()">
+                    <option value="todos">Todos os níveis</option>
+                    <option value="critical">Critical</option>
+                    <option value="error">Error</option>
+                    <option value="warning">Warning</option>
+                    <option value="info">Info</option>
+                    <option value="debug">Debug</option>
+                </select>
+            </div>
+            <div class="master-panel">
+                <table class="master-table log-table">
+                    <thead><tr><th>Horário</th><th>Nível</th><th>Origem</th><th>Mensagem</th><th>Ação</th></tr></thead>
+                    <tbody id="logsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="view-helpdesk" class="master-view">
+            <div class="master-section-head">
+                <div><h2>Help desk e suporte</h2><p>Solicitações de clientes, SLA e fila de atendimento.</p></div>
+                <button class="master-btn primary" onclick="createMockTicket()"><i class="fas fa-plus"></i> Ticket mock</button>
+            </div>
+            <div class="master-kanban" id="ticketBoard"></div>
+        </section>
+
+        <section id="view-infra" class="master-view">
+            <div class="master-section-head">
+                <div><h2>VPN e infraestrutura</h2><p>Possibilidade de integração com VPN para monitorar túneis, latência e disponibilidade.</p></div>
+                <span class="master-pill warning">Integração futura</span>
+            </div>
+            <div class="master-grid two">
+                <article class="master-panel">
+                    <div class="master-panel-head compact"><h2>Monitoramento VPN</h2><span class="master-pill success">Mock conectado</span></div>
+                    <div id="vpnNodes"></div>
+                </article>
+                <article class="master-panel">
+                    <div class="master-panel-head compact"><h2>Checklist técnico</h2></div>
+                    <div class="infra-checklist">
+                        <label><input type="checkbox" checked> 2FA obrigatório para master</label>
+                        <label><input type="checkbox" checked> Acesso por empresa condicionado à aprovação</label>
+                        <label><input type="checkbox"> Integração com provedor VPN via API</label>
+                        <label><input type="checkbox"> Correlação de logs com sessão e IP</label>
+                        <label><input type="checkbox"> Exportação de logs para SIEM</label>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div class="master-modal" id="companyModal">
+    <div class="master-modal-card">
+        <div class="master-modal-head">
+            <h2>Nova empresa</h2>
+            <button onclick="closeCompanyModal()"><i class="fas fa-xmark"></i></button>
+        </div>
+        <form onsubmit="saveCompany(event)" class="master-form">
+            <label>Razão social<input id="companyName" required placeholder="Ex.: Metalúrgica Aurora Ltda"></label>
+            <label>CNPJ<input id="companyDoc" required placeholder="00.000.000/0001-00"></label>
+            <label>Admin da empresa<input id="companyAdmin" required placeholder="Nome do administrador"></label>
+            <label>E-mail do admin<input id="companyEmail" type="email" required placeholder="admin@empresa.com.br"></label>
+            <div class="master-form-grid">
+                <label>Plano<select id="companyPlan"><option>Essencial</option><option>Profissional</option><option>Gestão Integrada</option><option>Industrial / Enterprise</option></select></label>
+                <label>Status<select id="companyStatus"><option>Ativa</option><option>Trial</option><option>Suspensa</option></select></label>
+            </div>
+            <button class="master-btn primary" type="submit"><i class="fas fa-floppy-disk"></i> Cadastrar empresa</button>
+        </form>
+    </div>
+</div>
+
+<div class="master-lock" id="masterLock">
+    <div>
+        <i class="fas fa-shield-halved"></i>
+        <h2>Sessão master não verificada</h2>
+        <p>Entre com o usuário master e confirme o 2FA mockado para acessar este console.</p>
+        <a class="master-btn primary" href="login.html">Ir para login</a>
+    </div>
+</div>
+
+<script>
+const MASTER_KEY = 'sgq_master_admin';
+
+function defaultMasterDB() {
+    return {
+        companies: [
+            {id: 1, name: 'Metalúrgica Aurora', doc: '18.440.220/0001-45', plan: 'Industrial / Enterprise', status: 'Ativa', admin: 'Carla Mendes', email: 'carla@aurora.com.br', users: 42, lastAccess: 'Hoje, 09:42', sessions: 1280, activeUsers: 31, topModule: 'Documentos', churn: 'Baixo'},
+            {id: 2, name: 'Biofarma Vale', doc: '44.902.111/0001-88', plan: 'Gestão Integrada', status: 'Ativa', admin: 'Rafael Lima', email: 'rafael@biofarma.com.br', users: 27, lastAccess: 'Hoje, 08:13', sessions: 842, activeUsers: 19, topModule: 'Auditorias', churn: 'Médio'},
+            {id: 3, name: 'LogPrime Serviços', doc: '09.330.770/0001-10', plan: 'Profissional', status: 'Trial', admin: 'Marina Costa', email: 'marina@logprime.com.br', users: 8, lastAccess: 'Ontem, 17:55', sessions: 214, activeUsers: 5, topModule: 'BPM', churn: 'Baixo'},
+            {id: 4, name: 'TecnoPlast Brasil', doc: '61.205.883/0001-72', plan: 'Profissional', status: 'Suspensa', admin: 'Henrique Alves', email: 'henrique@tecnoplast.com.br', users: 16, lastAccess: '12/06/2026', sessions: 96, activeUsers: 2, topModule: 'NCs', churn: 'Alto'}
+        ],
+        accessRequests: [
+            {id: 101, company: 'Metalúrgica Aurora', admin: 'Carla Mendes', reason: 'Análise de erro em aprovação de documento', status: 'Pendente', requestedAt: 'Hoje, 09:50'},
+            {id: 102, company: 'Biofarma Vale', admin: 'Rafael Lima', reason: 'Apoio em auditoria interna', status: 'Aprovado', requestedAt: 'Ontem, 15:20'},
+            {id: 103, company: 'TecnoPlast Brasil', admin: 'Henrique Alves', reason: 'Verificação de cobrança e acesso suspenso', status: 'Negado', requestedAt: '10/06/2026'}
+        ],
+        logs: [
+            {id: 1, at: '10:44:12', level: 'critical', source: 'api/documents', message: 'Falha ao gerar PDF de evidência DOC-842', action: 'Abrir incidente'},
+            {id: 2, at: '10:38:02', level: 'error', source: 'auth/tenant', message: 'Token expirado em troca de empresa', action: 'Reprocessar sessão'},
+            {id: 3, at: '10:21:48', level: 'warning', source: 'storage', message: 'Uso de storage em 82% para Biofarma Vale', action: 'Notificar admin'},
+            {id: 4, at: '09:58:10', level: 'info', source: 'billing', message: 'Trial criado para LogPrime Serviços', action: 'Acompanhar onboarding'},
+            {id: 5, at: '09:22:33', level: 'debug', source: 'bpm/engine', message: 'Gateway condicional avaliado em fluxo NC-204', action: 'Sem ação'}
+        ],
+        tickets: [
+            {id: 3001, company: 'Metalúrgica Aurora', title: 'Erro ao anexar evidência em auditoria', priority: 'Alta', status: 'aberto', sla: '1h 20min'},
+            {id: 3002, company: 'Biofarma Vale', title: 'Dúvida sobre permissão de aprovador', priority: 'Média', status: 'andamento', sla: '4h 10min'},
+            {id: 3003, company: 'LogPrime Serviços', title: 'Solicitação de migração de planilha', priority: 'Baixa', status: 'resolvido', sla: 'Concluído'}
+        ],
+        vpn: [
+            {name: 'vpn-sp-prod-01', status: 'online', latency: 18, tunnel: '10.8.0.12'},
+            {name: 'vpn-rj-backup-02', status: 'degraded', latency: 96, tunnel: '10.8.1.4'},
+            {name: 'vpn-cliente-aurora', status: 'online', latency: 31, tunnel: '172.16.4.22'}
+        ]
+    };
+}
+
+function readDB() {
+    try {
+        const db = JSON.parse(localStorage.getItem(MASTER_KEY)) || defaultMasterDB();
+        const oldNames = {Professional:'Profissional', Enterprise:'Industrial / Enterprise', Trial:'Profissional'};
+        db.companies = (db.companies || []).map(company => Object.assign({}, company, {plan:oldNames[company.plan] || company.plan}));
+        return db;
+    }
+    catch (e) { return defaultMasterDB(); }
+}
+
+function saveDB(db) {
+    localStorage.setItem(MASTER_KEY, JSON.stringify(db));
+}
+
+function logoutMaster() {
+    localStorage.removeItem('sgq_master_session');
+}
+
+function checkMasterSession() {
+    const session = localStorage.getItem('sgq_master_session');
+    document.getElementById('masterLock').classList.toggle('active', session !== '2fa-ok');
+}
+
+function switchMasterView(view, el) {
+    document.querySelectorAll('.master-view').forEach(item => item.classList.remove('active'));
+    document.getElementById(`view-${view}`).classList.add('active');
+    document.querySelectorAll('.master-nav-item').forEach(item => item.classList.remove('active'));
+    const nav = el || document.querySelector(`[data-view="${view}"]`);
+    if (nav) nav.classList.add('active');
+    if (view === 'analytics') renderAnalytics();
+    if (view === 'logs') renderLogs();
+    if (view === 'helpdesk') renderTickets();
+    if (view === 'infra') renderVpn();
+}
+
+function statusClass(status) {
+    const normalized = String(status).toLowerCase();
+    if (normalized.includes('ativa') || normalized.includes('aprovado') || normalized.includes('online') || normalized.includes('baixo')) return 'success';
+    if (normalized.includes('trial') || normalized.includes('pendente') || normalized.includes('médio') || normalized.includes('degraded')) return 'warning';
+    return 'danger';
+}
+
+function renderMetrics(db) {
+    const activeCompanies = db.companies.filter(c => c.status !== 'Suspensa').length;
+    const users = db.companies.reduce((acc, c) => acc + c.users, 0);
+    const sessions = db.companies.reduce((acc, c) => acc + c.sessions, 0);
+    const critical = db.logs.filter(l => ['critical', 'error'].includes(l.level)).length;
+    document.getElementById('overviewMetrics').innerHTML = [
+        ['Empresas ativas', activeCompanies, 'fa-building-circle-check', '+12% no mês'],
+        ['Usuários cadastrados', users, 'fa-users', `${db.companies.length} tenants`],
+        ['Acessos no mês', sessions.toLocaleString('pt-BR'), 'fa-arrow-right-to-bracket', '+18% vs. mês anterior'],
+        ['Erros abertos', critical, 'fa-triangle-exclamation', '2 críticos']
+    ].map(([label, value, icon, hint]) => `
+        <article class="master-metric">
+            <div class="master-metric-icon"><i class="fas ${icon}"></i></div>
+            <div class="master-metric-value">${value}</div>
+            <div class="master-metric-label">${label}</div>
+            <span>${hint}</span>
+        </article>`).join('');
+}
+
+function renderOverview() {
+    const db = readDB();
+    renderMetrics(db);
+    renderRequests();
+    document.getElementById('recentCompanies').innerHTML = db.companies.slice(0, 4).map(c => `
+        <div class="mini-row"><strong>${c.name}</strong><span class="master-pill ${statusClass(c.status)}">${c.status}</span></div>
+    `).join('');
+    document.getElementById('criticalLogs').innerHTML = db.logs.filter(l => ['critical', 'error'].includes(l.level)).map(l => `
+        <div class="mini-row vertical"><strong>${l.source}</strong><span>${l.message}</span></div>
+    `).join('');
+    document.getElementById('ticketSummary').innerHTML = db.tickets.map(t => `
+        <div class="mini-row vertical"><strong>#${t.id} ${t.company}</strong><span>${t.title}</span></div>
+    `).join('');
+    renderCompanies();
+    renderAccessView();
+}
+
+function renderRequests() {
+    const db = readDB();
+    const html = db.accessRequests.slice(0, 4).map(r => `
+        <div class="request-card">
+            <div><strong>${r.company}</strong><span>${r.reason}</span><small>${r.admin} · ${r.requestedAt}</small></div>
+            <span class="master-pill ${statusClass(r.status)}">${r.status}</span>
+        </div>
+    `).join('');
+    document.getElementById('accessRequestsList').innerHTML = html || '<p class="empty-state">Nenhuma solicitação registrada.</p>';
+}
+
+function renderCompanies() {
+    const db = readDB();
+    document.getElementById('companiesTable').innerHTML = db.companies.map(c => `
+        <tr>
+            <td><strong>${c.name}</strong><small>${c.doc}</small></td>
+            <td>${c.plan}</td>
+            <td><span class="master-pill ${statusClass(c.status)}">${c.status}</span></td>
+            <td>${c.admin}<small>${c.email}</small></td>
+            <td>${c.users}</td>
+            <td>${c.lastAccess}</td>
+            <td><button class="master-icon-btn" title="Solicitar acesso" onclick="requestCompanyAccess('${c.name}')"><i class="fas fa-key"></i></button></td>
+        </tr>
+    `).join('');
+}
+
+function renderAccessView() {
+    const db = readDB();
+    const pending = db.accessRequests.filter(r => r.status === 'Pendente');
+    const approved = db.accessRequests.filter(r => r.status === 'Aprovado' && r.expiresAt && new Date(r.expiresAt) > new Date());
+    document.getElementById('pendingAccessList').innerHTML = pending.map(r => `
+        <div class="request-card">
+            <div><strong>${r.company}</strong><span>${r.reason}</span><small>${r.admin} · ${r.requestedAt}</small></div>
+            <span class="master-pill warning">Aguardando admin da empresa</span>
+        </div>
+    `).join('') || '<p class="empty-state">Nenhum acesso pendente.</p>';
+    document.getElementById('approvedAccessList').innerHTML = approved.map(r => `
+        <div class="request-card">
+            <div><strong>${r.company}</strong><span>${r.reason}</span><small>Aprovado por ${r.approvedBy || r.admin} · expira às ${new Date(r.expiresAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</small></div>
+            <button class="master-btn ghost" onclick="enterCompany('${r.company}')"><i class="fas fa-arrow-right"></i> Entrar</button>
+        </div>
+    `).join('') || '<p class="empty-state">Nenhum acesso aprovado.</p>';
+}
+
+function setAccessStatus(id, status) {
+    const db = readDB();
+    const item = db.accessRequests.find(r => r.id === id);
+    if (item) item.status = status;
+    saveDB(db);
+    renderOverview();
+}
+
+function requestCompanyAccess(companyName) {
+    const db = readDB();
+    const company = companyName || (db.companies.find(c => c.status === 'Ativa') || db.companies[0]).name;
+    const duplicated=db.accessRequests.find(item=>item.company===company&&item.status==='Pendente');
+    if(duplicated){alert('Já existe uma solicitação pendente para esta empresa.');return;}
+    const reason=prompt('Justificativa obrigatória para solicitar acesso:', 'Suporte técnico controlado');
+    if(!reason?.trim())return;
+    db.accessRequests.unshift({
+        id: Date.now(),
+        company,
+        admin: db.companies.find(c => c.name === company)?.admin || 'Admin da empresa',
+        reason: reason.trim(),
+        status: 'Pendente',
+        requestedAt: 'Agora',
+        requestedAtISO:new Date().toISOString()
+    });
+    saveDB(db);
+    const notifications=JSON.parse(localStorage.getItem('sgq_notifications')||'[]');notifications.unshift({id:Date.now()+1,title:'Admin Master solicita acesso',message:`${company}: ${reason.trim()}`,type:'warning',module:'Segurança',read:false,createdAt:new Date().toISOString(),url:'configuracoes.html'});localStorage.setItem('sgq_notifications',JSON.stringify(notifications.slice(0,200)));
+    renderOverview();
+    switchMasterView('acessos');
+}
+
+function enterCompany(company) {
+    const db=readDB();const request=db.accessRequests.find(item=>item.company===company&&item.status==='Aprovado'&&item.expiresAt&&new Date(item.expiresAt)>new Date());
+    if(!request){alert('A aprovação expirou ou não está disponível. Solicite um novo acesso.');renderAccessView();return;}
+    localStorage.setItem('sgq_master_tenant_session',JSON.stringify({requestId:request.id,company,startedAt:new Date().toISOString(),expiresAt:request.expiresAt,level:'admin_master'}));
+    const history=JSON.parse(localStorage.getItem('sgq_audit_history')||'[]');history.unshift({id:Date.now(),module:'Segurança',action:'entrou no tenant',entityType:'Empresa',entityId:company,details:`Acesso temporário aprovado até ${request.expiresAt}`,user:'Admin Master',createdAt:new Date().toISOString()});localStorage.setItem('sgq_audit_history',JSON.stringify(history.slice(0,500)));
+    location.href='dashboard.html?masterAccess=1';
+}
+
+function openCompanyModal() {
+    document.getElementById('companyModal').classList.add('active');
+}
+
+function closeCompanyModal() {
+    document.getElementById('companyModal').classList.remove('active');
+}
+
+function saveCompany(event) {
+    event.preventDefault();
+    const db = readDB();
+    db.companies.unshift({
+        id: Date.now(),
+        name: document.getElementById('companyName').value.trim(),
+        doc: document.getElementById('companyDoc').value.trim(),
+        admin: document.getElementById('companyAdmin').value.trim(),
+        email: document.getElementById('companyEmail').value.trim(),
+        plan: document.getElementById('companyPlan').value,
+        status: document.getElementById('companyStatus').value,
+        users: 1,
+        lastAccess: 'Sem acesso ainda',
+        sessions: 0,
+        activeUsers: 1,
+        topModule: 'Setup SGQ',
+        churn: 'Baixo'
+    });
+    saveDB(db);
+    event.target.reset();
+    closeCompanyModal();
+    renderOverview();
+}
+
+function renderAnalytics(days = 30) {
+    const db = readDB();
+    const values = [42, 58, 61, 76, 92, 88, 104, 98, 121, 136, 129, 144];
+    document.getElementById('accessChart').innerHTML = values.map((v, i) => `
+        <div class="chart-bar" style="height:${Math.max(30, v)}px"><span>${v}</span><small>${i + 1}</small></div>
+    `).join('');
+    const modules = [
+        ['Documentos', 84], ['Não Conformidades', 72], ['BPM', 64], ['Auditorias', 51], ['Indicadores', 46], ['Setup SGQ', 38]
+    ];
+    document.getElementById('moduleUsage').innerHTML = modules.map(([name, pct]) => `
+        <div class="usage-row"><div><strong>${name}</strong><span>${pct}% das empresas</span></div><div><i style="width:${pct}%"></i></div></div>
+    `).join('');
+    document.getElementById('usageTable').innerHTML = db.companies.map(c => `
+        <tr><td><strong>${c.name}</strong></td><td>${c.sessions}</td><td>${c.activeUsers}</td><td>${c.topModule}</td><td><span class="master-pill ${statusClass(c.churn)}">${c.churn}</span></td></tr>
+    `).join('');
+}
+
+function renderLogs() {
+    const db = readDB();
+    const filter = document.getElementById('logLevelFilter')?.value || 'todos';
+    const logs = filter === 'todos' ? db.logs : db.logs.filter(l => l.level === filter);
+    document.getElementById('logsTable').innerHTML = logs.map(l => `
+        <tr>
+            <td>${l.at}</td>
+            <td><span class="log-level ${l.level}">${l.level}</span></td>
+            <td>${l.source}</td>
+            <td>${l.message}</td>
+            <td><button class="master-btn ghost" onclick="ackLog(${l.id})">${l.action}</button></td>
+        </tr>
+    `).join('');
+}
+
+function ackLog(id) {
+    const db = readDB();
+    db.logs = db.logs.filter(l => l.id !== id);
+    saveDB(db);
+    renderOverview();
+    renderLogs();
+}
+
+function renderTickets() {
+    const db = readDB();
+    const columns = [
+        ['aberto', 'Abertos'],
+        ['andamento', 'Em atendimento'],
+        ['resolvido', 'Resolvidos']
+    ];
+    document.getElementById('ticketBoard').innerHTML = columns.map(([status, label]) => `
+        <div class="ticket-column">
+            <h3>${label}</h3>
+            ${db.tickets.filter(t => t.status === status).map(t => `
+                <article class="ticket-card">
+                    <div><strong>#${t.id}</strong><span class="master-pill ${statusClass(t.priority)}">${t.priority}</span></div>
+                    <h4>${t.title}</h4>
+                    <p>${t.company}</p>
+                    <small>SLA: ${t.sla}</small>
+                    ${status !== 'resolvido' ? `<button class="master-btn ghost" onclick="moveTicket(${t.id})">Avançar</button>` : ''}
+                </article>
+            `).join('') || '<p class="empty-state">Sem tickets.</p>'}
+        </div>
+    `).join('');
+}
+
+function moveTicket(id) {
+    const db = readDB();
+    const t = db.tickets.find(item => item.id === id);
+    if (t) t.status = t.status === 'aberto' ? 'andamento' : 'resolvido';
+    saveDB(db);
+    renderOverview();
+    renderTickets();
+}
+
+function createMockTicket() {
+    const db = readDB();
+    db.tickets.unshift({id: Date.now(), company: 'Cliente mock', title: 'Nova solicitação de suporte criada pelo master', priority: 'Média', status: 'aberto', sla: '8h'});
+    saveDB(db);
+    renderOverview();
+    renderTickets();
+}
+
+function renderVpn() {
+    const db = readDB();
+    document.getElementById('vpnNodes').innerHTML = db.vpn.map(n => `
+        <div class="vpn-node">
+            <div><strong>${n.name}</strong><span>${n.tunnel}</span></div>
+            <span>${n.latency} ms</span>
+            <i class="${n.status}"></i>
+        </div>
+    `).join('');
+}
+
+if (!localStorage.getItem(MASTER_KEY)) saveDB(defaultMasterDB());
+checkMasterSession();
+renderOverview();
+renderAnalytics();
+renderLogs();
+renderTickets();
+renderVpn();
+</script>
+<script src="../assets/js/onboarding.js"></script>
+</body>
+</html>

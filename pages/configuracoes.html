@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações Gerais - SGQ Online</title>
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .cfg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}.cfg-module{display:flex;gap:14px;align-items:flex-start;padding:16px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}
+        .cfg-module.off{opacity:.55}.cfg-module-main{flex:1}.cfg-module h4{color:#fff;margin:0 0 5px}.cfg-module p{font-size:.78rem;color:rgba(255,255,255,.45);margin:0}.cfg-deps{font-size:.7rem;color:#fbbf24;margin-top:7px}.cfg-switch{position:relative;width:44px;height:24px;flex:0 0 auto}.cfg-switch input{opacity:0;width:0;height:0}.cfg-slider{position:absolute;inset:0;background:#334155;border-radius:30px;cursor:pointer}.cfg-slider:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:white;border-radius:50%;transition:.2s}.cfg-switch input:checked+.cfg-slider{background:#0f75bd}.cfg-switch input:checked+.cfg-slider:before{transform:translateX(20px)}
+        .cfg-note{padding:12px 15px;border-radius:9px;background:rgba(15,117,189,.1);border:1px solid rgba(15,117,189,.25);color:#93c5fd;font-size:.82rem;margin-bottom:16px}
+        .cfg-plan{padding:16px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}.cfg-plan.current{border-color:#0f75bd;background:rgba(15,117,189,.1)}.cfg-plan h4{margin:0 0 5px;color:#fff}.cfg-plan strong{display:block;color:#60a5fa;font-size:1.05rem;margin-bottom:7px}.cfg-plan p{margin:3px 0;color:rgba(255,255,255,.52);font-size:.76rem}
+        .cfg-usage{height:7px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:7px}.cfg-usage i{display:block;height:100%;background:#0f75bd}.cfg-user-actions{display:flex;gap:5px;flex-wrap:wrap}.cfg-user-actions button{padding:6px 8px}.cfg-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:end}.cfg-history{max-height:360px;overflow:auto}.cfg-history-item{padding:10px;border-bottom:1px solid rgba(255,255,255,.07);font-size:.76rem;color:rgba(255,255,255,.6)}.cfg-history-item strong{color:#fff}@media(max-width:900px){.cfg-form{grid-template-columns:1fr 1fr}}@media(max-width:600px){.cfg-form{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+<div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><img src="../assets/img/logo.png" style="width:100px" alt="SGQ Online"></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section"><div class="nav-section-title">Administração</div>
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+                <a href="configuracoes.html" class="nav-item active"><i class="fas fa-gears"></i> Configurações Gerais</a>
+                <a href="cadastros.html" class="nav-item"><i class="fas fa-box-archive"></i> Cadastros Gerais</a>
+            </div>
+            <div class="nav-section"><div class="nav-section-title">SGQ</div>
+                <a href="organizacao.html" class="nav-item"><i class="fas fa-building-shield"></i> Organização</a>
+                <a href="bpm.html" class="nav-item"><i class="fas fa-diagram-project"></i> BPM e Processos</a>
+                <a href="nao-conformidades.html" class="nav-item"><i class="fas fa-list-check"></i> NCs e Planos</a>
+            </div>
+        </nav>
+    </aside>
+    <main class="main-content">
+        <header class="topbar"><div class="topbar-left"><div class="topbar-search global-search" id="globalSearchBox"><i class="fas fa-search"></i><input id="globalSearchInput" autocomplete="off" placeholder="Buscar configuração ou módulo"><button class="global-search-btn" id="globalSearchBtn"><i class="fas fa-arrow-right"></i></button><div class="global-search-results" id="globalSearchResults"></div></div></div></header>
+        <div class="page-content">
+            <div class="page-header"><div><h2>Configurações Gerais</h2><p>Parâmetros da empresa e ativação dos módulos</p></div><button class="mod-btn primary" onclick="saveGeneralSettings()"><i class="fas fa-save"></i> Salvar configurações</button></div>
+
+            <div class="cfg-note"><i class="fas fa-shield-halved"></i> No backend, esta área será restrita ao Administrador da Empresa. Desativar um módulo preserva seus dados e apenas remove o acesso operacional.</div>
+
+            <section class="card company-admin-only" style="margin-bottom:18px"><div class="card-header"><h4><i class="fas fa-tags"></i> Plano e limites comerciais</h4></div><div class="card-body"><div id="planCatalog" class="cfg-grid"></div><p style="font-size:.75rem;color:rgba(255,255,255,.45);margin:12px 0 0">Essencial e Profissional possuem contratação direta e trial. Gestão Integrada e Industrial / Enterprise exigem proposta comercial.</p></div></section>
+
+            <section class="card" style="margin-bottom:18px"><div class="card-header"><h4><i class="fas fa-gauge-high"></i> Uso do plano</h4></div><div class="card-body"><div id="planUsage" class="cfg-grid"></div></div></section>
+
+            <section class="card company-admin-only" style="margin-bottom:18px"><div class="card-header"><h4><i class="fas fa-users-gear"></i> Usuários do sistema</h4></div><div class="card-body">
+                <div class="cfg-form"><input type="hidden" id="systemUserId"><div class="mod-form-group"><label>Nome</label><input class="mod-input" id="systemUserName" placeholder="Nome completo"></div><div class="mod-form-group"><label>E-mail corporativo</label><input class="mod-input" id="systemUserEmail" type="email" placeholder="usuario@empresa.com.br"></div><div class="mod-form-group"><label>Perfil</label><select class="mod-select-inp" id="systemUserRole"><option value="user">Usuário</option><option value="admin_quality">Administrador da Qualidade</option><option value="admin_company">Administrador da Empresa</option></select></div><div class="mod-form-group"><label>Setor</label><select class="mod-select-inp" id="systemUserSector"></select></div></div>
+                <div style="display:flex;justify-content:flex-end;gap:8px;margin:10px 0 16px"><button class="mod-btn ghost" onclick="clearSystemUserForm()">Limpar</button><button class="mod-btn primary" onclick="saveSystemUser()"><i class="fas fa-user-plus"></i> Salvar usuário</button></div>
+                <div style="overflow:auto"><table class="mod-table"><thead><tr><th>Usuário</th><th>Perfil</th><th>Setor</th><th>Status</th><th>Ações</th></tr></thead><tbody id="systemUsersBody"></tbody></table></div>
+            </div></section>
+
+            <section class="card company-admin-only" style="margin-bottom:18px"><div class="card-header"><h4><i class="fas fa-key"></i> Solicitações de acesso do Admin Master</h4></div><div class="card-body"><div id="tenantAccessRequests"></div></div></section>
+
+            <section class="card" style="margin-bottom:18px"><div class="card-header"><h4><i class="fas fa-cubes"></i> Módulos da empresa</h4></div><div class="card-body"><div id="modulesGrid" class="cfg-grid"></div></div></section>
+
+            <div class="cfg-grid">
+                <section class="card"><div class="card-header"><h4><i class="fas fa-hourglass-half"></i> Teste grátis</h4></div><div class="card-body">
+                    <div class="mod-form-group"><label>Plano atual</label><select class="mod-select-inp" id="currentCompanyPlan"><option>Essencial</option><option>Profissional</option><option>Gestão Integrada</option><option>Industrial / Enterprise</option></select></div>
+                    <div class="mod-form-group"><label>Situação da assinatura</label><select class="mod-select-inp" id="subscriptionStatus"><option value="trial">Em teste</option><option value="active">Assinatura ativa</option><option value="suspended">Suspensa</option></select></div>
+                    <div class="mod-form-group"><label>Duração do trial</label><div style="display:flex;align-items:center;gap:8px"><input class="mod-input" id="trialDays" type="number" min="1" max="90"><span>dias</span></div></div>
+                    <div class="mod-form-group"><label>Unidades cadastradas</label><input class="mod-input" id="companyUnits" type="number" min="1"><small style="display:block;color:rgba(255,255,255,.4);margin-top:5px">O limite depende do plano contratado.</small></div>
+                    <div class="mod-form-group"><label>Planos disponíveis</label><label style="display:block;margin:8px 0"><input type="checkbox" id="trialEssential"> Essencial</label><label style="display:block"><input type="checkbox" id="trialProfessional"> Profissional</label></div>
+                </div></section>
+                <section class="card"><div class="card-header"><h4><i class="fas fa-paperclip"></i> Arquivos em formulários</h4></div><div class="card-body">
+                    <div class="mod-form-row"><div class="mod-form-group"><label>Anexo padrão (MB)</label><input class="mod-input" id="attachmentMB" type="number" min="1" max="100"></div><div class="mod-form-group"><label>Anexo grande padrão (MB)</label><input class="mod-input" id="largeAttachmentMB" type="number" min="1" max="1024"></div></div>
+                    <p style="font-size:.76rem;color:rgba(255,255,255,.45)">O limite absoluto de Anexos Grandes é 1 GB. Cada formulário pode definir limite inferior.</p>
+                </div></section>
+                <section class="card"><div class="card-header"><h4><i class="fas fa-user-shield"></i> Permissões padrão</h4></div><div class="card-body">
+                    <div class="mod-form-group"><label>Escopo inicial de novos usuários</label><select class="mod-select-inp" id="defaultScope"><option value="own">Somente registros próprios</option><option value="all">Todos os registros permitidos</option></select></div>
+                    <label style="display:block;margin-top:10px"><input type="checkbox" id="allowDelegation"> Permitir delegação temporária</label>
+                    <label style="display:block;margin-top:10px"><input type="checkbox" id="allowSelfApproval"> Permitir aprovação pelo autor quando configurado como aprovador</label>
+                </div></section>
+            </div>
+
+            <section class="card" style="margin-top:18px"><div class="card-header"><h4><i class="fas fa-key"></i> Matriz de permissões</h4></div><div class="card-body">
+                <div class="mod-form-row"><div class="mod-form-group"><label>Aplicar permissões a</label><select class="mod-select-inp" id="permissionSubjectType" onchange="loadPermissionSubjects()"><option value="user">Usuário</option><option value="sector">Setor / grupo</option></select></div><div class="mod-form-group"><label>Usuário ou setor</label><select class="mod-select-inp" id="permissionSubject" onchange="renderPermissionMatrix()"></select></div></div>
+                <div style="overflow:auto;margin-top:14px"><table class="mod-table"><thead><tr><th>Módulo</th><th>Visualizar</th><th>Criar</th><th>Editar</th><th>Desativar</th><th>Aprovar</th><th>Exportar</th><th>Configurar</th><th>Escopo</th></tr></thead><tbody id="permissionMatrixBody"></tbody></table></div>
+                <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="mod-btn primary" onclick="savePermissionMatrix()"><i class="fas fa-save"></i> Salvar matriz</button></div>
+            </div></section>
+
+            <section class="card" style="margin-top:18px"><div class="card-header"><h4><i class="fas fa-user-clock"></i> Delegações temporárias</h4></div><div class="card-body">
+                <div class="mod-form-row three"><div class="mod-form-group"><label>De</label><select class="mod-select-inp" id="delegationFrom"></select></div><div class="mod-form-group"><label>Para</label><select class="mod-select-inp" id="delegationTo"></select></div><div class="mod-form-group"><label>Módulo</label><select class="mod-select-inp" id="delegationModule"></select></div></div>
+                <div class="mod-form-row three"><div class="mod-form-group"><label>Início</label><input class="mod-input" id="delegationStart" type="date"></div><div class="mod-form-group"><label>Fim</label><input class="mod-input" id="delegationEnd" type="date"></div><div class="mod-form-group"><label>Motivo</label><input class="mod-input" id="delegationReason" placeholder="Férias, afastamento, substituição..."></div></div>
+                <div style="display:flex;justify-content:flex-end"><button class="mod-btn primary" onclick="saveDelegation()"><i class="fas fa-plus"></i> Criar delegação</button></div><div id="delegationsList" style="margin-top:14px"></div>
+            </div></section>
+
+            <section class="card" style="margin-top:18px"><div class="card-header"><h4><i class="fas fa-sliders"></i> Configurações dos módulos</h4></div><div class="card-body"><div class="cfg-grid">
+                <div class="cfg-module"><div class="cfg-module-main"><h4>Satisfação e reclamações</h4><div class="mod-form-row"><div class="mod-form-group"><label>Validade da pesquisa (dias)</label><input class="mod-input" id="cfgSurveyExpiry" type="number" min="1" max="90"></div><div class="mod-form-group"><label>Prazo da reclamação (dias)</label><input class="mod-input" id="cfgComplaintDeadline" type="number" min="1"></div></div></div></div>
+                <div class="cfg-module"><div class="cfg-module-main"><h4>Calibração e auditorias</h4><div class="mod-form-row"><div class="mod-form-group"><label>Alerta de calibração (dias)</label><input class="mod-input" id="cfgCalibrationAlert" type="number" min="1"></div><div class="mod-form-group"><label>Lembrete de auditoria (dias)</label><input class="mod-input" id="cfgAuditReminder" type="number" min="1"></div></div></div></div>
+                <div class="cfg-module"><div class="cfg-module-main"><h4>Riscos e fornecedores</h4><div class="mod-form-row"><div class="mod-form-group"><label>Corte de risco crítico</label><input class="mod-input" id="cfgRiskThreshold" type="number" min="9" max="25"></div><div class="mod-form-group"><label>Reavaliar fornecedor (meses)</label><input class="mod-input" id="cfgSupplierReview" type="number" min="1"></div></div></div></div>
+                <div class="cfg-module"><div class="cfg-module-main"><h4>Produção</h4><div class="mod-form-group"><label>Modo operacional padrão</label><select class="mod-select-inp" id="cfgProductionMode"><option value="industrial">Industrial</option><option value="servicos">Serviços</option><option value="misto">Misto</option></select></div></div></div>
+            </div><div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="mod-btn primary" onclick="saveModuleSettings()"><i class="fas fa-save"></i> Salvar configurações dos módulos</button></div></div></section>
+
+            <section class="card" style="margin-top:18px"><div class="card-header"><h4><i class="fas fa-clock-rotate-left"></i> Trilha de auditoria</h4></div><div class="card-body"><div id="auditHistory" class="cfg-history"></div></div></section>
+        </div>
+    </main>
+</div>
+<script src="../assets/js/sgq-core.js"></script>
+<script>
+const moduleDefinitions = [
+    ['documentos','Controle de Documentos','Documentos, revisões e aprovações',[]],
+    ['bpm','BPM e Processos','Motor obrigatório dos processos',['cadastros']],
+    ['organizacao','Organização e Diagnóstico','SWOT, mudanças, análise crítica e ISO',['riscos','indicadores']],
+    ['nc','NCs, Planos e Melhorias','Central de ações do SGQ',[]],
+    ['riscos','Gestão de Riscos','Riscos, ocorrências e contingências',['nc']],
+    ['auditorias','Auditorias Internas','Programa, checklists e achados',['nc']],
+    ['indicadores','Indicadores e KPIs','Objetivos, metas e resultados',['nc']],
+    ['pessoas','Pessoas e Treinamentos','Competências e evidências de treinamento',['cadastros']],
+    ['fornecedores','Fornecedores','Cadastro e avaliação de provedores',['cadastros']],
+    ['satisfacao','Satisfação e Reclamações','NPS, clientes e reclamações',['nc']],
+    ['projetos','Projeto e Desenvolvimento','Processo ISO 9001 requisito 8.3',['bpm','organizacao']],
+    ['producao','Processo Produtivo','Ordens e apontamentos',['cadastros']],
+    ['inspecoes','Inspeções e Liberação','Inspeções e produtos bloqueados',['producao','nc']],
+    ['calibracao','Calibração','Instrumentos e certificados',[]],
+    ['cadastros','Cadastros Gerais','Produtos, pedidos, setores e domínios',[]]
+];
+let settings = SGQCore.getSettings();
+settings.modules = settings.modules || {};
+
+function renderPlanCatalog() {
+    const setup = SGQCore.read('sgq_company_setup', {});
+    const current = setup.trialPlano || settings.currentPlan || '';
+    planCatalog.innerHTML = SGQCore.getPlans().map(plan => {
+        const limits = plan.users ? `${plan.users} usuários · ${plan.storageGB} GB · ${plan.units} unidade${plan.units > 1 ? 's' : ''}` : 'Limites a negociar';
+        const isCurrent = current === plan.name || current === plan.id;
+        return `<article class="cfg-plan ${isCurrent ? 'current' : ''}"><h4>${plan.name}${isCurrent ? ' · plano atual' : ''}</h4><strong>${plan.priceLabel}</strong><p>${limits}</p><p>${plan.purchase === 'direct' ? 'Assinatura direta' : 'Falar com consultor'} · ${plan.aiAnalysesPerMonth} análises de IA/mês</p>${isCurrent && plan.aiExtraRequests ? '<button class="mod-btn ghost" type="button" onclick="requestExtraAiAnalyses()">Solicitar análises adicionais</button>' : ''}</article>`;
+    }).join('');
+}
+
+function requestExtraAiAnalyses() {
+    const quantity = Number(prompt('Quantas análises adicionais deseja solicitar?'));
+    if (!Number.isInteger(quantity) || quantity < 1) return alert('Informe uma quantidade inteira maior que zero.');
+    const reason = prompt('Informe brevemente a necessidade das análises adicionais:');
+    if (!reason || !reason.trim()) return alert('Informe a finalidade da solicitação.');
+    const requests = SGQCore.read('sgq_ai_analysis_requests', []);
+    const request = {id:SGQCore.nextId(requests),quantity,reason:reason.trim(),status:'Pendente',plan:SGQCore.currentPlan().name,requestedBy:SGQCore.currentUser()?.name||'Usuário',createdAt:new Date().toISOString()};
+    requests.push(request);
+    SGQCore.write('sgq_ai_analysis_requests', requests);
+    SGQCore.audit('Planos','solicitou análises adicionais de IA','Solicitação de IA',request.id,`${quantity} análises`);
+    SGQCore.notify({title:'Solicitação de IA registrada',message:`${quantity} análises adicionais aguardando retorno comercial.`,module:'Planos',url:'configuracoes.html'});
+    alert('Solicitação registrada para análise comercial.');
+}
+
+function renderPlanUsage() {
+    const usage=SGQCore.usage();
+    const rows=[['Usuários',usage.users,usage.userLimit,'fa-users'],['Unidades',usage.units,usage.unitLimit,'fa-building'],['Armazenamento',usage.storageGB,usage.storageLimitGB,'fa-hard-drive']];
+    planUsage.innerHTML=rows.map(([label,used,limit,icon])=>{const display=label==='Armazenamento'?`${used<.01?(used*1024).toFixed(1)+' MB':used.toFixed(2)+' GB'}`:used;const pct=limit?Math.min(100,(used/limit)*100):0;return `<div class="cfg-module"><i class="fas ${icon}" style="color:#60a5fa;margin-top:3px"></i><div class="cfg-module-main"><h4>${label}</h4><p>${display} de ${limit||'limite negociado'}</p><div class="cfg-usage"><i style="width:${pct}%"></i></div></div></div>`}).join('');
+}
+
+function roleLabel(role){return {super_admin:'Superusuário de Desenvolvimento',admin_company:'Administrador da Empresa',admin_quality:'Administrador da Qualidade',user:'Usuário'}[role]||role;}
+function loadSystemUserSectors(){const sectors=SGQCore.read('sgq_cadastros',{setores:[]}).setores||[];systemUserSector.innerHTML='<option value="">Empresa geral</option>'+sectors.filter(item=>item.ativo!==false&&!item.deletedAt).map(item=>`<option value="${item.id}" data-name="${item.nome}">${item.nome}</option>`).join('');}
+function renderSystemUsers(){const current=SGQCore.currentUser();systemUsersBody.innerHTML=SGQCore.getUsers(true).map(user=>`<tr><td><strong>${user.name}</strong><br><small>${user.email}</small></td><td>${roleLabel(user.role)}</td><td>${user.sectorName||'Empresa geral'}</td><td><span class="sbadge ${user.status==='inativo'?'cancelada':'concluida'}">${user.status==='inativo'?'Inativo':'Ativo'}</span></td><td><div class="cfg-user-actions"><button class="mod-btn ghost" onclick="editSystemUser(${user.id})">Editar</button><button class="mod-btn ghost" onclick="configureUserPermissions(${user.id})">Permissões</button>${user.status!=='inativo'?`<button class="mod-btn danger" onclick="deactivateSystemUser(${user.id})">Desativar</button>`:''}${user.status!=='inativo'&&String(current?.id)!==String(user.id)?`<button class="mod-btn ghost" onclick="simulateSystemUser(${user.id})">Simular acesso</button>`:''}</div></td></tr>`).join('');}
+function clearSystemUserForm(){systemUserId.value='';systemUserName.value='';systemUserEmail.value='';systemUserRole.value='user';systemUserSector.value='';}
+function editSystemUser(id){const user=SGQCore.getUsers(true).find(item=>item.id===id);if(!user)return;if(user.developmentOnly)return alert('O superusuário de desenvolvimento é protegido no protótipo.');systemUserId.value=user.id;systemUserName.value=user.name;systemUserEmail.value=user.email;systemUserRole.value=user.role;systemUserSector.value=user.sectorId||'';systemUserName.scrollIntoView({behavior:'smooth',block:'center'});}
+function saveSystemUser(){const name=systemUserName.value.trim(),email=systemUserEmail.value.trim().toLowerCase();if(!name||!email)return alert('Informe nome e e-mail corporativo.');const users=SGQCore.getUsers(true),id=Number(systemUserId.value);let user=users.find(item=>item.id===id);if(!user&&SGQCore.limitStatus('users').blocked)return alert('O limite de usuários do plano foi atingido. Desative um usuário ou altere o plano.');if(users.some(item=>item.email.toLowerCase()===email&&item.id!==id&&item.status!=='inativo'))return alert('Já existe um usuário ativo com este e-mail.');const sector=systemUserSector.selectedOptions[0];if(user){Object.assign(user,{name,email,role:systemUserRole.value,roleLabel:roleLabel(systemUserRole.value),sectorId:systemUserSector.value,sectorName:sector?.dataset.name||'Empresa geral',updatedAt:new Date().toISOString()});SGQCore.audit('Usuários','editou','Usuário',user.id,user.email);}else{user={id:SGQCore.nextId(users),name,email,role:systemUserRole.value,roleLabel:roleLabel(systemUserRole.value),sectorId:systemUserSector.value,sectorName:sector?.dataset.name||'Empresa geral',status:'ativo',createdAt:new Date().toISOString()};users.push(user);SGQCore.audit('Usuários','criou','Usuário',user.id,user.email);SGQCore.notify({title:'Usuário criado',message:`Convite simulado para ${email}. Senha de teste: 123456`,module:'Usuários',url:'configuracoes.html'});}SGQCore.write('sgq_system_users',users);clearSystemUserForm();renderSystemUsers();renderPlanUsage();loadPermissionSubjects();}
+function deactivateSystemUser(id){const users=SGQCore.getUsers(true),user=users.find(item=>item.id===id);if(!user)return;if(user.developmentOnly)return alert('O superusuário de desenvolvimento não pode ser desativado pelo protótipo.');const reason=prompt('Informe o motivo da desativação:');if(!reason)return;SGQCore.softDeactivate(users,id,{module:'Usuários',entityType:'Usuário',reason});SGQCore.write('sgq_system_users',users);renderSystemUsers();renderPlanUsage();}
+function simulateSystemUser(id){if(!confirm('Trocar a sessão atual para este usuário e validar suas permissões?'))return;SGQCore.setCurrentUser(id);location.href='dashboard.html';}
+function configureUserPermissions(id){permissionSubjectType.value='user';loadPermissionSubjects();permissionSubject.value=String(id);renderPermissionMatrix();permissionMatrixBody.scrollIntoView({behavior:'smooth'});}
+
+function getMasterDB(){return SGQCore.read('sgq_master_admin',{accessRequests:[]});}
+function renderTenantAccessRequests(){const db=getMasterDB(),requests=db.accessRequests||[];tenantAccessRequests.innerHTML=requests.length?requests.map(item=>{const active=item.status==='Aprovado'&&item.expiresAt&&new Date(item.expiresAt)>new Date();return `<div class="cfg-module"><div class="cfg-module-main"><h4>${item.reason}</h4><p>Solicitado em ${new Date(item.requestedAtISO||Date.now()).toLocaleString('pt-BR')} · ${item.status}${active?` · expira às ${new Date(item.expiresAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`:''}</p></div>${item.status==='Pendente'?`<button class="mod-btn primary" onclick="decideMasterAccess(${item.id},true)">Aprovar 1h</button><button class="mod-btn danger" onclick="decideMasterAccess(${item.id},false)">Negar</button>`:active?`<button class="mod-btn danger" onclick="revokeMasterAccess(${item.id})">Revogar</button>`:`<span class="sbadge pendente">${item.status}</span>`}</div>`}).join(''):'<p style="color:rgba(255,255,255,.45)">Nenhuma solicitação recebida.</p>';}
+function decideMasterAccess(id,approved){const db=getMasterDB(),item=(db.accessRequests||[]).find(entry=>entry.id===id);if(!item)return;item.status=approved?'Aprovado':'Negado';item.decidedAt=new Date().toISOString();item.approvedBy=SGQCore.currentUser()?.name;if(approved)item.expiresAt=new Date(Date.now()+3600000).toISOString();SGQCore.write('sgq_master_admin',db);SGQCore.audit('Segurança',approved?'aprovou acesso master':'negou acesso master','Solicitação Master',id,item.reason);SGQCore.notify({title:`Acesso master ${approved?'aprovado':'negado'}`,message:item.reason,module:'Segurança',url:'configuracoes.html'});renderTenantAccessRequests();}
+function revokeMasterAccess(id){const db=getMasterDB(),item=(db.accessRequests||[]).find(entry=>entry.id===id);if(!item)return;item.status='Revogado';item.revokedAt=new Date().toISOString();localStorage.removeItem('sgq_master_tenant_session');SGQCore.write('sgq_master_admin',db);SGQCore.audit('Segurança','revogou acesso master','Solicitação Master',id,item.reason);renderTenantAccessRequests();}
+
+function loadModuleSettings(){const moduleSettings=settings.moduleSettings||{};const satisfaction=SGQCore.read('sgq_satisfaction_template',{});cfgSurveyExpiry.value=moduleSettings.satisfaction?.expiryDays||satisfaction.expiryDays||7;cfgComplaintDeadline.value=moduleSettings.satisfaction?.complaintDeadline||satisfaction.complaintDeadline||5;cfgCalibrationAlert.value=moduleSettings.calibration?.alertDays||30;cfgAuditReminder.value=moduleSettings.audits?.reminderDays||15;cfgRiskThreshold.value=moduleSettings.risks?.criticalThreshold||15;cfgSupplierReview.value=moduleSettings.suppliers?.reviewMonths||12;cfgProductionMode.value=moduleSettings.production?.mode||'industrial';}
+function saveModuleSettings(){settings.moduleSettings={satisfaction:{expiryDays:Number(cfgSurveyExpiry.value)||7,complaintDeadline:Number(cfgComplaintDeadline.value)||5},calibration:{alertDays:Number(cfgCalibrationAlert.value)||30},audits:{reminderDays:Number(cfgAuditReminder.value)||15},risks:{criticalThreshold:Math.min(25,Math.max(9,Number(cfgRiskThreshold.value)||15))},suppliers:{reviewMonths:Number(cfgSupplierReview.value)||12},production:{mode:cfgProductionMode.value}};const satisfaction=SGQCore.read('sgq_satisfaction_template',{});Object.assign(satisfaction,settings.moduleSettings.satisfaction);const production=SGQCore.read('sgq_producao',null);SGQCore.write('sgq_satisfaction_template',satisfaction);if(production?.config){production.config.modo={industrial:'op',servicos:'processo',misto:'ambos'}[cfgProductionMode.value]||'ambos';SGQCore.write('sgq_producao',production);}SGQCore.write('sgq_system_settings',settings);SGQCore.audit('Configurações','atualizou','Configurações de módulos','empresa','Satisfação, calibração, auditorias, riscos, fornecedores e produção');alert('Configurações dos módulos salvas.');}
+function renderAuditHistory(){const rows=SGQCore.read('sgq_audit_history',[]);auditHistory.innerHTML=rows.length?rows.map(item=>`<div class="cfg-history-item"><strong>${item.user}</strong> ${item.action} ${item.entityType} · ${item.module}<br><span>${new Date(item.createdAt).toLocaleString('pt-BR')} · ${item.details||'Sem detalhes'}</span></div>`).join(''):'<p style="color:rgba(255,255,255,.45)">Nenhuma ação auditada.</p>';}
+
+function renderModules() {
+    modulesGrid.innerHTML = moduleDefinitions.map(([id,name,description,deps]) => {
+        const enabled = settings.modules[id] !== false;
+        const planAllowed=SGQCore.planAllowsModule(id);return `<div class="cfg-module ${enabled&&planAllowed ? '' : 'off'}"><div class="cfg-module-main"><h4>${name}</h4><p>${description}</p>${!planAllowed?`<div class="cfg-deps"><i class="fas fa-lock"></i> Não incluído no plano ${SGQCore.currentPlan().name}</div>`:deps.length ? `<div class="cfg-deps"><i class="fas fa-link"></i> Depende de: ${deps.map(dep => moduleDefinitions.find(m => m[0] === dep)?.[1] || dep).join(', ')}</div>` : ''}</div><label class="cfg-switch"><input type="checkbox" ${enabled&&planAllowed ? 'checked' : ''} ${planAllowed?'':'disabled'} onchange="toggleModule('${id}',this.checked)"><span class="cfg-slider"></span></label></div>`;
+    }).join('');
+}
+
+function toggleModule(id, enabled) {
+    if (!enabled) {
+        const dependents = moduleDefinitions.filter(module => module[3].includes(id) && settings.modules[module[0]] !== false).map(module => module[1]);
+        if (dependents.length && !confirm(`Os módulos ${dependents.join(', ')} dependem deste módulo. Deseja desativá-lo mesmo assim?`)) { settings.modules[id] = true; renderModules(); return; }
+    }
+    settings.modules[id] = enabled;
+    renderModules();
+    renderPlanCatalog();
+}
+
+function loadSettings() {
+    trialDays.value = settings.trial?.days || 30;
+    trialEssential.checked = (settings.trial?.plans || ['Essencial','Profissional']).includes('Essencial');
+    trialProfessional.checked = (settings.trial?.plans || ['Essencial','Profissional']).includes('Profissional');
+    currentCompanyPlan.value=settings.currentPlan||SGQCore.read('sgq_company_setup',{}).trialPlano||'Profissional';subscriptionStatus.value=settings.subscriptionStatus||'trial';
+    companyUnits.value=SGQCore.read('sgq_company_setup',{}).units||1;
+    attachmentMB.value = settings.files?.attachmentMB || 5;
+    largeAttachmentMB.value = settings.files?.largeAttachmentMB || 100;
+    defaultScope.value = settings.permissions?.defaultScope || 'own';
+    allowDelegation.checked = settings.permissions?.allowDelegation !== false;
+    allowSelfApproval.checked = settings.permissions?.allowSelfApproval !== false;
+    renderModules();
+    renderPlanCatalog();renderPlanUsage();loadSystemUserSectors();renderSystemUsers();renderTenantAccessRequests();loadModuleSettings();renderAuditHistory();
+}
+
+function saveGeneralSettings() {
+    const plans = [trialEssential.checked && 'Essencial', trialProfessional.checked && 'Profissional'].filter(Boolean);
+    if (!plans.length) return alert('Selecione ao menos um plano para o teste grátis.');
+    settings.trial = {days:Math.max(1,Math.min(90,Number(trialDays.value)||30)),plans};
+    settings.files = {attachmentMB:Math.max(1,Math.min(100,Number(attachmentMB.value)||5)),largeAttachmentMB:Math.max(1,Math.min(1024,Number(largeAttachmentMB.value)||100)),largeAttachmentMaxMB:1024};
+    settings.permissions = {defaultScope:defaultScope.value,allowDelegation:allowDelegation.checked,allowSelfApproval:allowSelfApproval.checked};
+    settings.currentPlan=currentCompanyPlan.value;settings.subscriptionStatus=subscriptionStatus.value;
+    const units=Math.max(1,Number(companyUnits.value)||1),selectedPlan=SGQCore.getPlan(currentCompanyPlan.value),unitLimit=selectedPlan?.units;if(selectedPlan?.users&&SGQCore.getUsers().length>selectedPlan.users)return alert(`Existem ${SGQCore.getUsers().length} usuários ativos. Desative usuários antes de mudar para o plano ${selectedPlan.name}, cujo limite é ${selectedPlan.users}.`);if(unitLimit&&units>unitLimit)return alert(`O plano ${selectedPlan.name} permite até ${unitLimit} unidade(s).`);const setup=SGQCore.read('sgq_company_setup',{});setup.units=units;SGQCore.write('sgq_company_setup',setup);
+    SGQCore.write('sgq_system_settings', settings);
+    SGQCore.audit('Configurações', 'atualizou', 'Configurações gerais', 'empresa', 'Módulos, trial, arquivos e permissões');
+    alert('Configurações salvas.');
+}
+
+const permissionActions = ['view','create','edit','deactivate','approve','export','configure'];
+function getUsersAndSectors() {
+    const people = SGQCore.getUsers();
+    const sectors = SGQCore.read('sgq_cadastros',{setores:[]}).setores || [];
+    return {users:people.map(item => ({id:String(item.id),name:item.name})),sectors:sectors.filter(item=>item.ativo!==false&&!item.deletedAt).map(item => ({id:String(item.id),name:item.nome}))};
+}
+function loadPermissionSubjects() {
+    const data=getUsersAndSectors(); const list=permissionSubjectType.value==='user'?data.users:data.sectors;
+    permissionSubject.innerHTML=list.length?list.map(item=>`<option value="${item.id}">${item.name}</option>`).join(''):'<option value="">Nenhum cadastro disponível</option>';
+    renderPermissionMatrix();
+}
+function permissionKey(){return `${permissionSubjectType.value}:${permissionSubject.value}`;}
+function renderPermissionMatrix() {
+    const all=SGQCore.read('sgq_permissions',{}); const current=all[permissionKey()]||{};
+    permissionMatrixBody.innerHTML=moduleDefinitions.map(([id,name])=>{const rule=current[id]||{};return `<tr data-module="${id}"><td><strong>${name}</strong></td>${permissionActions.map(action=>`<td style="text-align:center"><input type="checkbox" data-action="${action}" ${rule[action]?'checked':''}></td>`).join('')}<td><select class="mod-select-inp scope" style="min-width:115px"><option value="own" ${rule.scope!=='all'?'selected':''}>Próprios</option><option value="all" ${rule.scope==='all'?'selected':''}>Todos</option></select></td></tr>`}).join('');
+}
+function savePermissionMatrix() {
+    if(!permissionSubject.value)return alert('Cadastre ou selecione um usuário/setor.'); const all=SGQCore.read('sgq_permissions',{}); const rules={};
+    document.querySelectorAll('#permissionMatrixBody tr').forEach(row=>{const rule={scope:row.querySelector('.scope').value};row.querySelectorAll('[data-action]').forEach(input=>rule[input.dataset.action]=input.checked);rules[row.dataset.module]=rule;});
+    all[permissionKey()]={subjectType:permissionSubjectType.value,subjectId:permissionSubject.value,updatedAt:new Date().toISOString(),rules};SGQCore.write('sgq_permissions',all);SGQCore.audit('Configurações','atualizou','Permissões',permissionKey(),'Matriz por módulo e ação');alert('Matriz de permissões salva.');
+}
+function renderDelegations() {
+    const now=new Date();const list=SGQCore.read('sgq_permission_delegations',[]);delegationsList.innerHTML=list.length?list.map(item=>{const active=new Date(item.start+'T00:00:00')<=now&&new Date(item.end+'T23:59:59')>=now&&item.status!=='revogada';return `<div class="cfg-module"><div class="cfg-module-main"><h4>${item.fromName} → ${item.toName}</h4><p>${item.moduleName} • ${item.start} até ${item.end} • ${item.reason}</p></div><span class="sbadge ${active?'concluida':'pendente'}">${active?'Ativa':'Inativa'}</span>${item.status!=='revogada'?`<button class="mod-btn danger" onclick="revokeDelegation(${item.id})">Revogar</button>`:''}</div>`}).join(''):'<p style="color:rgba(255,255,255,.45)">Nenhuma delegação cadastrada.</p>';
+}
+function loadDelegationOptions() {
+    const users=getUsersAndSectors().users;const options=users.map(item=>`<option value="${item.id}">${item.name}</option>`).join('');delegationFrom.innerHTML=options;delegationTo.innerHTML=options;delegationModule.innerHTML=moduleDefinitions.map(item=>`<option value="${item[0]}">${item[1]}</option>`).join('');const today=new Date();delegationStart.value=today.toISOString().slice(0,10);today.setDate(today.getDate()+7);delegationEnd.value=today.toISOString().slice(0,10);renderDelegations();
+}
+function saveDelegation() {
+    if(!delegationFrom.value||!delegationTo.value)return alert('Cadastre e selecione os usuários.');if(delegationFrom.value===delegationTo.value)return alert('Delegante e delegado devem ser diferentes.');if(!delegationStart.value||!delegationEnd.value||delegationEnd.value<delegationStart.value)return alert('Informe um período válido.');
+    const list=SGQCore.read('sgq_permission_delegations',[]);const fromName=delegationFrom.selectedOptions[0].text;const toName=delegationTo.selectedOptions[0].text;list.push({id:SGQCore.nextId(list),fromId:delegationFrom.value,fromName,toId:delegationTo.value,toName,moduleId:delegationModule.value,moduleName:delegationModule.selectedOptions[0].text,start:delegationStart.value,end:delegationEnd.value,reason:delegationReason.value||'Substituição temporária',status:'ativa',createdAt:new Date().toISOString()});SGQCore.write('sgq_permission_delegations',list);SGQCore.audit('Configurações','criou','Delegação',list[list.length-1].id,`${fromName} para ${toName}`);delegationReason.value='';renderDelegations();
+}
+function revokeDelegation(id){const list=SGQCore.read('sgq_permission_delegations',[]);const item=list.find(entry=>entry.id===id);if(item){item.status='revogada';item.revokedAt=new Date().toISOString();SGQCore.write('sgq_permission_delegations',list);renderDelegations();}}
+
+loadSettings();loadPermissionSubjects();loadDelegationOptions();
+</script>
+<script src="../assets/js/global-search.js"></script>
+<script src="../assets/js/onboarding.js"></script></body>
+</html>

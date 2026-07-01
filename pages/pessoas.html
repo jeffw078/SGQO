@@ -18,7 +18,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-users" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Pessoas e Treinamentos</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -276,6 +275,8 @@
         <div class="mod-modal-body" id="perfil-body"></div>
         <div class="mod-modal-footer">
             <button class="mod-btn ghost" onclick="closeModal('modalPerfil')">Fechar</button>
+            <button class="mod-btn danger" onclick="deactivateColaborador()"><i class="fas fa-ban"></i> Desativar</button>
+            <button class="mod-btn ghost" onclick="editColaborador()"><i class="fas fa-pen"></i> Editar</button>
             <button class="mod-btn primary" onclick="openNovoTreinamentoModal()"><i class="fas fa-plus"></i> Agendar Treinamento</button>
         </div>
     </div>
@@ -345,6 +346,7 @@
 
 <script>
 const DB_KEY = 'sgq_pessoas';
+let editingColaboradorId = null;
 let currentColabId = null;
 
 function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"colaboradores":[],"funcoes":[],"treinamentos":[]}'); }
@@ -396,7 +398,7 @@ function renderColaboradores() {
     const db = getDB();
     const search = (document.getElementById('searchColab')?.value||'').toLowerCase();
     const setor = document.getElementById('filterSetor')?.value||'';
-    let items = db.colaboradores.filter(c => {
+    let items = SGQCore.filterRecords(db.colaboradores,'pessoas').filter(c => {
         if (!c.ativo) return false;
         if (search && !c.nome.toLowerCase().includes(search)) return false;
         if (setor && c.setor !== setor) return false;
@@ -564,12 +566,11 @@ function salvarColaborador() {
     const admissao = document.getElementById('nc-admissao').value;
     if (!nome || !funcao || !setor || !admissao) return alert('Preencha todos os campos obrigatórios.');
     const db = getDB();
-    const newId = db.colaboradores.length ? Math.max(...db.colaboradores.map(c=>c.id))+1 : 1;
-    db.colaboradores.push({ id:newId, nome, cpf:document.getElementById('nc-cpf').value, funcao, setor, admissao, email:document.getElementById('nc-email').value, ativo:true });
+    const current=db.colaboradores.find(item=>item.id===editingColaboradorId);const record={id:current?.id||(db.colaboradores.length ? Math.max(...db.colaboradores.map(c=>c.id))+1 : 1),nome,cpf:document.getElementById('nc-cpf').value,funcao,setor,admissao,email:document.getElementById('nc-email').value,ativo:true,createdById:current?.createdById||SGQCore.currentUser()?.id,createdBy:current?.createdBy||SGQCore.currentUser()?.name,updatedAt:new Date().toISOString()};if(current)Object.assign(current,record);else db.colaboradores.push(record);
     saveDB(db);
     closeModal('modalNovoColab');
     renderColaboradores();
-    showToast('Colaborador cadastrado!', 'success');
+    SGQCore.audit('Pessoas',current?'editou':'criou','Colaborador',record.id,record.nome);editingColaboradorId=null;showToast(current?'Colaborador atualizado!':'Colaborador cadastrado!', 'success');
 }
 
 function salvarTreinamento() {
@@ -603,7 +604,9 @@ function salvarFuncao() {
     showToast('Função cadastrada!', 'success');
 }
 
-function openNovoColaboradorModal() { openModal('modalNovoColab'); }
+function editColaborador(){const item=getDB().colaboradores.find(entry=>entry.id===currentColabId);if(!item)return;editingColaboradorId=item.id;['nome','cpf','funcao','setor','admissao','email'].forEach(key=>document.getElementById('nc-'+key).value=item[key]||'');closeModal('modalPerfil');openModal('modalNovoColab');}
+function deactivateColaborador(){const reason=prompt('Motivo da desativação do colaborador:');if(!reason)return;const db=getDB();SGQCore.softDeactivate(db.colaboradores,currentColabId,{module:'Pessoas',entityType:'Colaborador',reason});saveDB(db);closeModal('modalPerfil');renderColaboradores();showToast('Colaborador desativado.','success');}
+function openNovoColaboradorModal() { editingColaboradorId=null;['nome','cpf','funcao','setor','admissao','email'].forEach(key=>document.getElementById('nc-'+key).value='');openModal('modalNovoColab'); }
 function openNovoTreinamentoModal() { openModal('modalNovoTrein'); }
 function openNovaFuncaoModal() { openModal('modalNovaFuncao'); }
 function openModal(id) { document.getElementById(id).classList.add('active'); }
@@ -623,5 +626,5 @@ renderColaboradores();
 function startModuleTour() {
     alert('Tour deste módulo em breve! ');
 }
-</script><script src="../assets/js/global-search.js"></script></body>
+</script><script src="../assets/js/sgq-core.js"></script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>

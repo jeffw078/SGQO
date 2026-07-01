@@ -18,7 +18,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-face-smile" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Satisfação e Reclamações</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -173,11 +172,12 @@
                 <div class="card"><div class="card-header"><h4>Configurações de NPS e Reclamações</h4></div>
                     <div class="card-body">
                         <div class="mod-form-row">
-                            <div class="mod-form-group"><label>Método de coleta de satisfação</label><select class="mod-select-inp"><option>NPS (Net Promoter Score)</option><option>CSAT (Escala 1-5)</option><option>Ambos</option></select></div>
-                            <div class="mod-form-group"><label>Perãodo de coleta</label><select class="mod-select-inp"><option>Por pedido finalizado</option><option>Mensal</option><option>Trimestral</option></select></div>
+                            <div class="mod-form-group"><label>Método de coleta</label><select class="mod-select-inp" id="survey-method"><option value="nps_csat">NPS + avaliação detalhada</option><option value="nps">Somente NPS</option><option value="csat">Somente avaliação detalhada</option></select></div>
+                            <div class="mod-form-group"><label>Período de coleta</label><select class="mod-select-inp" id="survey-frequency"><option value="order">Por pedido finalizado</option><option value="monthly">Mensal</option><option value="quarterly">Trimestral</option></select></div>
                         </div>
-                        <div class="mod-form-group" style="margin-top:14px"><label>Prazo padrão para resposta de reclamação (dias)</label><input class="mod-input" type="number" value="5" style="max-width:100px"></div>
-                        <div style="display:flex;justify-content:flex-end;margin-top:16px"><button class="mod-btn primary"><i class="fas fa-save"></i> Salvar</button></div>
+                        <div class="mod-form-row"><div class="mod-form-group"><label>Validade padrão do link (dias)</label><input class="mod-input" id="survey-expiry" type="number" min="1" max="90" value="7"></div><div class="mod-form-group"><label>Prazo para resposta de reclamação (dias)</label><input class="mod-input" id="complaint-deadline" type="number" min="1" value="5"></div></div>
+                        <hr class="mod-divider"><div class="mod-form-section-title">Perguntas do formulário público</div><div id="survey-questions-config" style="display:flex;flex-direction:column;gap:8px"></div>
+                        <div style="display:flex;justify-content:space-between;margin-top:16px"><div><button class="mod-btn ghost" onclick="resetSatisfactionTemplate()"><i class="fas fa-rotate"></i> Restaurar padrão</button> <button class="mod-btn ghost" onclick="addSatisfactionQuestion()"><i class="fas fa-plus"></i> Pergunta</button> <button class="mod-btn ghost" onclick="previewSatisfactionSurvey()"><i class="fas fa-eye"></i> Visualizar</button></div><button class="mod-btn primary" onclick="saveSatisfactionTemplate()"><i class="fas fa-save"></i> Salvar modelo</button></div>
                     </div>
                 </div>
             </div>
@@ -241,8 +241,9 @@
                 <select class="mod-select-inp" id="nps-clientes" multiple style="height:100px"><option>Todos os clientes ativos</option></select>
             </div></div>
             <div class="mod-form-row full"><div class="mod-form-group"><label>Pergunta NPS</label>
-                <input class="mod-input" value="Em uma escala de 0 a 10, qual a probabilidade de você recomendar nossa empresa a um amigo ou colega?">
+                <input class="mod-input" id="nps-pergunta" value="Em uma escala de 0 a 10, qual a probabilidade de você recomendar nossa empresa a um amigo ou colega?">
             </div></div>
+            <div class="mod-form-group"><label>Link disponível por</label><div style="display:flex;align-items:center;gap:8px"><input class="mod-input" id="nps-validade" type="number" min="1" max="90" value="7" style="max-width:100px"><span>dias</span></div></div>
             <!-- Simulação de resposta -->
             <hr class="mod-divider">
             <div class="mod-form-section-title">Simular Resposta (para demonstração)</div>
@@ -255,7 +256,7 @@
         <div class="mod-modal-footer">
             <button class="mod-btn ghost" onclick="closeModal('modalNPS')">Fechar</button>
             <button class="mod-btn accent" onclick="salvarRespostaNPS()"><i class="fas fa-plus"></i> Adicionar Resposta</button>
-            <button class="mod-btn primary" onclick="showToast('NPS enviado para os clientes selecionados!','success');closeModal(\'modalNPS\')"><i class="fas fa-paper-plane"></i> Enviar NPS</button>
+            <button class="mod-btn primary" onclick="generatePublicSurvey()"><i class="fas fa-link"></i> Gerar link público</button>
         </div>
     </div>
 </div>
@@ -277,8 +278,22 @@
     </div>
 </div>
 
+<script src="../assets/js/sgq-core.js"></script>
 <script>
 const DB_KEY = 'sgq_satisfacao';
+const SATISFACTION_TEMPLATE_KEY = 'sgq_satisfaction_template';
+let editingClientId = null;
+const DEFAULT_SATISFACTION_QUESTIONS = [
+    {id:'nps',text:'Em uma escala de 0 a 10, qual a probabilidade de recomendar nossa empresa?',type:'nps',required:true},
+    {id:'quality',text:'Como você avalia a qualidade do produto ou serviço entregue?',type:'scale5',required:true},
+    {id:'requirements',text:'O produto ou serviço atendeu aos requisitos combinados?',type:'scale5',required:true},
+    {id:'delivery',text:'Como você avalia o cumprimento dos prazos?',type:'scale5',required:true},
+    {id:'service',text:'Como você avalia o atendimento e a comunicação?',type:'scale5',required:true},
+    {id:'problem',text:'Quando houve dúvida ou problema, nossa equipe resolveu de forma satisfatória?',type:'scale5',required:false},
+    {id:'reuse',text:'Você voltaria a contratar ou comprar de nossa empresa?',type:'yesno',required:true},
+    {id:'reason',text:'Qual é o principal motivo da sua nota?',type:'text',required:true},
+    {id:'improvement',text:'O que poderíamos melhorar em nossos produtos, serviços ou atendimento?',type:'text',required:false}
+];
 
 function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"clientes":[],"reclamacoes":[],"npsRespostas":[]}'); }
 function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
@@ -289,17 +304,17 @@ function seedData() {
     db.clientes = [
         { id:1, razao:'Metalúrgica Alpha Ltda', cnpj:'11.222.333/0001-44', email:'compras@alpha.com', tel:'(11) 3333-4444' },
         { id:2, razao:'Construtora Beta S.A.', cnpj:'22.333.444/0001-55', email:'suprimentos@beta.com', tel:'(11) 4444-5555' },
-        { id:3, razao:'Ind?stria Gama Eireli', cnpj:'33.444.555/0001-66', email:'qualidade@gama.com', tel:'(11) 5555-6666' },
+        { id:3, razao:'Indústria Gama Eireli', cnpj:'33.444.555/0001-66', email:'qualidade@gama.com', tel:'(11) 5555-6666' },
     ];
     db.reclamacoes = [
         { id:1, cliente:'Metalúrgica Alpha Ltda', titulo:'Peças entregues com dimensão incorreta', descricao:'Lote recebido com 5% das peças fora da tolerância especificada.', criticidade:'alta', canal:'E-mail', pedido:'PED-2026-0140', responsavel:'João Teste', prazo:'2026-06-10', status:'aberta', data:'2026-06-01T14:00' },
         { id:2, cliente:'Construtora Beta S.A.', titulo:'Atraso na entrega do pedido', descricao:'Pedido chegou 3 dias apçs o prazo acordado.', criticidade:'media', canal:'Telefone', pedido:'PED-2026-0138', responsavel:'Ana Carvalho', prazo:'2026-06-08', status:'andamento', data:'2026-06-02T09:30' },
-        { id:3, cliente:'Ind?stria Gama Eireli', titulo:'Embalagem danificada no transporte', descricao:'Caixas chegaram amassadas, produto interno OK.', criticidade:'baixa', canal:'WhatsApp', pedido:'PED-2026-0142', responsavel:'Carlos Ferreira', prazo:'2026-06-12', status:'concluida', data:'2026-05-28T11:00' },
+        { id:3, cliente:'Indústria Gama Eireli', titulo:'Embalagem danificada no transporte', descricao:'Caixas chegaram amassadas, produto interno OK.', criticidade:'baixa', canal:'WhatsApp', pedido:'PED-2026-0142', responsavel:'Carlos Ferreira', prazo:'2026-06-12', status:'concluida', data:'2026-05-28T11:00' },
     ];
     db.npsRespostas = [
         { id:1, cliente:'Metalúrgica Alpha Ltda', nota:9, comentario:'Ótima qualidade!', data:'2026-05-30' },
         { id:2, cliente:'Construtora Beta S.A.', nota:7, comentario:'Bom serviço, mas prazo poderia melhorar.', data:'2026-05-28' },
-        { id:3, cliente:'Ind?stria Gama Eireli', nota:10, comentario:'Excelente! Sempre confiável.', data:'2026-05-25' },
+        { id:3, cliente:'Indústria Gama Eireli', nota:10, comentario:'Excelente! Sempre confiável.', data:'2026-05-25' },
         { id:4, cliente:'Metalúrgica Alpha Ltda', nota:3, comentario:'Tivemos problemas com o último lote.', data:'2026-06-01' },
     ];
     saveDB(db);
@@ -315,6 +330,52 @@ function switchView(v) {
     if (v==='clientes') renderClientes();
     if (v==='nps') renderNPS();
     if (v==='reclamacoes') renderReclamacoes();
+    if (v==='config') renderSatisfactionTemplateConfig();
+}
+
+function getSatisfactionTemplate() {
+    return SGQCore.read(SATISFACTION_TEMPLATE_KEY, {method:'nps_csat',frequency:'order',expiryDays:7,complaintDeadline:5,questions:DEFAULT_SATISFACTION_QUESTIONS});
+}
+
+function renderSatisfactionTemplateConfig() {
+    const template = getSatisfactionTemplate();
+    document.getElementById('survey-method').value = template.method || 'nps_csat';
+    document.getElementById('survey-frequency').value = template.frequency || 'order';
+    document.getElementById('survey-expiry').value = template.expiryDays || 7;
+    document.getElementById('complaint-deadline').value = template.complaintDeadline || 5;
+    document.getElementById('survey-questions-config').innerHTML = (template.questions || []).map(question => questionConfigRow(question)).join('');
+}
+
+function questionConfigRow(question) {
+    return `<div class="survey-question-config" data-id="${question.id}" style="display:grid;grid-template-columns:1fr 160px 90px 40px;gap:8px;align-items:center"><input class="mod-input question-text" value="${String(question.text).replace(/"/g,'&quot;')}"><select class="mod-select-inp question-type"><option value="nps" ${question.type==='nps'?'selected':''}>NPS 0–10</option><option value="scale5" ${question.type==='scale5'?'selected':''}>Escala 1–5</option><option value="yesno" ${question.type==='yesno'?'selected':''}>Sim / Não</option><option value="text" ${question.type==='text'?'selected':''}>Texto livre</option></select><label style="font-size:.78rem"><input class="question-required" type="checkbox" ${question.required?'checked':''}> Obrigatória</label><button class="mod-btn danger" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button></div>`;
+}
+
+function addSatisfactionQuestion() {
+    document.getElementById('survey-questions-config').insertAdjacentHTML('beforeend', questionConfigRow({id:`q_${Date.now()}`,text:'Nova pergunta',type:'scale5',required:true}));
+}
+
+function saveSatisfactionTemplate() {
+    const questions = [...document.querySelectorAll('.survey-question-config')].map(row => ({id:row.dataset.id,text:row.querySelector('.question-text').value.trim(),type:row.querySelector('.question-type').value,required:row.querySelector('.question-required').checked})).filter(question => question.text);
+    if (!questions.length) return alert('Cadastre ao menos uma pergunta.');
+    if (document.getElementById('survey-method').value !== 'csat' && !questions.some(question => question.type === 'nps')) return alert('O método selecionado exige ao menos uma pergunta NPS.');
+    SGQCore.write(SATISFACTION_TEMPLATE_KEY, {method:document.getElementById('survey-method').value,frequency:document.getElementById('survey-frequency').value,expiryDays:Number(document.getElementById('survey-expiry').value)||7,complaintDeadline:Number(document.getElementById('complaint-deadline').value)||5,questions,updatedAt:new Date().toISOString()});
+    showToast('Modelo de pesquisa salvo!', 'success');
+}
+
+function resetSatisfactionTemplate() {
+    if (!confirm('Restaurar o questionário recomendado de satisfação?')) return;
+    SGQCore.write(SATISFACTION_TEMPLATE_KEY, {method:'nps_csat',frequency:'order',expiryDays:7,complaintDeadline:5,questions:DEFAULT_SATISFACTION_QUESTIONS});
+    renderSatisfactionTemplateConfig();
+    showToast('Modelo padrão restaurado!', 'success');
+}
+
+function previewSatisfactionSurvey() {
+    const template = getSatisfactionTemplate();
+    const surveys = SGQCore.read('sgq_satisfaction_surveys', []);
+    const token = `preview_${Date.now().toString(36)}`;
+    surveys.push({id:SGQCore.nextId(surveys),token,client:'Cliente de demonstração',questions:JSON.parse(JSON.stringify(template.questions || DEFAULT_SATISFACTION_QUESTIONS)),expiresAt:new Date(Date.now()+3600000).toISOString(),createdAt:new Date().toISOString(),status:'ativa',preview:true});
+    SGQCore.write('sgq_satisfaction_surveys',surveys);
+    window.open(`pesquisa-satisfacao.html?token=${encodeURIComponent(token)}`,'_blank');
 }
 
 function calcNPS() {
@@ -358,25 +419,30 @@ function renderDashboard() {
     document.getElementById('reclamacoes-recentes').innerHTML = recentes.length ? recentes.map(r => `
         <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer" onclick="switchView('reclamacoes')">
             <div style="width:8px;height:8px;border-radius:50%;background:${r.status==='aberta'?'var(--danger)':r.status==='andamento'?'var(--warning)':'var(--accent)'};flex-shrink:0"></div>
-            <div style="flex:1"><div style="font-size:.85rem;font-weight:600;color:#fff">${r.titulo}</div><div style="font-size:.75rem;color:rgba(255,255,255,.35)">${r.cliente} � ${formatDate(r.data)}</div></div>
-            <span class="sbadge ${r.status}">${{aberta:'Aberta',andamento:'Em Andamento',concluida:'Concluída'}[r.status]}</span>
+            <div style="flex:1"><div style="font-size:.85rem;font-weight:600;color:#fff">${r.titulo}</div><div style="font-size:.75rem;color:rgba(255,255,255,.35)">${r.cliente} • ${formatDate(r.data)}</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:7px">
+                <span class="sbadge ${r.status}">${{aberta:'Aberta',andamento:'Em Andamento',concluida:'Concluída'}[r.status]}</span>
+                <button class="mod-btn warning" style="font-size:.72rem;padding:5px 8px" onclick="createComplaintAction(${r.id},'rnc')"><i class="fas fa-bug"></i> Gerar RNC</button>
+                <button class="mod-btn ghost" style="font-size:.72rem;padding:5px 8px" onclick="createComplaintAction(${r.id},'plano')"><i class="fas fa-list-check"></i> Plano</button>
+            </div>
         </div>
     `).join('') : '<div style="padding:24px;text-align:center;color:rgba(255,255,255,.25);font-size:.85rem">Nenhuma reclamação recente</div>';
 }
 
 function renderClientes() {
     const db = getDB();
+    const clients=SGQCore.filterRecords(db.clientes||[],'satisfacao').filter(item=>item.ativo!==false&&!item.deletedAt);
     const listEl = document.getElementById('lista-clientes');
     const emptyEl = document.getElementById('empty-clientes');
-    if (!db.clientes.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    if (!clients.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
     emptyEl.style.display='none';
-    listEl.innerHTML = db.clientes.map(c => {
+    listEl.innerHTML = clients.map(c => {
         const npsResp = db.npsRespostas.filter(r=>r.cliente===c.razao);
         const avgNPS = npsResp.length ? (npsResp.reduce((a,b)=>a+b.nota,0)/npsResp.length).toFixed(1) : '-';
         return `<div style="display:flex;align-items:center;gap:16px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;margin-bottom:8px">
             <div style="width:44px;height:44px;border-radius:10px;background:rgba(249,115,22,.12);display:flex;align-items:center;justify-content:center;color:var(--orange);font-size:.9rem;flex-shrink:0"><i class="fas fa-building"></i></div>
-            <div style="flex:1"><div style="font-weight:700;color:#fff;font-size:.95rem;margin-bottom:3px">${c.razao}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${c.email} � ${c.tel}</div></div>
-            <div style="text-align:right"><div style="font-size:1.3rem;font-weight:800;color:var(--accent)">${avgNPS}</div><div style="font-size:.72rem;color:rgba(255,255,255,.35)">NPS médio</div></div>
+            <div style="flex:1"><div style="font-weight:700;color:#fff;font-size:.95rem;margin-bottom:3px">${c.razao}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${c.email} • ${c.tel}</div></div>
+            <div style="text-align:right"><div style="font-size:1.3rem;font-weight:800;color:var(--accent)">${avgNPS}</div><div style="font-size:.72rem;color:rgba(255,255,255,.35)">NPS médio</div><div style="display:flex;gap:5px;margin-top:7px"><button class="mod-btn ghost" style="padding:5px 7px" onclick="editClient(${c.id})"><i class="fas fa-pen"></i></button><button class="mod-btn danger" style="padding:5px 7px" onclick="deactivateClient(${c.id})"><i class="fas fa-ban"></i></button></div></div>
         </div>`;
     }).join('');
 }
@@ -386,30 +452,32 @@ function renderNPS() {
     const cont = document.getElementById('respostas-nps');
     populateNPSClienteSelect();
     if (!db.npsRespostas.length) { cont.innerHTML='<div class="mod-empty"><i class="fas fa-star"></i><h3>Nenhuma resposta NPS</h3></div>'; return; }
-    cont.innerHTML = db.npsRespostas.map(r => {
+    const detailed=db.pesquisaRespostas||[];cont.innerHTML = db.npsRespostas.map(r => {
         const cat = r.nota >= 9 ? 'promoter' : r.nota >= 7 ? 'passive' : 'detractor';
         const catLabel = {promoter:'Promotor',passive:'Passivo',detractor:'Detrator'}[cat];
         return `<div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.04)">
             <div class="nps-score ${cat}" style="width:44px;height:44px;font-size:1.1rem;border-radius:10px;flex-shrink:0">${r.nota}</div>
-            <div style="flex:1"><div style="font-weight:600;color:#fff;font-size:.9rem">${r.cliente}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${r.comentario||'Sem comentário'} � ${formatDate(r.data)}</div></div>
+            <div style="flex:1"><div style="font-weight:600;color:#fff;font-size:.9rem">${r.cliente}</div><div style="font-size:.78rem;color:rgba(255,255,255,.4)">${r.comentario||'Sem comentário'} • ${formatDate(r.data)}</div></div>
             <span class="sbadge ${cat==='promoter'?'concluida':cat==='passive'?'andamento':'aberta'}">${catLabel}</span>
         </div>`;
-    }).join('');
+    }).join('')+(detailed.length?`<div style="padding:14px 20px;background:rgba(15,117,189,.08);color:#93c5fd;font-size:.8rem"><strong>${detailed.length}</strong> pesquisa(s) detalhada(s) armazenada(s), com respostas por pergunta disponíveis para o backend e relatórios.</div>`:'');
 }
 
 function populateNPSClienteSelect() {
     const db = getDB();
+    const multi = document.getElementById('nps-clientes');
+    const clients=db.clientes.filter(c=>c.ativo!==false&&!c.deletedAt);if (multi) multi.innerHTML = '<option value="Todos os clientes ativos">Todos os clientes ativos</option>' + clients.map(c=>`<option value="${c.razao}">${c.razao}</option>`).join('');
     const sel = document.getElementById('nps-resp-cliente');
-    sel.innerHTML = '<option value="">Selecione...</option>' + db.clientes.map(c=>`<option>${c.razao}</option>`).join('');
+    sel.innerHTML = '<option value="">Selecione...</option>' + clients.map(c=>`<option>${c.razao}</option>`).join('');
     const recSel = document.getElementById('rec-cliente');
-    if (recSel) recSel.innerHTML = '<option value="">Selecione...</option>' + db.clientes.map(c=>`<option>${c.razao}</option>`).join('');
+    if (recSel) recSel.innerHTML = '<option value="">Selecione...</option>' + clients.map(c=>`<option>${c.razao}</option>`).join('');
 }
 
 function renderReclamacoes() {
     const db = getDB();
     const search = (document.getElementById('searchRec')?.value||'').toLowerCase();
     const sf = document.getElementById('filterStatusRec')?.value||'';
-    const items = db.reclamacoes.filter(r => {
+    const items = SGQCore.filterRecords(db.reclamacoes,'satisfacao').filter(r => {
         if (search && !r.titulo.toLowerCase().includes(search) && !r.cliente.toLowerCase().includes(search)) return false;
         if (sf && r.status !== sf) return false;
         return true;
@@ -428,7 +496,7 @@ function renderReclamacoes() {
                     ${r.pedido?`<span style="font-size:.72rem;color:rgba(255,255,255,.35)"><i class="fas fa-hashtag" style="margin-right:2px"></i>${r.pedido}</span>`:''}
                 </div>
                 <div style="font-weight:700;color:#fff;font-size:.95rem;margin-bottom:4px">${r.titulo}</div>
-                <div style="font-size:.78rem;color:rgba(255,255,255,.4)">Cliente: ${r.cliente} � Responsável: ${r.responsavel} � Prazo: ${formatDate(r.prazo)}</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.4)">Cliente: ${r.cliente} • Responsável: ${r.responsavel} • Prazo: ${formatDate(r.prazo)}</div>
             </div>
             <span class="sbadge ${r.status}">${{aberta:'Aberta',andamento:'Em Andamento',concluida:'Concluída'}[r.status]}</span>
         </div>
@@ -439,14 +507,26 @@ function salvarReclamacao() {
     const cliente = document.getElementById('rec-cliente').value;
     const titulo = document.getElementById('rec-titulo').value.trim();
     const descricao = document.getElementById('rec-descricao').value.trim();
-    if (!cliente || !titulo) return alert('Preencha cliente e t?tulo.');
+    if (!cliente || !titulo) return alert('Preencha cliente e título.');
     const db = getDB();
     const newId = db.reclamacoes.length ? Math.max(...db.reclamacoes.map(r=>r.id))+1 : 1;
-    db.reclamacoes.push({ id:newId, cliente, titulo, descricao, criticidade:document.getElementById('rec-criticidade').value, canal:document.getElementById('rec-canal').value, pedido:document.getElementById('rec-pedido').value, responsavel:document.getElementById('rec-responsavel').value, prazo:document.getElementById('rec-prazo').value, status:'aberta', data:new Date().toISOString() });
+    const reclamacao = { id:newId, cliente, titulo, descricao, criticidade:document.getElementById('rec-criticidade').value, canal:document.getElementById('rec-canal').value, pedido:document.getElementById('rec-pedido').value, responsavel:document.getElementById('rec-responsavel').value, prazo:document.getElementById('rec-prazo').value, status:'aberta', data:new Date().toISOString(),createdById:SGQCore.currentUser()?.id,createdBy:SGQCore.currentUser()?.name };
+    db.reclamacoes.push(reclamacao);
     saveDB(db);
+    SGQCore.audit('Satisfação', 'criou', 'Reclamação', newId, titulo);
     closeModal('modalNovaRec');
     switchView('reclamacoes');
     showToast('Reclamação registrada!', 'success');
+    if (['alta','critica'].includes(reclamacao.criticidade) && confirm('A criticidade desta reclamação recomenda uma RNC. Deseja criar agora?')) createComplaintAction(newId, 'rnc');
+}
+
+function createComplaintAction(id, tipo) {
+    const item = getDB().reclamacoes.find(r => r.id === id);
+    if (!item) return;
+    SGQCore.startLinkedAction({ tipo, titulo:`${tipo === 'rnc' ? 'Tratar reclamação' : 'Plano para reclamação'}: ${item.titulo}`,
+        descricao:`Cliente: ${item.cliente}\nPedido: ${item.pedido || '-'}\n${item.descricao || ''}`,
+        criticidade:item.criticidade || 'media', responsavel:item.responsavel || '', prazo:item.prazo || '',
+        origemTipo:'Reclamação', origemId:item.id, origemTitulo:item.titulo });
 }
 
 function salvarRespostaNPS() {
@@ -461,21 +541,50 @@ function salvarRespostaNPS() {
     showToast('Resposta NPS registrada!', 'success');
 }
 
+function generatePublicSurvey() {
+    const selected = [...document.getElementById('nps-clientes').selectedOptions].map(option => option.value).filter(value => value && value !== 'Todos os clientes ativos');
+    const client = selected[0] || document.getElementById('nps-resp-cliente').value || 'Cliente convidado';
+    const template = getSatisfactionTemplate();
+    const days = Math.max(1, Math.min(90, Number(document.getElementById('nps-validade').value) || template.expiryDays || 7));
+    const surveys = SGQCore.read('sgq_satisfaction_surveys', []);
+    const token = `${Date.now().toString(36)}${Math.random().toString(36).slice(2,10)}`;
+    const expiresAt = new Date(Date.now() + days * 86400000).toISOString();
+    const questions = JSON.parse(JSON.stringify(template.questions || DEFAULT_SATISFACTION_QUESTIONS));
+    const npsQuestion = questions.find(item => item.type === 'nps');
+    if (npsQuestion) npsQuestion.text = document.getElementById('nps-pergunta').value || npsQuestion.text;
+    surveys.push({ id:SGQCore.nextId(surveys), token, client, question:npsQuestion?.text || '', questions, templateMethod:template.method, expiresAt, createdAt:new Date().toISOString(), status:'ativa' });
+    SGQCore.write('sgq_satisfaction_surveys', surveys);
+    const url = new URL('pesquisa-satisfacao.html', location.href);
+    url.searchParams.set('token', token);
+    navigator.clipboard?.writeText(url.href).catch(() => {});
+    closeModal('modalNPS');
+    prompt('Link público criado e copiado. No MVP, abra no mesmo navegador para compartilhar os dados locais:', url.href);
+}
+
 function salvarCliente() {
     const razao = document.getElementById('cli-razao').value.trim();
     if (!razao) return alert('Informe a razão social.');
     const db = getDB();
-    const newId = db.clientes.length ? Math.max(...db.clientes.map(c=>c.id))+1 : 1;
-    db.clientes.push({ id:newId, razao, cnpj:document.getElementById('cli-cnpj').value, email:document.getElementById('cli-email').value, tel:document.getElementById('cli-tel').value });
+    const current=db.clientes.find(item=>item.id===editingClientId);const record={id:current?.id||(db.clientes.length ? Math.max(...db.clientes.map(c=>c.id))+1 : 1),razao,cnpj:document.getElementById('cli-cnpj').value,email:document.getElementById('cli-email').value,tel:document.getElementById('cli-tel').value,ativo:true,createdById:current?.createdById||SGQCore.currentUser()?.id,createdBy:current?.createdBy||SGQCore.currentUser()?.name,updatedAt:new Date().toISOString()};if(current)Object.assign(current,record);else db.clientes.push(record);
     saveDB(db);
     closeModal('modalNovoCliente');
     renderClientes();
-    showToast('Cliente cadastrado!', 'success');
+    SGQCore.audit('Satisfação',current?'editou':'criou','Cliente',record.id,record.razao);editingClientId=null;showToast(current?'Cliente atualizado!':'Cliente cadastrado!', 'success');
 }
 
+function editClient(id){const item=getDB().clientes.find(entry=>entry.id===id);if(!item)return;editingClientId=id;['razao','cnpj','email','tel'].forEach(key=>document.getElementById('cli-'+key).value=item[key]||'');openModal('modalNovoCliente');}
+function deactivateClient(id){const reason=prompt('Motivo da desativação do cliente:');if(!reason)return;const db=getDB();SGQCore.softDeactivate(db.clientes,id,{module:'Satisfação',entityType:'Cliente',reason});saveDB(db);renderClientes();showToast('Cliente desativado.','success');}
+
 function openNovaReclamacaoModal() { populateNPSClienteSelect(); openModal('modalNovaRec'); }
-function openEnviarNPSModal() { populateNPSClienteSelect(); openModal('modalNPS'); }
-function openNovoClienteModal() { openModal('modalNovoCliente'); }
+function openEnviarNPSModal() {
+    populateNPSClienteSelect();
+    const template = getSatisfactionTemplate();
+    const npsQuestion = (template.questions || []).find(item => item.type === 'nps');
+    if (npsQuestion) document.getElementById('nps-pergunta').value = npsQuestion.text;
+    document.getElementById('nps-validade').value = template.expiryDays || 7;
+    openModal('modalNPS');
+}
+function openNovoClienteModal() { editingClientId=null;['razao','cnpj','email','tel'].forEach(key=>document.getElementById('cli-'+key).value='');openModal('modalNovoCliente'); }
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 function formatDate(str) { if(!str) return '-'; const d=new Date(str+(str.length===10?'T00:00':'')); return d.toLocaleDateString('pt-BR'); }
@@ -486,6 +595,7 @@ function showToast(msg, type) {
 document.querySelectorAll('.mod-modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active');}));
 seedData();
 renderDashboard();
+renderSatisfactionTemplateConfig();
 </script>
 <script>
 function toggleUserMenu(e){if(e)e.stopPropagation();var m=document.getElementById('userMenu');if(m)m.classList.toggle('open');}
@@ -494,6 +604,5 @@ document.addEventListener('click',function(e){var m=document.getElementById('use
 function startModuleTour() {
     alert('Tour deste módulo em breve! ');
 }
-</script><script src="../assets/js/global-search.js"></script></body>
+</script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>
-

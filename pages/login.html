@@ -123,6 +123,12 @@
                         <input type="password" id="password" placeholder="********" value="databooster123" required autocomplete="current-password">
                     </div>
 
+                    <div class="form-group master-2fa-group" id="master2faGroup" style="display:none">
+                        <label for="master2fa">Código 2FA master</label>
+                        <input type="text" id="master2fa" placeholder="123456" value="123456" inputmode="numeric" autocomplete="one-time-code">
+                        <small>Mock: use <strong>123456</strong> para validar o acesso master.</small>
+                    </div>
+
                     <div class="form-row">
                         <label>
                             <input type="checkbox" id="remember" style="accent-color:var(--primary)" checked> Lembrar de mim
@@ -143,8 +149,61 @@
     </div>
 
     <script>
+        let waitingMaster2fa = false;
+
         function handleLogin(e) {
             e.preventDefault();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const isMaster = email === 'master@sgqonline.com.br' || email === 'adminmaster@sgqonline.com.br';
+
+            if (isMaster) {
+                if (password !== 'master123') {
+                    alert('Senha master mockada inválida. Use master123.');
+                    return;
+                }
+
+                if (!waitingMaster2fa) {
+                    waitingMaster2fa = true;
+                    document.getElementById('master2faGroup').style.display = 'block';
+                    document.getElementById('master2fa').value = '123456';
+                    document.getElementById('master2fa').focus();
+                    document.querySelector('.btn-login').innerHTML = '<i class="fas fa-shield-halved"></i> Validar 2FA e entrar';
+                    return;
+                }
+
+                if (document.getElementById('master2fa').value.trim() !== '123456') {
+                    alert('Código 2FA mockado inválido. Use 123456.');
+                    return;
+                }
+
+                localStorage.setItem('sgq_master_session', '2fa-ok');
+                window.location.href = 'admin-master.html';
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('sgq_system_users') || '[]');
+            const defaultUsers = [
+                {id:1,name:'Administrador Demo',email:'admin@empresa.com.br',role:'admin_company',roleLabel:'Administrador da Empresa',sectorName:'Direção',status:'ativo'},
+                {id:2,name:'Ana Carvalho',email:'qualidade@empresa.com.br',role:'admin_quality',roleLabel:'Administrador da Qualidade',sectorId:'1',sectorName:'Qualidade',status:'ativo'},
+                {id:3,name:'Carlos Ferreira',email:'producao@empresa.com.br',role:'user',roleLabel:'Usuário',sectorId:'2',sectorName:'Produção',status:'ativo'}
+            ];
+            const available = users.length ? users : defaultUsers;
+            let developmentSuper = available.find(item => String(item.email || '').toLowerCase() === 'jefferson@databooster.com.br');
+            if (!developmentSuper) developmentSuper = available.find(item => String(item.name || '').toLowerCase().includes('jefferson') && String(item.email || '').toLowerCase() === 'admin@empresa.com.br');
+            const superProfile = {name:'Jefferson Willian',email:'jefferson@databooster.com.br',role:'super_admin',roleLabel:'Superusuário de Desenvolvimento',sectorId:'',sectorName:'Desenvolvimento',status:'ativo',developmentOnly:true,deletedAt:null};
+            if (developmentSuper) Object.assign(developmentSuper, superProfile, {updatedAt:new Date().toISOString()});
+            else available.unshift(Object.assign({id:Math.max(0,...available.map(item => Number(item.id) || 0))+1,createdAt:new Date().toISOString()}, superProfile));
+            if (!available.some(item => item.role === 'admin_company' && item.status !== 'inativo')) available.push({id:Math.max(0,...available.map(item => Number(item.id) || 0))+1,name:'Administrador Demo',email:'admin@empresa.com.br',role:'admin_company',roleLabel:'Administrador da Empresa',sectorId:'',sectorName:'Direção',status:'ativo',createdAt:new Date().toISOString()});
+            localStorage.setItem('sgq_system_users', JSON.stringify(available));
+            const user = available.find(item => item.email.toLowerCase() === email && item.status !== 'inativo');
+            const validPassword = user?.developmentOnly ? password === 'databooster123' : password === '123456';
+            if (!user || !validPassword) {
+                alert('Acesso de teste inválido. Verifique o usuário e a senha informados.');
+                return;
+            }
+            localStorage.setItem('sgq_user_session', JSON.stringify({userId:user.id,tenantId:'empresa_demo',startedAt:new Date().toISOString()}));
+            localStorage.removeItem('sgq_master_session');
             window.location.href = 'dashboard.html';
         }
 

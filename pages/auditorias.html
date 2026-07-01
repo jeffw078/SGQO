@@ -18,7 +18,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-clipboard-list" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Auditorias Internas</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -231,7 +230,7 @@
             </div>
             <div class="mod-form-section-title" style="margin-top:16px">Cláusulas ISO 9001 a Auditar</div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px" id="clausulas-grid">
-                ${['4.1 Contexto','4.2 Partes Interessadas','4.3 Escopo','4.4 SGQ/Processos','5.1 Liderança','5.2 Polática','5.3 Funções','6.1 Riscos','6.2 Objetivos','7.1 Recursos','7.2 Competência','7.3 Conscientização','7.4 Comunicação','7.5 Documentos','8.1 Planejamento','8.4 Fornecedores','8.5 Produção','8.6 Liberação','8.7 Saídas NC','9.1 Monitoramento','9.2 Auditoria','9.3 Análise Crática','10.2 NC/AC','10.3 Melhoria'].map(c=>`
+                ${['4.1 Contexto','4.2 Partes Interessadas','4.3 Escopo','4.4 SGQ/Processos','5.1 Liderança','5.2 Política','5.3 Funções','6.1 Riscos','6.2 Objetivos','7.1 Recursos','7.2 Competência','7.3 Conscientização','7.4 Comunicação','7.5 Documentos','8.1 Planejamento','8.4 Fornecedores','8.5 Produção','8.6 Liberação','8.7 Saídas NC','9.1 Monitoramento','9.2 Auditoria','9.3 Análise Crática','10.2 NC/AC','10.3 Melhoria'].map(c=>`
                     <label style="display:flex;align-items:center;gap:8px;padding:8px;background:rgba(255,255,255,.04);border-radius:6px;cursor:pointer;font-size:.82rem;color:rgba(255,255,255,.65)">
                         <input type="checkbox" class="clausula-check" value="${c}" style="accent-color:var(--primary)"> ${c}
                     </label>
@@ -257,6 +256,8 @@
         </div>
         <div class="mod-modal-body" id="cond-body"></div>
         <div class="mod-modal-footer">
+            <button class="mod-btn danger" onclick="deactivateAudit()"><i class="fas fa-ban"></i> Desativar</button>
+            <button class="mod-btn ghost" onclick="editAudit()"><i class="fas fa-pen"></i> Editar planejamento</button>
             <button class="mod-btn ghost" onclick="closeModal('modalConduzir')">Salvar Rascunho</button>
             <button class="mod-btn primary" id="btn-finalizar-aud" onclick="finalizarAuditoria()"><i class="fas fa-check"></i> Finalizar Auditoria</button>
         </div>
@@ -282,9 +283,11 @@
     </div>
 </div>
 
+<script src="../assets/js/sgq-core.js"></script>
 <script>
 const DB_KEY = 'sgq_auditorias';
 let currentAudId = null;
+let editingAuditId = null;
 
 function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{"auditorias":[],"checklists":[]}'); }
 function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
@@ -299,8 +302,8 @@ function seedData() {
         { id:3, titulo:'Auditoria Interna - Controle de Documentos', auditor:'João Teste', data:addDays(-60), escopo:'Qualidade', clausulas:['7.5 Documentos','4.2 Partes Interessadas'], objetivos:'Verificar conformidade do GED', status:'concluida', ncs:1, conformidades:12 },
     ];
     db.checklists = [
-        { id:1, nome:'Checklist ISO 9001 - Controle de Documentos', clausula:'7.5', perguntas:['Os documentos possuem identificação única?','Existe processo de aprovação antes da emissão?','Documentos obsoletos são retirados de circulação?','O controle de vers?es está implementado?','Existe lista mestra de documentos?'] },
-        { id:2, nome:'Checklist ISO 9001 - Não Conformidades', clausula:'10.2', perguntas:['As NCs são registradas tempestivamente?','Existe análise de causa raiz?','Ações corretivas são verificadas quanto � eficácia?'] },
+        { id:1, nome:'Checklist ISO 9001 - Controle de Documentos', clausula:'7.5', perguntas:['Os documentos possuem identificação única?','Existe processo de aprovação antes da emissão?','Documentos obsoletos são retirados de circulação?','O controle de versões está implementado?','Existe lista mestra de documentos?'] },
+        { id:2, nome:'Checklist ISO 9001 - Não Conformidades', clausula:'10.2', perguntas:['As NCs são registradas tempestivamente?','Existe análise de causa raiz?','Ações corretivas são verificadas quanto à eficácia?'] },
     ];
     saveDB(db);
 }
@@ -319,10 +322,10 @@ function switchView(v) {
 
 function renderCronograma() {
     const db = getDB();
-    const agendadas = db.auditorias.filter(a=>a.status==='agendada').length;
-    const andamento = db.auditorias.filter(a=>a.status==='andamento').length;
-    const concluidas = db.auditorias.filter(a=>a.status==='concluida').length;
-    const ncs = db.auditorias.reduce((s,a)=>s+(a.ncs||0),0);
+    const activeAudits=SGQCore.filterRecords(db.auditorias,'auditorias').filter(a=>a.status!=='inativa'&&a.ativo!==false&&!a.deletedAt);const agendadas = activeAudits.filter(a=>a.status==='agendada').length;
+    const andamento = activeAudits.filter(a=>a.status==='andamento').length;
+    const concluidas = activeAudits.filter(a=>a.status==='concluida').length;
+    const ncs = activeAudits.reduce((s,a)=>s+(a.ncs||0),0);
     document.getElementById('stat-agendadas').textContent = agendadas;
     document.getElementById('stat-andamento-aud').textContent = andamento;
     document.getElementById('stat-concluidas-aud').textContent = concluidas;
@@ -330,12 +333,12 @@ function renderCronograma() {
 
     const listEl = document.getElementById('cronograma-list');
     const emptyEl = document.getElementById('empty-cronograma');
-    if (!db.auditorias.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
+    if (!activeAudits.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
     emptyEl.style.display='none';
 
     const today = new Date();
     const months = {};
-    [...db.auditorias].sort((a,b)=>new Date(a.data)-new Date(b.data)).forEach(a => {
+    [...activeAudits].sort((a,b)=>new Date(a.data)-new Date(b.data)).forEach(a => {
         const d = new Date(a.data+'T00:00');
         const key = d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
         if (!months[key]) months[key] = [];
@@ -359,7 +362,7 @@ function renderCronograma() {
                         <div class="audit-meta">
                             <span class="meta-tag"><i class="fas fa-user"></i>${a.auditor}</span>
                             <span class="meta-tag"><i class="fas fa-building"></i>${a.escopo}</span>
-                            <span class="meta-tag"><i class="fas fa-list"></i>${a.clausulas.length} cl?usulas</span>
+                            <span class="meta-tag"><i class="fas fa-list"></i>${a.clausulas.length} cláusulas</span>
                             ${a.ncs ? `<span class="meta-tag" style="color:#f87171"><i class="fas fa-exclamation-circle"></i>${a.ncs} NCs</span>` : ''}
                         </div>
                     </div>
@@ -380,7 +383,7 @@ function openConduzirModal(id) {
 
     const checklistsHtml = aud.clausulas.map(c => {
         const cl = db.checklists.find(x => x.clausula === c.split(' ')[0]);
-        const pergs = cl ? cl.perguntas : ['Verificar conformidade geral com este requisito','Evid?ncias documentadas adequadas?','Responsáveis definidos?'];
+        const pergs = cl ? cl.perguntas : ['Verificar conformidade geral com este requisito','Evidências documentadas adequadas?','Responsáveis definidos?'];
         return `<div class="detail-panel"><div class="detail-panel-header" onclick="togglePanel(this)"><h4><i class="fas fa-check-circle" style="color:var(--primary)"></i>${c}</h4><i class="fas fa-chevron-down toggle-icon"></i></div>
             <div class="detail-panel-body">
                 ${pergs.map((p,i) => `
@@ -395,7 +398,7 @@ function openConduzirModal(id) {
                         </select>
                     </div>
                 `).join('')}
-                <div style="margin-top:10px"><textarea class="mod-textarea" rows="2" placeholder="Evid?ncias e observações para esta cl?usula..."></textarea></div>
+                <div style="margin-top:10px"><textarea class="mod-textarea" rows="2" placeholder="Evidências e observações para esta cláusula..."></textarea></div>
             </div>
         </div>`;
     }).join('');
@@ -458,7 +461,7 @@ function renderChecklists() {
 
 function renderResultados() {
     const db = getDB();
-    const concluidas = db.auditorias.filter(a=>a.status==='concluida');
+    const concluidas = db.auditorias.filter(a=>a.status==='concluida'&&a.ativo!==false&&!a.deletedAt);
     const tbody = document.getElementById('tbody-resultados');
     const emptyEl = document.getElementById('empty-resultados');
     if (!concluidas.length) { tbody.innerHTML=''; emptyEl.style.display='flex'; document.querySelector('.mod-table-wrap').style.display='none'; return; }
@@ -479,7 +482,7 @@ function renderResultados() {
 
 function renderPlanosAud() {
     const db = getDB();
-    const comNCs = db.auditorias.filter(a=>a.ncs>0);
+    const comNCs = db.auditorias.filter(a=>a.ncs>0&&a.ativo!==false&&!a.deletedAt);
     const listEl = document.getElementById('lista-planos-aud');
     const emptyEl = document.getElementById('empty-planos-aud');
     if (!comNCs.length) { listEl.innerHTML=''; emptyEl.style.display='flex'; return; }
@@ -487,8 +490,17 @@ function renderPlanosAud() {
     listEl.innerHTML = comNCs.map(a => `<div style="background:rgba(255,255,255,.03);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:16px 20px;margin-bottom:10px">
         <div style="font-weight:700;color:#fff;margin-bottom:6px">${a.titulo}</div>
         <div style="font-size:.82rem;color:rgba(255,255,255,.4);margin-bottom:10px">${a.ncs} NC(s) identificada(s) na auditoria de ${formatDate(a.data)}</div>
-        <a href="nao-conformidades.html" class="mod-btn warning" style="font-size:.82rem"><i class="fas fa-external-link-alt"></i> Criar Plano de Ação no módulo NC</a>
+        <button class="mod-btn warning" style="font-size:.82rem" onclick="createAuditAction(${a.id},'plano')"><i class="fas fa-list-check"></i> Criar Plano de Ação</button>
+        <button class="mod-btn ghost" style="font-size:.82rem" onclick="createAuditAction(${a.id},'rnc')"><i class="fas fa-bug"></i> Criar RNC</button>
     </div>`).join('');
+}
+
+function createAuditAction(id, tipo) {
+    const item = getDB().auditorias.find(a => a.id === id);
+    if (!item) return;
+    SGQCore.startLinkedAction({ tipo, titulo:`${tipo === 'rnc' ? 'Achado de auditoria' : 'Plano da auditoria'}: ${item.titulo}`,
+        descricao:`Escopo: ${item.escopo || '-'}\nCláusulas: ${(item.clausulas || []).join(', ')}\nQuantidade de NCs: ${item.ncs || 0}`,
+        criticidade:(item.ncs || 0) > 3 ? 'alta' : 'media', origemTipo:'Auditoria', origemId:item.id, origemTitulo:item.titulo });
 }
 
 function salvarAuditoria() {
@@ -498,15 +510,18 @@ function salvarAuditoria() {
     const escopo = document.getElementById('na-escopo').value.trim();
     if (!titulo || !data || !escopo) return alert('Preencha os campos obrigatórios.');
     const clausulas = [...document.querySelectorAll('.clausula-check:checked')].map(c=>c.value);
-    if (!clausulas.length) return alert('Selecione pelo menos uma cl?usula.');
+    if (!clausulas.length) return alert('Selecione pelo menos uma cláusula.');
     const db = getDB();
-    const newId = db.auditorias.length ? Math.max(...db.auditorias.map(a=>a.id))+1 : 1;
-    db.auditorias.push({ id:newId, titulo, auditor, data, escopo, clausulas, objetivos:document.getElementById('na-objetivos').value, status:'agendada', ncs:0, conformidades:0 });
+    const current=db.auditorias.find(item=>item.id===editingAuditId);const record={id:current?.id||(db.auditorias.length ? Math.max(...db.auditorias.map(a=>a.id))+1 : 1),titulo,auditor,data,escopo,clausulas,objetivos:document.getElementById('na-objetivos').value,status:current?.status||'agendada',ncs:current?.ncs||0,conformidades:current?.conformidades||0,historico:current?.historico||[],ativo:true,createdById:current?.createdById||SGQCore.currentUser()?.id,createdBy:current?.createdBy||SGQCore.currentUser()?.name,updatedAt:new Date().toISOString()};record.historico.push({acao:current?'Planejamento editado':'Auditoria planejada',data:new Date().toISOString(),usuario:SGQCore.currentUser()?.name});if(current)Object.assign(current,record);else db.auditorias.push(record);
     saveDB(db);
+    SGQCore.audit('Auditorias', current?'editou':'criou', 'Auditoria', record.id, titulo);
     closeModal('modalNovaAuditoria');
     renderCronograma();
-    showToast('Auditoria planejada com sucesso!', 'success');
+    editingAuditId=null;showToast(current?'Auditoria atualizada!':'Auditoria planejada com sucesso!', 'success');
 }
+
+function editAudit(){const item=getDB().auditorias.find(entry=>entry.id===currentAudId);if(!item)return;editingAuditId=item.id;['titulo','auditor','data','escopo','objetivos'].forEach(key=>document.getElementById('na-'+key).value=item[key]||'');document.querySelectorAll('.clausula-check').forEach(input=>input.checked=item.clausulas.includes(input.value));closeModal('modalConduzir');openModal('modalNovaAuditoria');}
+function deactivateAudit(){const reason=prompt('Motivo da desativação da auditoria:');if(!reason)return;const db=getDB();SGQCore.softDeactivate(db.auditorias,currentAudId,{module:'Auditorias',entityType:'Auditoria',status:'inativa',reason});saveDB(db);closeModal('modalConduzir');renderCronograma();showToast('Auditoria desativada.','success');}
 
 function openNovoChecklistModal() {
     document.getElementById('perguntas-list').innerHTML = '';
@@ -536,7 +551,7 @@ function salvarChecklist() {
     showToast('Checklist criado!', 'success');
 }
 
-function openNovaAuditoriaModal() { openModal('modalNovaAuditoria'); }
+function openNovaAuditoriaModal() { editingAuditId=null;['titulo','data','escopo','objetivos'].forEach(key=>document.getElementById('na-'+key).value='');document.querySelectorAll('.clausula-check').forEach(input=>input.checked=false);openModal('modalNovaAuditoria'); }
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 function formatDate(str) { if(!str) return '-'; const d=new Date(str+(str.length===10?'T00:00':'')); return d.toLocaleDateString('pt-BR'); }
@@ -557,5 +572,5 @@ function saveConfigAuditorias(){showToast('Configurações salvas com sucesso!',
 function startModuleTour() {
     alert('Tour deste módulo em breve! ');
 }
-</script><script src="../assets/js/global-search.js"></script></body>
+</script><script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>

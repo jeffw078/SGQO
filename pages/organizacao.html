@@ -59,7 +59,6 @@
                 <div style="display:flex;align-items:center;gap:9px;padding:4px 0 2px">
                     <i class="fas fa-building-shield" style="color:var(--primary);font-size:1.1rem;flex-shrink:0"></i>
                     <span style="font-size:1rem;font-weight:700;color:#fff;line-height:1.2">Organização</span>
-                    <button onclick="startModuleTour()" title="Ajuda / Tour deste módulo" style="margin-left:auto;background:none;border:none;color:rgba(167,139,250,.5);cursor:pointer;font-size:.95rem;padding:2px 4px;border-radius:5px;line-height:1;flex-shrink:0" onmouseenter="this.style.color='#a78bfa'" onmouseleave="this.style.color='rgba(167,139,250,.5)'"><i class="fas fa-circle-question"></i></button>
                 </div>
             </div>
             <div class="nav-section">
@@ -443,6 +442,7 @@
     </div>
 </div>
 
+<script src="../assets/js/sgq-core.js"></script>
 <script>
 const ORG_KEY = 'sgq_organizacao_iso';
 const today = new Date().toISOString().slice(0, 10);
@@ -553,7 +553,7 @@ function renderContexto() {
 
     document.getElementById('swotGrid').innerHTML = Object.keys(labels).map(tipo => {
         const cfg = labels[tipo];
-        const items = data.swot.filter(i => i.tipo === tipo);
+        const items = data.swot.filter(i => i.tipo === tipo && i.ativo!==false && !i.deletedAt);
         return `<div class="swot-col">
             <div class="swot-head" style="background:${cfg[2]}22"><span><i class="fas ${cfg[3]}" style="color:${cfg[2]};margin-right:8px"></i>${cfg[0]}</span><small>${cfg[1]}</small></div>
             <div class="swot-body">
@@ -572,6 +572,7 @@ function renderContexto() {
                     <div class="pd-actions-row" style="margin-top:10px">
                         <span style="font-size:.72rem;color:rgba(255,255,255,.38)">Responsável: ${esc(i.responsavel || 'Não definido')}</span>
                         <div class="mod-actions">
+                            <button class="mod-btn ghost" style="padding:6px 9px" onclick="createSwotAction(${idx})" title="Criar ação vinculada"><i class="fas fa-list-check"></i></button>
                             <button class="mod-btn ghost" style="padding:6px 9px" onclick="openSwotModal(${idx})"><i class="fas fa-pen"></i></button>
                             <button class="mod-btn danger" style="padding:6px 9px" onclick="removeSwotItem(${idx})"><i class="fas fa-trash"></i></button>
                         </div>
@@ -624,11 +625,23 @@ function saveSwotItem() {
 }
 
 function removeSwotItem(idx) {
-    if (!confirm('Remover este item SWOT?')) return;
-    const data = getData();
-    data.swot.splice(idx, 1);
+    const reason=prompt('Motivo da desativação do item SWOT:');if(!reason)return;
+    const data = getData();const item=data.swot[idx];if(!item)return;item.ativo=false;item.status='Inativo';item.deletedAt=new Date().toISOString();item.deletedBy=SGQCore.currentUser()?.name;item.deactivationReason=reason;SGQCore.audit('Organização','desativou','Item SWOT',idx,reason);
     saveData(data);
     renderContexto();
+}
+
+function createSwotAction(idx) {
+    const data = getData();
+    const item = data.swot[idx];
+    if (!item) return;
+    SGQCore.startLinkedAction({
+        tipo: item.tipo === 'oportunidade' ? 'melhoria' : 'plano',
+        titulo: `${item.tipo === 'oportunidade' ? 'Aproveitar oportunidade' : 'Tratar item SWOT'}: ${item.titulo}`,
+        descricao: item.acao || item.descricao,
+        responsavel: item.responsavel || '', criticidade: score(item) >= Number(data.contexto.corte || 10) ? 'alta' : 'media',
+        origemTipo: 'SWOT', origemId: idx + 1, origemTitulo: item.titulo
+    });
 }
 
 function saveContexto() {
@@ -647,7 +660,7 @@ function saveContexto() {
 
 function renderPartes() {
     const data = getData();
-    document.getElementById('partesBody').innerHTML = data.partes.map((p, idx) => `
+    document.getElementById('partesBody').innerHTML = data.partes.map((p, idx) => ({p,idx})).filter(entry=>entry.p.ativo!==false&&!entry.p.deletedAt).map(({p,idx}) => `
         <tr>
             <td><strong style="color:#fff">${esc(p.nome)}</strong><div style="font-size:.75rem;color:rgba(255,255,255,.35)">${esc(p.responsavel)}</div></td>
             <td>${esc(p.necessidades)}</td>
@@ -697,8 +710,7 @@ function saveParte() {
 }
 
 function removeParte(idx) {
-    const data = getData();
-    data.partes.splice(idx, 1);
+    const reason=prompt('Motivo da desativação da parte interessada:');if(!reason)return;const data = getData();const item=data.partes[idx];if(!item)return;item.ativo=false;item.deletedAt=new Date().toISOString();item.deletedBy=SGQCore.currentUser()?.name;item.deactivationReason=reason;SGQCore.audit('Organização','desativou','Parte interessada',idx,reason);
     saveData(data);
     renderPartes();
 }
@@ -706,7 +718,7 @@ function removeParte(idx) {
 function renderRecursos() {
     const data = getData();
     const colors = ['var(--primary)', 'var(--purple)', 'var(--warning)', 'var(--accent)', 'var(--orange)'];
-    document.getElementById('recursosGrid').innerHTML = data.recursos.map((r, idx) => `
+    document.getElementById('recursosGrid').innerHTML = data.recursos.map((r, idx) => ({r,idx})).filter(entry=>entry.r.ativo!==false&&!entry.r.deletedAt).map(({r,idx}) => `
         <div class="org-card">
             <h3><i class="fas fa-cube" style="color:${colors[idx % colors.length]}"></i> ${esc(r.tipo)}</h3>
             <p style="margin-bottom:12px">${esc(r.descricao)}</p>
@@ -764,9 +776,7 @@ function saveRecurso() {
 }
 
 function removeRecurso(idx) {
-    if (!confirm('Remover este recurso?')) return;
-    const data = getData();
-    data.recursos.splice(idx, 1);
+    const reason=prompt('Motivo da desativação do recurso:');if(!reason)return;const data = getData();const item=data.recursos[idx];if(!item)return;item.ativo=false;item.deletedAt=new Date().toISOString();item.deletedBy=SGQCore.currentUser()?.name;item.deactivationReason=reason;SGQCore.audit('Organização','desativou','Recurso',idx,reason);
     saveData(data);
     renderRecursos();
 }
@@ -788,7 +798,7 @@ function renderMudancas() {
             </div>
             <div class="mod-actions">
                 <button class="mod-btn ghost" onclick="openMudancaModal(${idx})"><i class="fas fa-pen"></i> Editar</button>
-                <a class="mod-btn ghost" href="nao-conformidades.html?tipo=plano"><i class="fas fa-list-check"></i> Plano</a>
+                <button class="mod-btn ghost" onclick="createMudancaAction(${idx})"><i class="fas fa-list-check"></i> Plano</button>
             </div>
         </div>
     `;
@@ -797,6 +807,15 @@ function renderMudancas() {
 
 function statusMudancaLabel(status) {
     return {analise:'Em análise', aprovada:'Aprovada', implantacao:'Em implantação', concluida:'Concluída', reprovada:'Reprovada'}[status] || status || 'Em análise';
+}
+
+function createMudancaAction(idx) {
+    const item = getData().mudancas[idx];
+    if (!item) return;
+    SGQCore.startLinkedAction({ tipo:'plano', titulo:`Implantar mudança: ${item.titulo}`,
+        descricao:`Motivo: ${item.motivo || '-'}\nImpacto: ${item.impacto || '-'}\nEvidências planejadas: ${item.evidencia || '-'}`,
+        prazo:item.prazo || '', criticidade:String(item.risco).toLowerCase() === 'crítico' ? 'critica' : String(item.risco).toLowerCase() === 'alto' ? 'alta' : 'media',
+        origemTipo:'Mudança', origemId:item.id, origemTitulo:item.titulo });
 }
 
 function openMudancaModal(idx = '') {
@@ -858,7 +877,7 @@ function renderAnalises() {
             </div>
             <div class="mod-actions">
                 <button class="mod-btn ghost" onclick="openAnaliseModal(${idx})"><i class="fas fa-pen"></i> Editar</button>
-                <a class="mod-btn ghost" href="nao-conformidades.html?tipo=plano"><i class="fas fa-list-check"></i> Ações</a>
+                <button class="mod-btn ghost" onclick="createAnaliseAction(${idx})"><i class="fas fa-list-check"></i> Ações</button>
             </div>
         </div>
     `).join('');
@@ -883,6 +902,14 @@ function openAnaliseModal(idx = '') {
     setVal('ana-aprovador', a.aprovador || '');
     setVal('ana-evidencia', a.evidencia || '');
     openModal('modalAnalise');
+}
+
+function createAnaliseAction(idx) {
+    const item = getData().analises[idx];
+    if (!item) return;
+    SGQCore.startLinkedAction({ tipo:'plano', titulo:`Ações da análise crítica: ${item.titulo}`,
+        descricao:item.acoes || item.decisoes || 'Detalhar ações definidas pela direção.',
+        origemTipo:'Análise crítica', origemId:item.id, origemTitulo:item.titulo });
 }
 
 function saveAnalise() {
@@ -912,12 +939,13 @@ function saveAnalise() {
 
 function renderDados() {
     const data = getData();
+    const metrics = SGQCore.metrics();
     const cards = [
-        ['Indicadores ativos', '5', 'Metas e tendências em indicadores/KPIs', 'fa-chart-line', 'var(--accent)'],
-        ['NCs e ações', '17', 'NCs, planos, melhorias e eficácia', 'fa-list-check', 'var(--warning)'],
-        ['Riscos críticos', '2', 'Riscos e oportunidades monitorados', 'fa-shield-virus', 'var(--danger)'],
-        ['Satisfação', '82', 'NPS e reclamações de clientes', 'fa-face-smile', 'var(--orange)'],
-        ['Fornecedores', '4.1', 'Score médio de provedores externos', 'fa-handshake', 'var(--purple)'],
+        ['Indicadores ativos', String(metrics.activeKpis), 'Metas e tendências em indicadores/KPIs', 'fa-chart-line', 'var(--accent)'],
+        ['NCs e ações', String(metrics.openRnc + metrics.openPlans + metrics.openImprovements), `${metrics.overdueActions} item(ns) em atraso`, 'fa-list-check', 'var(--warning)'],
+        ['Riscos críticos', String(metrics.criticalRisks), 'Riscos e oportunidades monitorados', 'fa-shield-virus', 'var(--danger)'],
+        ['Satisfação', metrics.npsScore === null ? '-' : String(metrics.npsScore), `${metrics.complaintsOpen} reclamação(ões) aberta(s)`, 'fa-face-smile', 'var(--orange)'],
+        ['Fornecedores', metrics.supplierAverage === null ? '-' : String(metrics.supplierAverage), `${metrics.suppliersCount} fornecedor(es) cadastrado(s)`, 'fa-handshake', 'var(--purple)'],
         ['Mudanças', String(data.mudancas.length), 'Mudanças em análise e implantação', 'fa-repeat', 'var(--primary)']
     ];
     document.getElementById('dadosGrid').innerHTML = cards.map(c => `
@@ -928,37 +956,13 @@ function renderDados() {
         </div>
     `).join('');
     document.getElementById('dadosResumo').innerHTML = `
-        <p style="margin-bottom:10px">A análise consolidada deve ser usada como entrada para a análise crítica pela direção. Neste protótipo, os números são demonstrativos e representam os principais grupos de dados exigidos pela ISO 9001.</p>
-        <p>Quando houver integração com os módulos e API de IA, esta tela poderá gerar tendências, prioridades e recomendações automaticamente.</p>
+        <p style="margin-bottom:10px">Dados consolidados diretamente dos registros salvos nos módulos deste navegador.</p>
+        <p>Há ${metrics.openRnc} RNC(s), ${metrics.openPlans} plano(s), ${metrics.criticalRisks} risco(s) crítico(s), ${metrics.auditsPlanned} auditoria(s) pendente(s) e ${metrics.calibrationAlerts} alerta(s) de calibração.</p>
     `;
 }
 
 function getCoverage() {
-    const data = getData();
-    return [
-        ['4.1', 'Contexto da organização', data.swot.length ? 'ok' : 'gap', 'SWOT e planejamento estratégico.'],
-        ['4.2', 'Partes interessadas', data.partes.length ? 'ok' : 'gap', 'Cadastro de partes interessadas e requisitos.'],
-        ['4.3', 'Escopo do SGQ', data.contexto.escopo ? 'ok' : 'partial', 'Escopo em configurações da organização.'],
-        ['5.1', 'Liderança', 'partial', 'Evidências da direção ficam para segundo momento.'],
-        ['5.2', 'Política da qualidade', 'partial', 'Documento controlado e comunicação por treinamento.'],
-        ['5.3', 'Responsabilidades e autoridades', 'partial', 'Segundo momento: organograma/RACI/responsáveis ISO.'],
-        ['6.1', 'Riscos e oportunidades', 'ok', 'Módulo de riscos e SWOT.'],
-        ['6.2', 'Objetivos da qualidade', 'ok', 'Indicadores e metas.'],
-        ['6.3', 'Planejamento de mudanças', data.mudancas.length ? 'ok' : 'partial', 'Controle de mudanças com risco, aprovação e plano.'],
-        ['7.1', 'Recursos', data.recursos.length ? 'partial' : 'gap', 'Recursos gerais cadastrados na Organização.'],
-        ['7.2/7.3', 'Competência e conscientização', 'ok', 'Pessoas e treinamentos.'],
-        ['7.4', 'Comunicação', 'partial', 'Será controlada por documentos.'],
-        ['7.5', 'Informação documentada', 'ok', 'Controle de documentos.'],
-        ['8.2', 'Requisitos do cliente', 'partial', 'Modelagem por fluxo customizado no BPM.'],
-        ['8.3', 'Projeto e desenvolvimento', 'ok', 'Módulo executável com etapas ISO e opção de customização no BPM.'],
-        ['8.4', 'Provedores externos', 'ok', 'Avaliação de fornecedores.'],
-        ['8.5/8.6/8.7', 'Operação, liberação e saídas NC', 'ok', 'Produção, inspeções e NCs.'],
-        ['9.1.3', 'Análise e avaliação', 'partial', 'Tela consolidada preparada para integração.'],
-        ['9.2', 'Auditoria interna', 'ok', 'Módulo de auditorias.'],
-        ['9.3', 'Análise crítica pela direção', data.analises.length ? 'ok' : 'partial', 'Fluxo de análise crítica na Organização.'],
-        ['10.2', 'Não conformidade e ação corretiva', 'ok', 'NCs e planos de ação.'],
-        ['10.3', 'Melhoria contínua', 'partial', 'Guia de melhoria contínua no módulo de NCs/planos.']
-    ];
+    return SGQCore.coverage();
 }
 
 function runDiagnostic() {
@@ -1082,5 +1086,5 @@ function startModuleTour() { alert('Este módulo centraliza os requisitos organi
 if (!localStorage.getItem(ORG_KEY)) saveData(defaultData());
 applyInitialView();
 </script>
-<script src="../assets/js/global-search.js"></script></body>
+<script src="../assets/js/global-search.js"></script><script src="../assets/js/onboarding.js"></script></body>
 </html>

@@ -1,11 +1,8 @@
-PROMPT BASE PARA DESENVOLVIMENTO DO SGQ ONLINE
-==============================================
+# PROMPT BASE PARA DESENVOLVIMENTO DO SGQ ONLINE
 
 Use este prompt como base para entender o produto, suas regras de negócio e o escopo dos módulos antes de desenvolver o sistema real com backend e banco de dados.
 
-
-1. VISÃO DO PRODUTO
--------------------
+## 1. VISÃO DO PRODUTO
 
 O SGQ Online é um sistema de gestão da qualidade orientado à ISO 9001:2015. O objetivo é permitir que empresas organizem seu Sistema de Gestão da Qualidade de forma simples, funcional e rastreável, reduzindo uso de planilhas e centralizando documentos, processos, evidências, auditorias, não conformidades, riscos, indicadores e planos de ação.
 
@@ -19,13 +16,13 @@ O sistema deve priorizar:
 - relação entre módulos e requisitos ISO 9001;
 - backend simples, modular e fácil de revisar.
 
-
-2. PREMISSA TÉCNICA
--------------------
+## 2. PREMISSA TÉCNICA
 
 O protótipo atual é feito em HTML, CSS e JavaScript, com persistência em localStorage. No desenvolvimento real, o localStorage deve ser substituído por backend e banco de dados.
 
 Premissas para backend:
+
+- desenvolvimento baseado em TDD para garantir testes focando em funcionalidade e segurança
 - monólito modular no início;
 - banco relacional;
 - APIs REST simples;
@@ -36,38 +33,73 @@ Premissas para backend:
 - migrations versionadas;
 - auditoria/histórico em entidades críticas;
 - evitar arquitetura excessivamente complexa.
+- O desenvolvimento do sistema será feito por módulos, onde cada módulo terá sua interface gráfica, seus controllers e sua tabelas no banco o qual deve ser estruturado para atender os requisitos multi tenant do sistema.
 
-#?# Definir stack oficial do backend: Node.js, PHP/Laravel, Python/Django/FastAPI, Java/Spring ou outra?
-#?# Definir banco: PostgreSQL, MySQL/MariaDB, SQL Server ou outro?
-#?# Definir se haverá SPA/frontend moderno depois ou se o HTML atual será migrado gradualmente.
+Esse isolamento é necessário para garantir a manutenção de cada módulo
 
+#?# Definir stack oficial do backend: Node.js, PHP/Laravel, Python/Django/FastAPI, Java/Spring ou outra? deve ser usado python, fast api, front deverá ser refeito em tailwind
+#?# Definir banco: PostgreSQL, MySQL/MariaDB, SQL Server ou outro? o banco deverá ser postgresql
+#?# Definir se haverá SPA/frontend moderno depois ou se o HTML atual será migrado gradualmente. o front será multi page, verificar durante o desenvolvimento o que pode ser reaproveitado, ex cabeçalhos etc
 
-3. REGRAS GLOBAIS DO NEGÓCIO
-----------------------------
+## 3. REGRAS GLOBAIS DO NEGÓCIO
 
-Toda empresa deve ter seus dados isolados.
-Todo usuário deve pertencer a uma empresa e ter perfil/permissões.
+A ideia geral do sistema é ser um consultor iso 9001 &dentro da empresa que possa guia de forma completa ou parcial o atendimento de requisitos iso 9001 para empresas que querem seguir, certificar outro manter certificação ISO 9001.
+
+Além disso o sistema conta com ferramentas adicionais que podem ser utilizadas para a transformação digital de empresas, como pro exemplo o módulo de assinaturas e elaboração deu fluxos através do bpm. Além disso o sistema conta com um controle do processo produtivo o que auxilia empresas a monitorarem os seus processos produtivos.
+
+Adicionalmente é possível fazer a gestão de documentos, riscos, pessoas e treinamentos.
+
+módulos que envolverem risco deverão puxar em forma de complemento a matriz de risco com link para a matriz de risco principal, acessando a principal deverá ser possível analisar com em filtro por modulos, sendo possivel ver pelos dois caminhos.
+
+Como diferencial além das perguntas padrão para setup do sistema, ele contaram com ia integrada para análise do sistema de gestão da qualidade, buscando identificar sempre possíveis não conformidades em processos e documentos fornecendo dicas valiosas para o sistema de gestão. (ver como é possível implementar regras para avisos gerais, por exemplo, a abertura de uma reclamação de cliente gera uma rnc? Isso deve ser avisado, ver como implementar isso dentro das configurações de cada módulo)
+
+deve existir um usuário master para todo o sistema, esse usuário só pode acessar o sistema das empresas mediante aprovação do admin da empresa. o painel adm desse usuário deverá ser separado dos demais contendo informações gerais do estado da aplicação, como, acessos ao sistema, empresas ativas, cadastro de novas empresas, e usuários admin e demais dados da empresa, dashboard geral com informações de acessos e analytics, logs gerais de erros no sistema com nivel de verbosidade para tratamento e ações, acesso a help desk de clientes, suporte, estatisticas de uso, verificar possibilidade de integração com vpn para monitoramento. o acesso ao sistema pelo admin master deverá ser feito obrigatoriamente via 2FA para maior segurança do sistema
+
+O Admin Master cadastra o primeiro administrador de cada empresa. Quando precisar acessar dados internos de uma empresa, deverá abrir uma solicitação específica. O administrador da empresa deverá aprovar a solicitação e o acesso terá validade de 1 hora. Durante essa janela, o Admin Master poderá visualizar todos os módulos e executar todas as ações dentro da empresa. Toda solicitação, aprovação, entrada, ação e encerramento da sessão deverá ficar registrada em trilha de auditoria. Encerrado o prazo, uma nova aprovação será obrigatória.
+
+Toda empresa deve ter seus dados isolados dentro do sistema garantindo que a multi tenant funcione de forma segura e robusta.
+
+Todo usuário deve pertencer a uma empresa e ter perfil/permissões de acesso, cada usuário poderá ou não ver e acessar os módulos do sistema, as regras de acessos serão definidas pelo admin do sistema.
+
+O administrador da empresa cria os demais usuários. Após a criação, deverá definir uma matriz de permissões por módulo e por ação, incluindo no mínimo visualizar, criar, editar, desativar, aprovar, exportar e configurar. O backend deverá validar cada permissão; ocultar botões no frontend não é controle de acesso suficiente. A alteração do administrador principal da empresa deverá seguir processo formal e gerar notificação à empresa, conforme previsto em contrato.
+
+Regras da matriz de permissões:
+- as permissões poderão ser atribuídas diretamente ao usuário ou por setor/grupo;
+- para visualizar, editar, desativar e demais ações aplicáveis, deverá ser possível definir o escopo `próprios registros` ou `todos os registros permitidos no módulo`;
+- como padrão, usuários comuns atuarão apenas sobre os próprios registros;
+- não haverá exclusão definitiva pela interface operacional: registros serão desativados e manterão histórico, autor, data, motivo e responsável pela desativação;
+- os aprovadores serão selecionados nas configurações do módulo, categoria, documento ou fluxo aplicável;
+- o autor de um registro poderá aprová-lo quando também estiver explicitamente configurado como aprovador;
+- deverá existir delegação temporária de permissões e responsabilidades, com data inicial, data final, motivo, delegante, delegado e trilha de auditoria; a delegação deverá expirar automaticamente;
+- o Administrador da Qualidade poderá administrar configurações, processos e registros do SGQ, mas não poderá administrar usuários, contratos, cobrança ou configurações globais da empresa;
+- o Administrador da Empresa continuará responsável por usuários, setores, permissões, módulos ativos e configurações administrativas da empresa.
+
+cada empresa deverá ter setores, cada usuário deve ser vinculado a um setor ou a empresa de modo geral
 Módulos críticos devem permitir cadastro, edição, visualização, filtros, status, evidências e histórico.
 Planos de ação devem ser centralizados e vinculáveis a múltiplas origens.
 Documentos controlados são evidência preferencial para procedimentos, políticas, formulários e registros.
-Diagnóstico ISO deve ser automático no MVP por regras locais, com preparação para futura API de IA.
+Diagnóstico ISO deve ser automático no MVP por regras locais, com preparação para futura API de IA que será usada da openAI.
 
+O acesso às configurações de cada módulo deverá ser movido para as configurações gerais do sistema onde cada módulo terá um menu dedicado com suas configurações particulares, inicialmente essas configurações devem estar disponíveis apenas para o admin do sistema, o qual poderá gerenciar e liberar acesso à outro colaboradores, ativar ou desativar módulos que não serão usados.
 
-4. MÓDULOS EXISTENTES E REGRAS DE NEGÓCIO
------------------------------------------
+Módulos que forem desativados e que tenham impacto em outros módulos deverão sofrer softdelet, caso um módulo seja necessário para garantir informações para outro módulo o usuário deve ser avisado que o módulo dependente e seu nome está desativado e deve ser solicitada ativação ao administrador dó sistema.
+
+A dir
+
+## 4. MÓDULOS EXISTENTES E REGRAS DE NEGÓCIO
 
 4.1 Dashboard
 
 Arquivo protótipo: pages/dashboard.html
 
 Função:
-- tela inicial após login;
-- visão geral do SGQ;
-- atalhos para módulos;
-- indicadores rápidos;
-- maturidade ISO;
-- atividades recentes;
-- busca global.
+- tela inicial após login com dashboard completo, todas as informações precisam ser reais a partir do inicio da implantação, o modelo inicial está de acordo, apenas precisa ser migrado para dados reais;
+- visão geral do SGQ; manter
+- atalhos para módulos; manter
+- indicadores rápidos; manter
+- maturidade ISO; manter
+- atividades recentes; manter
+- busca global. manter
 
 Regras:
 - deve consolidar dados de documentos, NCs, ações, auditorias, riscos, indicadores e treinamentos;
@@ -80,6 +112,7 @@ Busca global:
 - tipos de resultado: Documento, Processo em execução, Iniciar processo, Módulo, Ação.
 - placeholder animado com sugestões como iniciar processo, buscar documento, buscar processo em execução e comece digitando código ou nome.
 
+Deve exibir o menu padrão na lateral do painel assim como ocorre no modelo atual
 
 4.2 Login e Cadastro
 
@@ -88,36 +121,66 @@ Arquivos:
 - pages/cadastro.html
 
 Função:
+
+Cadastro inicial de pessoa para facilitar acesso a ferramenta, visto que por vezes a empresa é indicada pelo próprio colaborador
 - autenticação;
 - cadastro de empresa;
 - coleta inicial de informações de certificação ISO.
 
 Regras:
-- bloquear ou alertar e-mails pessoais quando necessário;
+- bloquear e-mails pessoais para não perder vínculo a empresas
 - no backend real, autenticação deve ser segura;
-- cadastro deve criar empresa/tenant e usuário administrador;
+- cadastro deve criar empresa/tenant e usuário administrador, necessidade de criação de senha deve ser enviada ao e-mail do admin, prever esse e-mail em contrato necessidade de alteração deve ser comunicada
 - dados de setup inicial devem alimentar módulo Setup SGQ/Organização.
 
-#?# Definir se será exigido e-mail corporativo obrigatoriamente ou apenas recomendado.
+#?# Definir se será exigido e-mail corporativo obrigatoriamente ou apenas recomendado, vamos deixar como recomendado, acusar erro na primeira tentativa, na segunda, liberar
+
 #?# Definir modelo de assinatura, trial e ativação de conta.
 
+No teste grátis, o cliente poderá escolher entre o plano Essencial e o plano Profissional. O trial terá duração de 30 dias. Nesse período será possível executar o setup do sistema, fazer o tour, cadastrar setores, máquinas e pessoas e criar fluxos BPM, respeitando os limites funcionais do plano escolhido. O onboarding deverá informar claramente o plano selecionado, data de início, data de término e o que ocorrerá com os dados ao final do trial.
+
+Catálogo comercial oficial:
+- Essencial — assinatura direta, R$ 349/mês, até 5 usuários, 20 GB e 1 unidade. Inclui motor BPM, modelagem de fluxos e formulários, documentos, registros, NC/CAPA, planos de ação, riscos básicos, auditoria interna básica, indicadores básicos, fornecedores simples e checklist ISO 9001. Não inclui análises de IA (0 por mês).
+- Profissional — assinatura direta e plano principal/mais vendido, R$ 749/mês, até 15 usuários, 100 GB e 3 unidades. Inclui tudo do Essencial, calibração, treinamentos e competências, avaliação de fornecedores, reclamações, satisfação de clientes, indicadores avançados, workflows predefinidos, permissões por função, dashboards e 20 análises de IA por mês.
+- Gestão Integrada — venda consultiva, a partir de R$ 1.690/mês, até 40 usuários, 300 GB e 5 unidades. Inclui todos os módulos SGQ, BPM configurável, aprovações avançadas, trilha de auditoria robusta, API, importação assistida, relatórios gerenciais, matriz de riscos avançada, 40 análises de IA por mês, suporte prioritário e onboarding.
+- Industrial / Enterprise — venda consultiva, a partir de R$ 3.490/mês, com limites negociados. Inclui tudo do Gestão Integrada, inspeções e liberação, saídas não conformes produtivas, modo tablet/chão de fábrica, rastreabilidade por pedido/OP, integração ERP, multiunidade, SSO, 60 análises de IA por mês e suporte dedicado.
+
+Somente Essencial e Profissional terão preço público com contratação direta e poderão ser escolhidos no trial. Gestão Integrada e Industrial / Enterprise usarão a ação “Falar com consultor”. O motor BPM, o modelador de fluxos, os formulários e o versionamento estarão disponíveis em todos os planos por serem diferenciais centrais da ferramenta. Os planos superiores ampliam módulos integrados, governança, aprovações, relatórios, IA, suporte e integrações, sem retirar o BPM dos planos de entrada.
+
+Todos os planos poderão solicitar análises adicionais de IA. A solicitação deverá registrar empresa, plano, quantidade, finalidade, solicitante, data e status para tratamento comercial. Preço, pacote mínimo e validade das análises adicionais serão definidos na política comercial.
+
+O onboarding da empresa deverá acompanhar uma jornada persistente: setup da empresa, módulos e permissões, cadastros básicos, pessoas, documentos, revisão dos fluxos padrão, Organização e diagnóstico ISO. Cada tela operacional e administrativa deverá possuir ajuda contextual reabrível, com passos curtos, destaque visual dos elementos e registro local/servidor das etapas concluídas. A ajuda nunca deverá abrir automaticamente: ficará disponível em um botão flutuante inferior com o texto `Precisa de ajuda? Clique aqui` e somente será aberta por ação do usuário.
+
+O trial deverá pedir cadastro e dados iniciais da empresa. Também deverá ter aceite simplificado dos termos e condições, com registro da versão aceita, usuário, e-mail, data, hora e IP. O uso dos dados para marketing deverá possuir finalidade e fundamento próprios, sem ficar implicitamente misturado ao aceite necessário para uso do sistema.
+
+Modo pago vai ser conforme plano escolhido pelo usuário.
+
+Nos cadastros via cartão de crédito deverá ser mostrado um termo de aceite estilo contrato que deve ser assinado com 2fa antes do pagamento, isso será o contrato, para planos que seja necessário o contrato este será enviado a parte para assinatura e depois sua ativação.
+
+Em todos os casos os contratos devem ficar salvos nas configurações do sistema em meu contrato. Exibindo quem assinou / email data e hora
 
 4.3 Setup SGQ
 
 Arquivo protótipo: pages/setup-sgq.html
 
 Função:
-- diagnóstico inicial guiado da empresa;
-- cadastro de dados essenciais;
-- vínculo de evidências aos requisitos ISO;
-- identificação de lacunas.
+- implantação inicial guiada da empresa;
+- cadastro de dados essenciais da empresa;
+- cadastro de setores;
+- cadastro de usuários iniciais;
+- cadastro opcional de máquinas/recursos críticos;
+- definição dos módulos ativos;
+- definição de permissões por usuário, módulo e ação;
+- definição dos responsáveis por setor.
 
 Regras:
-- perguntas configuráveis por requisito ISO;
-- respostas podem apontar evidência/documento ou marcar lacuna;
-- deve gerar percentual estimado de atendimento;
-- deve manter histórico de diagnósticos;
-- deve alimentar diagnóstico ISO geral.
+- o setup não deve exigir documentos existentes;
+- diagnóstico ISO e validação de evidências ficam em Organização/Diagnóstico ISO;
+- o percentual do setup mede conclusão da implantação, não atendimento ISO;
+- BPM deve permanecer disponível em todos os planos;
+- máquinas podem ser cadastradas ou marcadas como não aplicáveis;
+- permissões devem registrar visualizar, criar, editar, apagar e aprovar;
+- responsáveis por setor devem alimentar pendências, notificações e fluxos.
 
 Requisitos abordados:
 - 4.3 escopo;
@@ -139,6 +202,7 @@ Requisitos abordados:
 - 10.2 NC e ação corretiva;
 - 10.3 melhoria.
 
+Parece ok será refinado na etapa de desenvolvimento
 
 4.4 Organização
 
@@ -153,10 +217,10 @@ Submódulos:
 - Partes interessadas.
 - Recursos, infraestrutura e ambiente.
 - Controle de mudanças.
-- Projeto e desenvolvimento como referência, com execução em módulo próprio.
+- Projeto e desenvolvimento como referência, com execução em módulo próprio. Movido para a tela inicial visto que poderá ser acessado por níveis mais baixos no processo
 - Análise crítica pela direção.
 - Análise consolidada de dados.
-- Diagnóstico ISO.
+- Diagnóstico ISO. Mover para o nível mais baixo também.
 
 Regras:
 - SWOT deve permitir cadastrar, editar e remover itens;
@@ -184,6 +248,7 @@ Requisitos ISO:
 
 #?# Liderança e responsabilidades foram marcadas como segundo momento. Definir se haverá matriz RACI, organograma ou responsáveis por requisito ISO.
 
+Organograma será carregado como documento neste momento, depois será analisado possibilidade de inserir no sistema, me lembre disso
 
 4.5 Controle de Documentos
 
@@ -201,18 +266,47 @@ Função:
 - cópias controladas.
 
 Regras:
-- documentos devem possuir código, título, categoria, versão, data, status, autor e anexos;
+- documentos devem possuir código, título, categoria, versão, data, status, autor e anexos no modelo original podendo ser editado o fluxo e os formulários dentro das categorias de documento;
 - categorias podem exigir aprovação, validade, campos adicionais e permissão;
 - documentos podem ter anexos em base64 no protótipo;
 - cópias controladas devem registrar emissão, destinatário e validade;
 - documentos controlados são evidência ISO.
 
+- as copias controladas devem ficar em destaque na guia de documentos ja emitidos, os documentos ja baixados devem ser mantidos com histórico
+
+- deve ser possível solicitar edição de documento, após aprovação do dono do documento, este deve ser liberado para download do solicitante
+
+- na barra superior do módulo, no mesmo nível da pesquisa, deverá existir o botão `Minhas pendências`, com contador;
+- a visão `Minhas pendências` deverá listar, independentemente da pasta, somente documentos pendentes ou em revisão cuja aprovação esteja atribuída ao usuário autenticado;
+- documentos já aprovados pelo usuário não deverão continuar em sua lista, mesmo quando ainda dependerem de outros aprovadores;
+- em fluxos sequenciais ou por alçada, a pendência somente aparecerá quando chegar a vez do usuário;
+- a lista deverá permitir abrir e revisar o documento antes da decisão, informar estado vazio e atualizar o contador após cada aprovação;
+- o backend deverá aplicar a mesma regra de atribuição e permissão; filtrar apenas no frontend não autoriza a aprovação.
+
 Requisito ISO:
 - 7.5 informação documentada.
 
 #?# Definir política de armazenamento real de arquivos: banco, filesystem, S3/compatível ou outro.
+
+Considerando um volume alto de arquivos qual seria a melhor estratégia?
+
 #?# Definir assinatura digital/eletrônica e requisitos legais.
 
+Uma assinatura 2fa, considerando e-mail e sistema, pode ser considerado legal? E-mail enviado para e-mail empresarial terá código que deve ser informado na plataforma, documento terá link e código para verificação dentro do sistema, verificação mostrará data hora e responsável pela assinatura e possibilidade de download digital do arquivo
+
+buscar garantir:
+
+**Autoria:** quem assinou.
+
+Exemplo: usuário autenticado, e-mail corporativo, código 2FA, matrícula/cargo/setor.
+
+**Integridade:** que o documento não foi alterado após a assinatura.
+
+Exemplo: hash do arquivo assinado, versão, código único, bloqueio de edição após assinatura.
+
+**Rastreabilidade:** quando, como e em qual contexto assinou.
+
+Exemplo: data/hora, IP, navegador/dispositivo, usuário, ação realizada, versão do documento, histórico de eventos.
 
 4.6 BPM / Processos e Formulários
 
@@ -238,8 +332,18 @@ Regras:
 - fluxo possui etapas, responsáveis, setores, usuários, formulários, ordem e condicional;
 - formulário possui blocos e campos;
 - instância registra respostas por etapa;
+- cada publicação de um fluxo gera uma versão imutável;
+- a instância deve armazenar o identificador da versão do fluxo usada no momento em que foi iniciada;
+- instâncias em andamento continuam na versão original, enquanto somente novas instâncias usam a versão publicada posteriormente;
+- o onboarding do BPM deve explicar versionamento, publicação, revisão, clonagem e impacto das mudanças;
+- o modelador de formulários deve possuir os campos `Anexo` e `Anexos Grandes`;
+- `Anexo` terá limite padrão de 5 MB, configurável por formulário;
+- `Anexos Grandes` terá limite padrão de 100 MB, configurável até o máximo de 1 GB;
+- o backend deverá validar tamanho, tipo permitido e segurança do arquivo. Arquivos grandes deverão usar upload em partes ou streaming, sem carregar o arquivo inteiro na memória da aplicação;
 - processos ativos devem aparecer na busca global como Processo em execução e Iniciar processo;
 - clientes podem modelar processos customizados para análise crítica de pedido, propriedade do cliente, preservação e outros requisitos específicos.
+
+Exibir os documentos do processo com datas de postagem e revisão dentro de uma guia única com links dentro das abas de execução do processo.
 
 Requisitos ISO:
 - 4.4 processos;
@@ -248,10 +352,27 @@ Requisitos ISO:
 
 #?# Definir até que ponto BPM será motor central de workflow no backend ou apenas módulo independente.
 
+O bpm será o motor central, todos os módulos que tiverem processos envolvidos devem ser feitos com base em fluxos, podendo estes serem ajustados. A ideia é deixar o sistema dinâmico para que seja possível atender as necessidades de qualquer negócio deixando livre a customizacao.
+
+Cada módulo baseado em processo deverá possuir um fluxo padrão funcional e versionado. A empresa poderá customizar uma nova versão desse fluxo sem alterar as instâncias já iniciadas.
+
+Será necessário refazer uma validação para garantir que todos os processos ocorrem de forma simplificada para criação e edição de fluxos, ao testar ele é possível identificar gargalos na criação de fluxos, como por exemplo, como posso fazer uma revisão de processo ser iniciar um novo? Será necessário fazer todo o caminho novamente?
+
+É possível usar a ia para modelar um novo fluxo e seus formulários com base em descrição e apenas ajustar depois? Ver o custo em tokens disso e cobrar como diferencial estratégico.
 
 4.7 Processo Produtivo
 
 Arquivo protótipo: pages/producao.html
+
+As informações do processo produtivo devem seguir a seguinte ideia que deve funcionar usando um importador ou conexão via api
+
+Cadastro de clientes
+
+Cadastro de pedido
+
+Cadastro de ordem de produção
+
+No cadastro de ordem de produção deve ser definido se haverá inspeção, se houver inspeção, ao ser produzido deverá iniciar um processo de inspeção e liberação se tiver não conforme deverá ir para produtos não conforme. Todas essas informações apontadas devem gerar os indicadores do processo produtivo. Considerando quantidade a ser inspecionada em quantidade ou porcentagem, isso deve ser cadastrado no tipo de produto nas configurações que deve ter a frequência de inspeção e a quantidade. Se será durante o processo ou ao final do processo.
 
 Função:
 - ordens de produção;
@@ -272,6 +393,7 @@ Requisitos ISO:
 
 #?# Definir se processo produtivo será genérico para serviços também ou focado em indústria.
 
+O módulo deve estar disponível, caso não seja utilizado deverá ser desativado pelo administrador
 
 4.8 Inspeções e Liberação
 
@@ -294,7 +416,6 @@ Requisitos ISO:
 - 8.5 controle de produção/serviço;
 - 8.6 liberação;
 - 8.7 saídas não conformes.
-
 
 4.9 Não Conformidades, Planos de Ação e Melhorias
 
@@ -320,7 +441,6 @@ Requisitos ISO:
 
 #?# Definir se planos de ação terão tarefas independentes com responsáveis diferentes e notificações.
 
-
 4.10 Calibração de Equipamentos
 
 Arquivo protótipo: pages/calibracao.html
@@ -332,6 +452,8 @@ Função:
 - vencimentos.
 
 Regras:
+
+Deve ser possível importar Excel para agilizar cadastros
 - instrumento deve ter identificação, categoria, validade, status, certificado e histórico;
 - vencidos/vencendo devem gerar alerta;
 - desativação deve registrar motivo;
@@ -339,7 +461,6 @@ Regras:
 
 Requisito ISO:
 - 7.1.5 recursos de monitoramento e medição.
-
 
 4.11 Avaliação de Fornecedores
 
@@ -357,9 +478,14 @@ Regras:
 - classificação do fornecedor deve refletir desempenho;
 - fornecedores externos são parte interessada e provedor externo.
 
+Configuração para definir as pontuações de acordo com normas e procedimentos
+
+Deverá ser criado uma página similar a de pesquisa de satisfação de clientes porém como questionários de avaliação de fornecedores, fazendo perguntas estratégicas baseada em iso 9001 para verificar se o sistema de Gestão está adequado. Faça as perguntas genéricas baseada em iso que possam ser editadas nas configurações deste módulo
+
+O questionário padrão deve avaliar qualidade/especificações, documentos e certificados, prazo e quantidade, rastreabilidade, requisitos legais e contratuais, comunicação de mudanças, tratamento de não conformidades e atendimento. Perguntas e pesos serão configuráveis, deverão totalizar 100% e cada avaliação manterá uma cópia do modelo utilizado.
+
 Requisito ISO:
 - 8.4 controle de processos, produtos e serviços providos externamente.
-
 
 4.12 Pessoas e Treinamentos
 
@@ -373,6 +499,8 @@ Função:
 - relatório do colaborador.
 
 Regras:
+
+Deve ser possível importar Excel para cadastros rápidos
 - cargo/função define competências e treinamentos requeridos;
 - colaborador deve ter trilha de treinamentos;
 - registros de treinamento evidenciam competência e comunicação da política da qualidade;
@@ -381,7 +509,6 @@ Regras:
 Requisitos ISO:
 - 7.2 competência;
 - 7.3 conscientização.
-
 
 4.13 Satisfação e Reclamações
 
@@ -399,10 +526,13 @@ Regras:
 - clientes são parte interessada;
 - pós-entrega será tratado por satisfação/reclamações e RNC quando aplicável.
 
+Deve ser criado uma página sem vínculo com o sistema e necessidade de login, essa página será enviada para clientes após o pedido finalizado sendo uma pesquisa rápida e prática que será usada para avaliar a satisfação do cliente, colocando um tempo limite para ser respondido e depoia tirado do ar, aproveitar para fazer marketing para o sistema. Faça as perguntas padrão com base no mercado e deixe disponível para revisão nas configurações do sistema
+
+O modelo padrão deve combinar NPS, qualidade percebida, atendimento aos requisitos, cumprimento de prazo, atendimento/comunicação, intenção de nova compra e comentário livre. As perguntas são configuráveis e cada pesquisa enviada deve guardar uma cópia do modelo usado para preservar o histórico.
+
 Requisitos ISO:
 - 8.2.1 comunicação com cliente;
 - 9.1.2 satisfação do cliente.
-
 
 4.14 Auditorias Internas
 
@@ -422,7 +552,6 @@ Regras:
 
 Requisito ISO:
 - 9.2 auditoria interna.
-
 
 4.15 Indicadores e KPIs
 
@@ -444,7 +573,6 @@ Requisitos ISO:
 - 6.2 objetivos da qualidade;
 - 9.1 monitoramento, medição, análise e avaliação.
 
-
 4.16 Gestão de Riscos
 
 Arquivo protótipo: pages/riscos.html
@@ -464,7 +592,6 @@ Regras:
 
 Requisito ISO:
 - 6.1 ações para abordar riscos e oportunidades.
-
 
 4.17 Projeto e Desenvolvimento
 
@@ -488,11 +615,10 @@ Regras:
 - cada etapa possui status, responsável, data, evidência, observações e aprovador;
 - progresso é calculado por etapas concluídas;
 - mudanças de projeto devem abrir ou vincular controle de mudanças;
-- processo padrão deve funcionar sem BPM, mas pode ser customizado no BPM.
+- processo padrão deve ser entregue pré-configurado no motor BPM e pode ser customizado conforme as permissões do plano e do usuário.
 
 Requisito ISO:
 - 8.3 projeto e desenvolvimento de produtos e serviços.
-
 
 4.18 Cadastros Gerais
 
@@ -513,7 +639,6 @@ Regras:
 - tipos de defeito alimentam inspeções e NC;
 - setores alimentam permissões, responsáveis e BPM.
 
-
 4.19 Blog e Blog Admin
 
 Arquivos:
@@ -526,11 +651,28 @@ Função:
 - artigos sobre ISO 9001 e gestão da qualidade;
 - administração de posts, categorias, mídias, comentários e anúncios.
 
-#?# Definir se blog fará parte do produto final com backend próprio ou se será separado em CMS/marketing.
+#?# Definir se blog fará parte do produto final com backend próprio ou se será separado em CMS/marketing. O blog fará parte do mesmo backend, mas será um módulo independente como os demais, com tabelas próprias para posts, categorias, mídias, comentários e demais dados. Verificar a possibilidade de usar IA via API no editor para auxiliar na elaboração de postagens.
 
+## 4.20 Privacidade e LGPD
 
-5. DIAGNÓSTICO ISO
-------------------
+O sistema deverá ser preparado desde o primeiro MVP para atender solicitações relacionadas a dados pessoais e manter rastreabilidade do tratamento.
+
+Requisitos técnicos iniciais:
+- inventário dos dados pessoais tratados por módulo, finalidade, base legal, origem, compartilhamentos e prazo de retenção;
+- política de privacidade e termos versionados, com histórico de aceite quando aplicável;
+- canal para solicitações do titular e fluxo para confirmação de identidade, consulta, correção, exportação, anonimização ou exclusão quando juridicamente aplicável;
+- definição contratual dos papéis de controlador, operador e suboperadores;
+- minimização de dados e restrição de acesso por empresa, módulo e ação;
+- criptografia em trânsito, proteção de credenciais e dados sensíveis, backups protegidos e registros de acesso;
+- política de retenção e descarte por categoria de dado e documento;
+- registro e tratamento de incidentes de segurança;
+- dados enviados futuramente à IA devem possuir política específica, com configuração por empresa, minimização, registro do envio e bloqueio de envio quando não autorizado;
+- ambientes de desenvolvimento e teste não devem usar dados pessoais reais sem anonimização;
+- logs de auditoria devem evitar armazenar senhas, tokens, códigos 2FA ou conteúdo pessoal desnecessário.
+
+A definição das bases legais, prazos de retenção e situações em que exclusão ou anonimização são permitidas deverá ser validada juridicamente antes da implantação oficial.
+
+## 5. DIAGNÓSTICO ISO
 
 O diagnóstico ISO deve ser automático no MVP e futuramente usar API de IA.
 
@@ -552,9 +694,7 @@ Futuro com IA:
 
 #?# Definir provedor de IA futuro e política de privacidade para envio de documentos/evidências.
 
-
-6. BUSCA GLOBAL
----------------
+## 6. BUSCA GLOBAL
 
 Arquivo:
 - assets/js/global-search.js
@@ -579,9 +719,7 @@ Regras:
 - Enter abre o primeiro resultado;
 - Escape fecha o dropdown.
 
-
-7. MODELAGEM DE DADOS INICIAL SUGERIDA
---------------------------------------
+## 7. MODELAGEM DE DADOS INICIAL SUGERIDA
 
 Entidades base:
 - empresas;
@@ -629,9 +767,7 @@ Entidades base:
 - projetos_desenvolvimento;
 - etapas_projeto_desenvolvimento.
 
-
-8. PRINCIPAIS INTEGRAÇÕES ENTRE MÓDULOS
----------------------------------------
+## 8. PRINCIPAIS INTEGRAÇÕES ENTRE MÓDULOS
 
 - Reclamação de cliente pode gerar NC ou plano de ação.
 - Auditoria pode gerar NC ou plano de ação.
@@ -639,36 +775,34 @@ Entidades base:
 - Mudança pode exigir avaliação de risco e plano de ação.
 - SWOT pode gerar risco, melhoria ou plano de ação.
 - Diagnóstico ISO pode gerar plano de ação.
-- Indicadores alimentam análise de dados e análise crítica.
+- Indicadores alimentam análise de dados e análise crítica e geram ações.
 - Treinamentos evidenciam competência e comunicação da política.
 - Documentos controlados evidenciam procedimentos, políticas e registros.
 - BPM executa processos customizados de clientes.
-- Projeto e Desenvolvimento pode acionar controle de mudanças.
+- Projeto e Desenvolvimento pode acionar controle de mudanças, gera planos de ação para realização do produto.
 
+## 9. DÚVIDAS PARA VALIDAÇÃO
 
-9. DÚVIDAS PARA VALIDAÇÃO
--------------------------
+#?# Qual stack oficial será usada no backend? Python fast api
+#?# Qual banco de dados será usado? Postgreesql
+#?# Haverá multiempresa desde o primeiro MVP? Sim
+#?# Quais perfis de usuário existirão inicialmente? Admin Master, administrador da empresa, administrador da qualidade e usuários da empresa. As permissões dos usuários serão definidas por módulo e ação nas configurações do sistema.
+#?# O sistema terá assinatura/planos/trial no MVP backend? Sim. O teste grátis permitirá escolher Essencial ou Profissional e terá duração de 30 dias.
+#?# O blog fará parte do mesmo backend? Sim, como módulo independente e com tabelas próprias.
+#?# Os arquivos serão armazenados onde? Dentro de pastas na vps para período de validação
+#?# Haverá assinatura eletrônica/digital em documentos? Sim usando 2fa
+#?# Notificações serão por e-mail, WhatsApp, interno ou todos? Por sistema e por e-mail conforme definido nas configurações de cada módulo e na modelagem de fluxos para cada usuário
+#?# Planos de ação terão tarefas independentes por responsável? Sim
+#?# BPM será motor central de workflow para todos os módulos ou apenas customização? Será o motor obrigatório dos módulos que funcionem como processo. Cada módulo terá fluxo padrão customizável e versionado.
+#?# Como será feita a integração futura com IA e quais dados poderão ser enviados? Ver resposta no tópico
+#?# Quais requisitos de LGPD devem ser considerados desde o início? Aplicar o escopo técnico inicial da seção 4.20 e validar juridicamente bases legais, retenção, contratos e atendimento aos titulares antes da implantação oficial.
+#?# O sistema será focado em indústria ou também serviços de forma equivalente? Indústria e serviços todos que busquem digitalização de processos baseado em iso9001
 
-#?# Qual stack oficial será usada no backend?
-#?# Qual banco de dados será usado?
-#?# Haverá multiempresa desde o primeiro MVP?
-#?# Quais perfis de usuário existirão inicialmente?
-#?# O sistema terá assinatura/planos/trial no MVP backend?
-#?# O blog fará parte do mesmo backend?
-#?# Os arquivos serão armazenados onde?
-#?# Haverá assinatura eletrônica/digital em documentos?
-#?# Notificações serão por e-mail, WhatsApp, interno ou todos?
-#?# Planos de ação terão tarefas independentes por responsável?
-#?# BPM será motor central de workflow para todos os módulos ou apenas customização?
-#?# Como será feita a integração futura com IA e quais dados poderão ser enviados?
-#?# Quais requisitos de LGPD devem ser considerados desde o início?
-#?# O sistema será focado em indústria ou também serviços de forma equivalente?
-
-
-10. INSTRUÇÃO PARA DESENVOLVIMENTO
-----------------------------------
+## 10. INSTRUÇÃO PARA DESENVOLVIMENTO
 
 Ao desenvolver o sistema real:
+
+- usar `guia-casos-de-uso-e-validacao-sgqonline.md` como referência obrigatória para critérios de aceite, testes funcionais, segurança, multi-tenant e usabilidade;
 
 - manter simplicidade;
 - mapear localStorage para entidades reais;
@@ -678,3 +812,4 @@ Ao desenvolver o sistema real:
 - quando houver dúvida, parar e perguntar usando o marcador #?#;
 - evitar criar módulos apenas demonstrativos;
 - todo requisito ISO coberto deve gerar registro, evidência ou vínculo rastreável.
+- Criar com base em tdd para garantir segurança e usabilidade

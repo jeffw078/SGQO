@@ -17,7 +17,7 @@
         </div>
 
         <div class="cadastro-header">
-            <h2>Comece grátis por 15 dias</h2>
+            <h2>Comece grátis por 30 dias</h2>
             <p>Sem cartão de crédito. Cancele quando quiser.</p>
         </div>
 
@@ -183,10 +183,20 @@
                         <option>Outro</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label>Plano para o teste grátis <span>*</span></label>
+                    <select id="trial-plano">
+                        <option value="">Selecione...</option>
+                        <option value="Essencial">Essencial</option>
+                        <option value="Profissional">Profissional</option>
+                    </select>
+                    <small id="trial-plan-summary">Você poderá testar os recursos do plano escolhido durante 30 dias.</small>
+                    <div class="error-msg">Selecione o plano do teste</div>
+                </div>
 
                 <div style="background:rgba(15,117,189,.06);border:1.5px solid rgba(15,117,189,.15);border-radius:var(--radius-md);padding:16px 18px;margin-bottom:20px;font-size:.84rem;color:var(--text-secondary);">
                     <i class="fas fa-shield-halved" style="color:var(--primary);margin-right:6px;"></i>
-                    Ao criar sua conta você concorda com os <a href="javascript:void(0)" style="color:var(--primary)">Termos de Uso</a> e a <a href="javascript:void(0)" style="color:var(--primary)">Polática de Privacidade</a>.
+                    Ao criar sua conta você concorda com os <a href="javascript:void(0)" style="color:var(--primary)">Termos de Uso</a> e a <a href="javascript:void(0)" style="color:var(--primary)">Política de Privacidade</a>.
                 </div>
 
                 <div class="cadastro-nav">
@@ -202,7 +212,7 @@
         </form>
 
         <div class="cadastro-trial-badge">
-            <strong>15 dias grátis</strong> - Sem cartão de crédito - Cancele quando quiser
+            <strong>30 dias grátis</strong> — escolha Essencial ou Profissional — sem cartão de crédito
         </div>
         <div style="text-align:center;margin-top:18px;font-size:.85rem;color:var(--text-light)">
             Já tem conta? <a href="login.html" style="color:var(--primary);font-weight:600">Entrar</a>
@@ -211,6 +221,10 @@
 </div>
 
 <script>
+    const DIRECT_PLANS = {
+        Essencial: {price:'R$ 349/mês', limits:'até 5 usuários, 20 GB e 1 unidade'},
+        Profissional: {price:'R$ 749/mês', limits:'até 15 usuários, 100 GB e 3 unidades'}
+    };
     const BLOCKED_DOMAINS = [
         'gmail','googlemail','yahoo','ymail','hotmail','outlook','live','msn',
         'icloud','me','mac','aol','uol','bol','terra','ig','globo','r7',
@@ -230,6 +244,19 @@
         const input = document.getElementById(id);
         if (input) input.classList.toggle('error', show);
     }
+
+    function updateTrialPlanSummary() {
+        const name = document.getElementById('trial-plano').value;
+        const plan = DIRECT_PLANS[name];
+        document.getElementById('trial-plan-summary').textContent = plan
+            ? `${name}: ${plan.price}, ${plan.limits}. O teste grátis dura 30 dias.`
+            : 'Você poderá testar os recursos do plano escolhido durante 30 dias.';
+    }
+
+    const requestedPlan = new URLSearchParams(location.search).get('plano');
+    if (DIRECT_PLANS[requestedPlan]) document.getElementById('trial-plano').value = requestedPlan;
+    document.getElementById('trial-plano').addEventListener('change', updateTrialPlanSummary);
+    updateTrialPlanSummary();
 
     function validateStep(n) {
         let ok = true;
@@ -258,6 +285,8 @@
         if (n === 3) {
             const cert = document.getElementById('certificacao').value;
             if (!cert) { showErr('certificacao', true); ok = false; } else showErr('certificacao', false);
+            const plano = document.getElementById('trial-plano').value;
+            if (!plano) { showErr('trial-plano', true); ok = false; } else showErr('trial-plano', false);
         }
         return ok;
     }
@@ -290,7 +319,11 @@
             empresa_id: document.getElementById('empresa').value.trim().toLowerCase().replace(/\s+/g, '_') || 'empresa_demo',
             dataCadastro: new Date().toISOString()
         };
+        setupEmpresa.trialPlano = document.getElementById('trial-plano').value;
+        setupEmpresa.trialInicio = new Date().toISOString();
+        setupEmpresa.trialFim = new Date(Date.now() + 30 * 86400000).toISOString();
         localStorage.setItem('sgq_company_setup', JSON.stringify(setupEmpresa));
+        localStorage.setItem('sgq_onboarding_state', JSON.stringify({visited:{'cadastro.html':true},pageTours:{},companyDone:false,startedAt:new Date().toISOString()}));
         // Show success state
         const card = document.querySelector('.cadastro-card');
         card.innerHTML = `
@@ -299,7 +332,7 @@
                     <i class="fas fa-check"></i>
                 </div>
                 <h2 style="color:var(--dark);margin-bottom:10px">Conta criada com sucesso!</h2>
-                <p style="max-width:420px;margin:0 auto 28px">Seu período de teste de 15 dias começou agora. O próximo passo é completar o setup da empresa e o diagnóstico inicial do SGQ.</p>
+                <p style="max-width:420px;margin:0 auto 28px">Seu período de teste de 30 dias começou agora. O próximo passo é completar o setup guiado da empresa: setores, usuários, módulos, permissões e responsáveis.</p>
                 <a href="setup-sgq.html" class="btn btn-primary btn-lg" style="justify-content:center">
                     <i class="fas fa-gears"></i> Abrir setup da empresa
                 </a>
